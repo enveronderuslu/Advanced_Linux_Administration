@@ -2,15 +2,39 @@ echo -e icerdeki özel karakterleri algila
 yorum satirlari: # ile baslar
 Bash script te cift tirnak kullan
 multiline comment icin 
+**********************************************
+USER ACCOUNT MANAGEMENT
+" su - " superuser yapar 
+useradd
+groupadd
+userdel supi home directory silinmez
+userdel -r supi home directory silinir
+usermod -G heros supiderman (diger gruplardan cikarir. kendi ismine ait grup elbette korumur)
+usermod -aG heros supiderman (diger gruplarda kalmaya devam eder)
+visudo /etc/sudoers
+w veya users makineyi o an kullanan kullanicilari verir
+****************************************************************
+SPEAK WITH USERS; WALL; write
+wall yaz sonra makine kapatiliyor de sonra ctrl + d
 
-: <<'COMMENT'
-echo bu arad 
-echo yazilanlari
-echo okumaz
-echo multiline comment
-COMMENT
-
-variables bir nevi container
-isim=Enver esittir ile deger arasinda bosluk olmayacak
-
-readonly variable=is_always_fix_u_cant_change
+write ansible _| ansible kullanicisi kapat oturumu 
+******************************************************************************
+PASSWORD AGING
+chage -m mindays -M maxdays -d lastday
+/etc/login.defs icinde ayarlamalari yapar (password aging controls kisminda)
+*******************************************************************************
+LINUX ACCOUNT AUTHENTICATION
+Sirkete gelen birini binlerce server a nasil tanitacaksin. 
+Types of ACCOUNTs
+   Local ACCOUNTs
+   Domain/Directory accounts
+Windows -> Active directory
+LDAP is only protocol used for Win or LINUX
+LINUX=IDM Rhel product Identity manager
+WinBIND (Samba) : dadurch können die AD benutzer in die Linux Maschienen loggen werden
+OpenLDAP (open source) simply download install
+IBM Directory Server 
+*********************************************************************************
+SYSTEM UTILITY COMMANDS
+date  uptime(1, 5, 15 dakikalarda cpu kullanimi)   
+hostname   uname   ehich  cal   bc
