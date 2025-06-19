@@ -1,4 +1,3 @@
-echo man benutzt es um outputs auf display zu schreiben
 echo -e icerdeki özel karakterleri algila
 yorum satirlari: # ile baslar
 Bash script te cift tirnak kullan
@@ -11,7 +10,7 @@ echo okumaz
 echo multiline comment
 COMMENT
 
-varianles bir nevi container
+variables bir nevi container
 isim=Enver esittir ile deger arasinda bosluk olmayacak
 
-readonly varuable=is_always_fix_u_cant_change
+readonly variable=is_always_fix_u_cant_change
