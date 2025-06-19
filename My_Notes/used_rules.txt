@@ -38,3 +38,4 @@ IBM Directory Server
 SYSTEM UTILITY COMMANDS
 date  uptime(1, 5, 15 dakikalarda cpu kullanimi)   
 hostname   uname   ehich  cal   bc
+denem
