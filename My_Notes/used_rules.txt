@@ -59,3 +59,81 @@ mesela nice -n 5 en öncelikli 5 process (degerler -20 ile 19 arasindadir
 )bg sleep 100 (normalde 100 saniye beklersin)
 *************************************************************
 SYSTEM MONITORING
+top 
+| Kolon     | Açılım (İngilizce)   | Açıklama (Türkçe)                                   |
+| --------- | -------------------- | --------------------------------------------------- |
+| `PID`     | Process ID           | İşlem kimliği                                       |
+| `USER`    | User                 | İşlemi başlatan kullanıcı                           |
+| `PR`      | Priority             | İşlem önceliği                                      |
+| `NI`      | Nice value           | Nice değeri – işlem önceliğini belirleyen değer     |
+| `VIRT`    | Virtual Memory       | Sanal bellek kullanımı (MB/KB)                      |
+| `RES`     | Resident Memory      | Fiziksel RAM kullanımı                              |
+| `SHR`     | Shared Memory        | Paylaşılan bellek miktarı                           |
+| `S`       | State                | İşlem durumu (S: uyku, R: çalışıyor, Z: zombie vs.) |
+| `%CPU`    | CPU Usage Percent    | İşlemin CPU kullanım yüzdesi                        |
+| `%MEM`    | Memory Usage Percent | İşlemin RAM kullanım yüzdesi                        |
+| `TIME+`   | CPU Time (total)     | İşlemin toplam CPU süresi (saniye+salise)           |
+
+
+df -h disk usage
+
+dmesg hardware ile ilgili hersey burada
+| Section                | Description                                                               |
+| ---------------------- | ------------------------------------------------------------------------- |
+| **Boot**               | Messages related to system initialization (BIOS, ACPI, EFI).              |
+| **CPU and Memory**     | Information about processors, cores, and memory mapping.                  |
+| **Disks and I/O**      | Detection and status of storage devices (e.g., `sda`, `nvme`, `usb`).     |
+| **Network Interfaces** | Initialization of network devices (e.g., `eth0`, `wlan0`, `enpXsY`).      |
+| **USB Devices**        | Connection/disconnection messages for USB peripherals.                    |
+| **Driver Errors**      | Kernel messages indicating driver or hardware failures (`error`, `fail`). |
+| **Kernel Warnings**    | Serious issues or crashes (`WARNING`, `BUG`, `panic`, `call trace`).      |
+| **Module Loading**     | Messages about kernel modules being loaded (`modprobe`, `insmod`).        |
+| **Timestamps**         | Elapsed time since boot, shown as `[ XX.XXXXXX ]` in each line.           |
+
+pratik filtreleme 
+dmesg | grep -i error       # Hata mesajlarını bulur
+dmesg | grep usb            # USB ile ilgili mesajları listeler
+dmesg | grep -i fail        # Başarısızlıklarla ilgili satırlar
+dmesg | grep eth            # Ethernet veya ağ arayüzü sorunları
+
+
+netstat -tunp
+
+| Alan                 | Açıklama                                                                               |
+| -------------------- | -------------------------------------------------------------------------------------- |
+| **Proto**            | Protokol türü: TCP, UDP, RAW gibi.                                                     |
+| **Recv-Q / Send-Q**  | Alınan ve gönderilen veri kuyrukları. Genelde sıfır olur, değilse tıkanıklık olabilir. |
+| **Local Address**    | Yerel IP adresi ve portu. Hangi portun hangi IP'de dinlendiğini gösterir.              |
+| **Foreign Address**  | Bağlı olan uzak IP ve port. Hangi istemcinin bağlı olduğunu gösterir.                  |
+| **State**            | Bağlantı durumu: `LISTEN`, `ESTABLISHED`, `TIME_WAIT`, `CLOSE_WAIT`, vs.               |
+| **PID/Program name** | (Bazı sürümlerde) Bağlantıyı kullanan işlem adı ve PID.                                |
+******************DIKKAT******************
+| Durum                     | Ne Anlama Gelir?                                                     |
+| ------------------------- | -------------------------------------------------------------------- |
+| **LISTEN**                | Port dinlemede, gelen bağlantıları kabul etmeye hazır.               |
+| **ESTABLISHED**           | Aktif bir bağlantı var.                                              |
+| **CLOSE\_WAIT**           | Karşı taraf kapattı ama sizin taraf hala kapatmadı — sorun olabilir. |
+| **TIME\_WAIT**            | Bağlantı kapatıldı ama bir süre daha beklemede kalıyor (normaldir).  |
+| **SYN\_SENT / SYN\_RECV** | TCP bağlantısı kurulmaya çalışılıyor. Aşırıysa ağ sorunu olabilir.   |
+
+cat proc/cpuinfo
+************************************************************
+LOG MONITORING 
+Log directory /var/log 
+boot reboots issues 
+chronyd=NTP 
+cron
+maillog
+secure   all login logout activities
+tail -f secure dinamik olarrak log penceresi acik kalir 
+messages important to monitor system  activities
+httpd apache application log 
+************************************************************
+SYSTEM MAINTANCE COMMANDS 
+shutdown now tamamen kapatir 
+systemctl kalt durdurur daha modern
+*************************************************
+Chamging system HOSTNAME
+Ssy hostname is the name of the linux machine 
+/etc/hostname dosyasini modifiye edip reboot et veya
+hostnamectl set-hostname yeniname 
