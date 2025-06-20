@@ -37,5 +37,25 @@ IBM Directory Server
 *********************************************************************************
 SYSTEM UTILITY COMMANDS
 date  uptime(1, 5, 15 dakikalarda cpu kullanimi)   
-hostname   uname   ehich  cal   bc
-denem deneme
+hostname   uname   ehich  
+cal 11 1976
+bc calculator
+********************************************
+PROCESSES & JOBS
+
+Application=Service
+Script list of instructions
+Process when you start a service(app) it starts a Process and process id
+Daemon etwas continuously runs in background doesnt stops. it is also a process
+Threads Service-->Process-->Thread1, thread2, ...
+Job (workorder) Run a service or process at a  schedule time
+top -u user1  user1 ne kullaniyor sadece bunu gösterir
+kill [OPTION] PID manages the processes 
+crontab - e = Edit the crontab table
+crontab -l list the crontab entries -r remove
+/etc/cron* kisminda saatlik aylik yillik seklinde ayri dosyalara var
+nice process priority
+mesela nice -n 5 en öncelikli 5 process (degerler -20 ile 19 arasindadir
+)bg sleep 100 (normalde 100 saniye beklersin)
+*************************************************************
+SYSTEM MONITORING
