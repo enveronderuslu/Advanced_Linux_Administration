@@ -137,3 +137,25 @@ Chamging system HOSTNAME
 Ssy hostname is the name of the linux machine 
 /etc/hostname dosyasini modifiye edip reboot et veya
 hostnamectl set-hostname yeniname 
+script deneme.txt bunu calistirdiktan sonra terminalde ne olusursa hepini bu 
+file icine yazar. exit yazinca is tamamlanir 
+**********************************************
+RECOVER ROOT PASSWORD
+edit grub detayi cok fazla sifreni unutma aq
+
+sos report komutu  rhel ve rocky linux sistemlerde;
+Sistem hakkında ayrıntılı teşhis bilgileri toplar:
+Donanım bilgileri
+Ağ ayarları
+Servis durumları
+Log dosyaları
+Yüklü paketler
+Çekirdek bilgileri vs. 
+***********************************
+env enviroment varianbles tamamini verir
+"echo $PATH" tüm yukarida verilenlerden bi tanesi
+
+
+
+
+
