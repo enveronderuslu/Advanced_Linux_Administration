@@ -177,4 +177,8 @@ A Shell script os a executable file containing
 commands that runs sequentially
 The first line is always " #!/bin/bash "
 For  comments use #
+*****************************************
+/////////////////////////////////////////
+*****************************************
+NERWORKING; SERVICES AND SYSTEM UPDATES
 

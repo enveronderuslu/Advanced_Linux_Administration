@@ -1,0 +1,33 @@
+#!/bin/bash
+# Aothor: Enver Önder USLU
+# Date: 21.06.2025
+# Description: This script demonstrates use of while loop in bash.
+echo "Geben Sie eine Zahl ein"
+read nummer
+
+echo "hacked in $nummer seconds"
+
+count=1
+
+while [ $count -le $nummer ]
+do
+  echo " $count"
+  sleep 1
+  ((count++))
+done
+
+echo "Möchtest du fortfahren? (ja/nein)"
+read antwort
+
+case "$antwort" in
+  ja | JA | Ja)
+    echo "Fortfahren..."
+    ;;
+  nein | NEIN | Nein)
+    echo "Abbruch."
+    ;;
+  *)
+    echo "Ungültige Eingabe."
+    ;;
+esac
+#reboot
