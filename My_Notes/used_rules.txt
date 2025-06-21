@@ -154,8 +154,26 @@ Yüklü paketler
 ***********************************
 env enviroment varianbles tamamini verir
 "echo $PATH" tüm yukarida verilenlerden bi tanesi
-
-
-
+***********************************
+SPECIAL PERMISSIONS
+| Bit      | Kullanım Yeri | Etkisi                                                                  | İlgili Komut       | `ls -l` Göstergesi |
+| -------- | ------------- | ----------------------------------------------------------------------- | ------------------ | ------------------ |
+| `setuid` | **Dosya**     | Dosya, **sahibinin yetkileriyle çalışır**                               | `chmod u+s dosya`  | `rws` (x yerine s) |
+| `setgid` | **Dosya**     | Dosya, **grup sahibinin yetkisiyle çalışır**                            | `chmod g+s dosya`  | `rwxr-s`           |
+| `setgid` | **Klasör**    | Klasöre eklenen dosyalar **aynı grup** ile oluşturulur                  | `chmod g+s klasör` | `rwxr-s`           |
+| `sticky` | **Klasör**    | Klasördeki dosyalar, **sadece sahibi veya root tarafından silinebilir** | `chmod +t klasör`  | `rwxrwxrwt`        |
+ ortak calisma gruplarinda kullanilir. Gruba bisey ekleyince
+ artik o gruptaki herkese ait olur.
+***************************************
+tmux (Terminal Multplex Command)
+terminal ekranini birkac bölmeye ayirir
+****************************************
+LINUX KERNEL
+It is the interface between hardware and software
+hardware Kernel Shell Application User
+*********************************
+SHELL SCRIPTING
+A Shell script os a executable file containing
+commands that runs sequentially
 
 
