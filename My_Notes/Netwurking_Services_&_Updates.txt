@@ -1,0 +1,21 @@
+NERWORKING; SERVICES AND SYSTEM UPDATES
+nsswitch.conf
+Görevi:
+Sistem hangi kaynaktan (örneğin: dosya, DNS, LDAP) kullanıcı, grup, host, şifre, network vb. bilgilerini alacağını ve hangi sırayla deneyeceğini belirtir.
+
+Örnek içerik:
+passwd:     files sss
+group:      files sss
+hosts:      files dns
+Anlamı:
+passwd: files sss → Önce /etc/passwd, sonra SSSD (örn. LDAP) kullanılacak.
+hosts: files dns → IP/hostname çözümlemesinde önce /etc/hosts, sonra DNS kullanılacak.
+Bu dosya, kimlik doğrulama veya ağ gibi temel sistem fonksiyonlarının nasıl davranacağını kontrol eder.
+
+/etc/NetworkManager/system-connections/ens...
+burada ip adresini manuelmi yoksa DHCP denmi alacaksin onu belirlersin
+Örnegin;
+method=manual
+addresses=192.168.178.119/24;      # İstediğin IP ve subnet
+gateway=192.168.178.1              # Varsayılan ağ geçidi
+dns=8.8.8.8;1.1.1.1  
