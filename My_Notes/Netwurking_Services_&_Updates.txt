@@ -21,7 +21,7 @@ nmcli connection show buda devices gösteriyor
 
 BASKA VARMI
 nmtui
-nm-connection-editor
+nm-connection-editor (GUI)
 ************************************************************
 What is the loopback device?
 
@@ -39,3 +39,16 @@ No traffic is sent to physical network hardware
 NIC bonding 
 combining multiple NICs together
 **************************************************
+ss COMMAND
+What is the ss command?
+The ss (socket statistics) command is used in Linux to 
+display detailed information about network sockets. 
+It is considered a faster and more modern replacement for netstat.
+
+Basic Usage Examples
+ss               # Show all connections
+ss -tuln         # Show listening TCP/UDP ports with numeric addresses
+ss -s            # Display summary statistics
+ss -plnt         # Show listening TCP sockets with process info
+
+Protocol: Set of rules that computers use to communicate
