@@ -1,5 +1,6 @@
 NERWORKING; SERVICES AND SYSTEM UPDATES
-nsswitch.conf
+ns
+switch.conf
 Görevi:
 Sistem hangi kaynaktan (örneğin: dosya, DNS, LDAP) kullanıcı, grup, host, şifre, network vb. bilgilerini alacağını ve hangi sırayla deneyeceğini belirtir.
 
@@ -10,12 +11,31 @@ hosts:      files dns
 Anlamı:
 passwd: files sss → Önce /etc/passwd, sonra SSSD (örn. LDAP) kullanılacak.
 hosts: files dns → IP/hostname çözümlemesinde önce /etc/hosts, sonra DNS kullanılacak.
-Bu dosya, kimlik doğrulama veya ağ gibi temel sistem fonksiyonlarının nasıl davranacağını kontrol eder.
-
+Bu dosya, kimlik doğrulama veya ağ gibi temel sistem fonksiyonlarının nasıl 
+davranacağını kontrol eder.
+*********************************************************
 /etc/NetworkManager/system-connections/ens...
 burada ip adresini manuelmi yoksa DHCP denmi alacaksin onu belirlersin
-Örnegin;
-method=manual
-addresses=192.168.178.119/24;      # İstediğin IP ve subnet
-gateway=192.168.178.1              # Varsayılan ağ geçidi
-dns=8.8.8.8;1.1.1.1  
+nmcli temiz network device adress bilgisi veriyor
+nmcli connection show buda devices gösteriyor
+
+BASKA VARMI
+nmtui
+nm-connection-editor
+************************************************************
+What is the loopback device?
+
+The loopback device is a virtual network interface used by a computer to communicate 
+with itself.
+Details:
+Interface name: lo
+IP address: 127.0.0.1 (IPv4), ::1 (IPv6)
+Hostname: localhost
+Uses:
+Local testing of services and applications
+Internal communication between processes
+No traffic is sent to physical network hardware
+****************************************************
+NIC bonding 
+combining multiple NICs together
+**************************************************
