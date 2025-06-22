@@ -52,3 +52,8 @@ ss -s            # Display summary statistics
 ss -plnt         # Show listening TCP sockets with process info
 
 Protocol: Set of rules that computers use to communicate
+how to copy a file from a server to another?
+scp test.txt  kali@192.168.178.114:/home/kali/Desktop
+timedatectl
+timedatectl list-timezones
+timedatectl set-timezone Europe/Berlin
