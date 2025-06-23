@@ -180,5 +180,6 @@ For  comments use #
 *****************************************
 /////////////////////////////////////////
 *****************************************
-
+WEB SERVERS
+systenctl enable service make the service active at boot
 
