@@ -1,1 +1,12 @@
 LINUX OS HARDENING
+- User Account
+ Naming conventions. Instead of admin use sadmin, hradmin,  usw. 
+ Use names that are not easily guessted.
+- Remove  un-wanted Packages
+- Stop un-used Services
+- Check on Listening Ports
+- Secure SSH Configuration
+- Enable Firewall (firewalld)
+- Enable Selinux
+- Chande listening Services Port numbers
+- Keep your OS up to date
