@@ -1,7 +1,9 @@
 LINUX OS HARDENING
 - User Account
  Naming conventions. Instead of admin use sadmin, hradmin,  usw. 
- Use names that are not easily guessted.
+ Use names that are not easily guessted. Begin userid from 10000. 
+ also password policies. 
+ 
 - Remove  un-wanted Packages
 - Stop un-used Services
 - Check on Listening Ports
