@@ -57,3 +57,11 @@ scp test.txt  kali@192.168.178.114:/home/kali/Desktop
 timedatectl
 timedatectl list-timezones
 timedatectl set-timezone Europe/Berlin
+
+traceroute: traceroute is used to display the path that 
+network packets take from your computer to a destination 
+(IP or domain). It helps identify where delays or 
+connection problems occur in the route.
+traceroute www.google.com 
+Bunun dinamik olani real time olani mtr dir. 
+mtr www.google.com
