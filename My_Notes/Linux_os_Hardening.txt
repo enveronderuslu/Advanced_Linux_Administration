@@ -13,6 +13,8 @@ LINUX OS HARDENING
 - Stop un-used Services
  systemctl -a 
 - Check on Listening Ports
+ netstat -tunlp  tcp udp listening Ports
+ fuser -k 80/tcp 80 nolu porttaki servisi durdurur ve portu kaoatir
 - Secure SSH Configuration
 - Enable Firewall (firewalld)
 - Enable Selinux
