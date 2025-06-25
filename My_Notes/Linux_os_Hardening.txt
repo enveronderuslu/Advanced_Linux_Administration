@@ -1,11 +1,17 @@
 LINUX OS HARDENING
 - User Account
  Naming conventions. Instead of admin use sadmin, hradmin,  usw. 
- Use user names that are not easily guessted. Begin userid from 10000. 
- also password policies. 
+ Use user names that are not easily guessted. Useradd ile user 
+ olusturdugunda  direk id olusturulur. Begin userid from 10000. 
+ also password policies. max min age expire day (one can use chage command)
+ /etc/login.defs
+ /etc/pam.d/system-auth 
  
 - Remove  un-wanted Packages
+ rpm -qa kurulu tüm paketleri verir (Debian da "dpkg -l")
+ bir paketi kaldirirken dependiec  kismini dikkat et
 - Stop un-used Services
+ systemctl -a 
 - Check on Listening Ports
 - Secure SSH Configuration
 - Enable Firewall (firewalld)
