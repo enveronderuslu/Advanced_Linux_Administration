@@ -2,7 +2,8 @@ NERWORKING; SERVICES AND SYSTEM UPDATES
 ns
 switch.conf
 Görevi:
-Sistem hangi kaynaktan (örneğin: dosya, DNS, LDAP) kullanıcı, grup, host, şifre, network vb. bilgilerini alacağını ve hangi sırayla deneyeceğini belirtir.
+Sistem hangi kaynaktan (örneğin: dosya, DNS, LDAP) kullanıcı, grup, host, şifre, 
+network vb. bilgilerini alacağını ve hangi sırayla deneyeceğini belirtir.
 
 Örnek içerik:
 passwd:     files sss

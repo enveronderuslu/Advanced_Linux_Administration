@@ -11,6 +11,7 @@ Installation:
 sudo dnf install cockpit
 sudo systemctl enable --now cockpit.socket
 yukaridaki islemleri badlanmak istedigin server da yapacaksin. 
-sonra 9090 portundan browser dan baglanacaksin
+sonra 9090 portundan browser dan baglanacaksin. Ayni subnetteki 
+herhangi mknanin browser indan baglanirsin. 
 Access via browser:
 https://<server-ip>:9090
