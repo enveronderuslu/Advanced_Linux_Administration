@@ -1,0 +1,179 @@
+PAM Nedir?
+
+PAM (Pluggable Authentication Modules), Linux sistemlerinde kullanıcı kimlik 
+doğrulama işlemlerini esnek ve modüler şekilde yöneten bir çerçevedir. 
+Her servis (örneğin sshd, sudo, login) kendi PAM yapılandırma dosyasına sahiptir.
+
+Konfigürasyon Dosyaları
+
+PAM yapılandırması genellikle iki yerde yapılır:
+- /etc/pam.conf: Tüm servisleri tek bir dosyada tanımlamak için kullanılır (nadiren tercih edilir).
+- /etc/pam.d/: Her servis için ayrı ayrı dosya içerir (modern sistemlerde tercih edilir Güvenlik açısından 
+/etc/pam.d/ daha esnek ve tercih edilir yapıdadır).
+
+PAM Yapılandırma Satır Formatı
+
+Her PAM yapılandırma satırı üç temel sütundan oluşur:
+
+<module-type>  <control-flag>  <module-path> [options]
+
+1. Module Type (Modül Türü)
+- auth: Kimlik doğrulama işlemleri (şifre, parmak izi, vs.)
+- account: Hesap izinleri ve kısıtlamaları (geçerlilik süresi, nologin, vs.)
+- password: Parola değişikliği ile ilgili işlemler
+- session: Giriş ve çıkış sırasında yapılacak işlemler
+
+2. Control Flag (Kontrol Bayrağı)
+Bu modülün sonucunun nasıl değerlendirileceğini belirler:
+- required: Başarılı olmak zorunda. Başarısız olsa bile tüm modüller çalıştırılır, 
+ama sonuç olarak başarısız sayılır.
+- requisite: Hemen başarısız olur, diğer modüller çalışmaz.
+- sufficient: Bu modül başarılıysa diğer modüller atlanabilir.
+- optional: Durumu göz ardı edilir (bazı durumlarda etkili olabilir).
+- include: Başka bir dosyayı dahil eder.
+- substack: Diğer modülleri bir alt yığında çalıştırır.
+
+3. Module Path
+Kullanılacak PAM modülünün adı ve yolu: örneğin pam_unix.so, pam_nologin.so, pam_motd.so
+
+Örnek Satırlar
+
+auth       required     pam_unix.so
+Kullanıcının kimliğini doğrular. Başarısızsa giriş başarısız olur.
+
+account    required     pam_nologin.so
+/etc/nologin dosyası varsa kullanıcıların girişini engeller.
+
+session    optional     pam_motd.so
+Kullanıcıya giriş sırasında bilgi mesajı (Message of the Day) gösterir.
+
+password   include      system-auth
+system-auth dosyasındaki password satırlarını dahil eder.
+
+Örnek: /etc/pam.d/sshd Dosyası Açıklaması
+
+auth       substack     password-auth
+→ password-auth dosyasındaki auth modüllerini alt yığın olarak çağırır.
+
+auth       include      postlogin
+→ postlogin dosyasındaki auth satırlarını dahil eder.
+
+account    required     pam_sepermit.so
+→ SELinux kullanıcı izinlerini kontrol eder.
+
+account    required     pam_nologin.so
+→ /etc/nologin varsa giriş engellenir.
+
+account    include      password-auth
+→ password-auth dosyasındaki account satırlarını dahil eder.
+
+password   include      password-auth
+→ password-auth dosyasındaki password satırlarını dahil eder.
+
+session    required     pam_selinux.so close
+→ SELinux oturumunu kapatma işlemini yürütür (ilk session kuralı olmalı).
+
+session    required     pam_loginuid.so
+→ login UID ayarlanır.
+
+session    required     pam_selinux.so open env_params
+→ SELinux oturumu açılır ve ortam değişkenleri aktarılır.
+
+session    required     pam_namespace.so
+→ Namespace yapılandırmasını sağlar.
+
+session    optional     pam_keyinit.so force revoke
+→ Anahtarları sıfırlar.
+
+session    optional     pam_motd.so
+→ Giriş mesajı (Message of the Day) gösterilir.
+
+session    include      password-auth
+→ password-auth dosyasındaki session satırlarını dahil eder.
+
+session    include      postlogin
+→ postlogin dosyasındaki session satırlarını dahil eder.
+
+Modül Başarısızlığı
+
+Eğer bir modül required olarak tanımlanmışsa ve başarısız olursa, 
+işlem sonunda tüm diğer modüller çalıştırılsa da sonuç başarısız olur.
+
+Örnek:
+
+auth required pam_unix.so
+auth required pam_tally2.so deny=3
+
+Burada, pam_tally2.so başarısızsa kullanıcı giriş yapamaz.
+
+
+
+PAM, sistem güvenliği ve kimlik doğrulama politikalarını merkezi 
+olarak yönetmeyi sağlar. Her satırın türü, kontrol bayrağı ve modülü, 
+sistemin kullanıcılarla nasıl etkileşim kuracağını belirler.
+ 
+PAM (Pluggable Authentication Modules) sisteminde kullanılan `pam_*.so` dosyaları ve işlevlerini öğrenmek için aşağıdaki yöntemleri kullanabilirsin:
+
+1. Dosya Konumu:
+   PAM modülleri genellikle aşağıdaki dizinlerde yer alır:
+   - /lib/security/
+   - /lib64/security/
+   - /usr/lib64/security/
+
+   Listelemek için:
+   ls /lib/security/pam_*.so
+   ls /lib64/security/pam_*.so
+
+2. Man Sayfaları:
+   Her modül için detaylı bilgi almak adına `man` komutunu kullan:
+   man pam_unix
+   man pam_nologin
+   man pam_tally2
+
+3. Kısa Açıklama İçin:
+   whatis komutu ile modülün kısa tanımını al:
+   whatis pam_unix
+
+4. Belgeler:
+   Bazı sistemlerde modül belgeleri şu dizinlerde yer alabilir:
+   /usr/share/doc/pam*/html/
+   /usr/share/doc/pam*/txts/
+
+5. Resmi ve Online Kaynaklar:
+   https://www.linux-pam.org/
+   Ayrıca şu komutlar genel bilgi verir:
+   man pam
+   man pam.d
+   man pam.conf
+
+Örnek kullanım:
+
+man pam_env
+# Ortam değişkenlerini ayarlayan PAM modülü hakkında bilgi verir.
+
+man pam_limits
+# Kullanıcı oturumlarına kaynak limiti koymak için kullanılır.
+
+Pluggable Authentication Modules
+Bir application sürekli Local Authentication ile iletisim 
+kursun istersen PAM  lazim
+ integrate different services with authentication mrchanisms
+ /etc/pam.conf veya /etc/pam.d (better for individual services)
+ Linux ignores  /etc/pam.conf when /etc/pam.d exits 
+ Ne zaman konfigürasyon yapılır?
+Şifre politikalarını (örneğin karmaşıklık, süresi) belirlemek istiyorsan
+
+SSH oturumlarının kısıtlanması gerekiyorsa
+
+Belirli kullanıcı gruplarına erişim izni vermek/engellemek istiyorsan
+
+Oturum açma denemelerini sınırlamak istiyorsan (örneğin 3 kez yanlış girişte kilitleme)
+
+İki faktörlü kimlik doğrulama (2FA) eklemek istiyorsan 
+
+
+PAM loglari  /var/log/messages veya /var/log/secure dosyalarina gider
+
+Tüm modüller lib/security ve lib64/security dosyalrinda
+
+man modülpath  detayli bilgi wedinirsin
