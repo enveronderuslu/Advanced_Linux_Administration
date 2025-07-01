@@ -2,6 +2,16 @@ echo -e icerdeki özel karakterleri algila
 yorum satirlari: # ile baslar
 Bash script te cift tirnak kullan
 multiline comment icin 
+umask set the defaults of file/directory  creation 
+umask /etc/bashrc icinde bu degeri degistirebilirsun
+rpm -qa  veya dpkg -l  shows the installed packages
+
+ORPHAN PACKAGES 
+A paketi B paketine bagli . B yi kaldirdin.
+A atil kalsi. iste A ya Orphan package denir.  
+How to remove? dnf repoquery --unneeded
+dnf remove $(dnf repoquery --unneeded -q)
+
 **********************************************
 USER ACCOUNT MANAGEMENT
 " su - " superuser yapar 
@@ -13,6 +23,9 @@ usermod -G heros supiderman (diger gruplardan cikarir. kendi ismine ait grup elb
 usermod -aG heros supiderman (diger gruplarda kalmaya devam eder)
 visudo /etc/sudoers
 w veya users makineyi o an kullanan kullanicilari verir
+systemd-analyze  baslangicla ilgili rakamlari verir
+MESSAGE OF THE Day
+
 ****************************************************************
 SPEAK WITH USERS; WALL; write
 wall yaz sonra makine kapatiliyor de sonra ctrl + d
