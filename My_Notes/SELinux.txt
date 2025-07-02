@@ -50,3 +50,15 @@ oder
 sealert -a /var/log/audit/audit.log
 
 Diese Befehle helfen bei der alltäglichen Arbeit mit SELinux und bei der Fehlersuche.
+
+Was sind die Selinux 
+
+SELINUX=  
+- enforcing  #  SELinux erzwingt die Richtlinien und blockiert unerlaubte Aktionen 
+# SELinux enforces the policies and blocks unauthorized actions  
+
+- permissive # SELinux protokolliert Verstöße, blockiert sie aber nicht (Warnmodus)  
+# SELinux logs violations but does not block them (warning mode) 
+
+- disabled   # SELinux ist komplett deaktiviert
+# SELinux is completely disabled
