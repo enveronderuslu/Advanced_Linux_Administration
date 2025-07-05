@@ -195,4 +195,16 @@ For  comments use #
 *****************************************
 WEB SERVERS
 systenctl enable service make the service active at boot
+*******************************
+///////////////////////////////
+**********************************
+VIM Kullanimi
+yy stir yw kelime kopyalar p yapistirir
+/word yazarsan dosya icindeki ilk "word" kelimesini bulur. Sonra n harfine basarak
+sirasiyla digerlerini bulursun. 
+asagidan yukari arama: shift + g ile dosyanin sonnuna git. 
+Satir numaralarin inasil gösterirsin: escape modda:set number
+3 shift g  ile 3. satira gidersin
+kelime degistirme: kelimenin üstüne gel cw yaz sonra yeni kelimeyi yaz
+
 
