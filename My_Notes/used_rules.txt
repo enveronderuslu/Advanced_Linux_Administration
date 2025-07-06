@@ -206,5 +206,5 @@ asagidan yukari arama: shift + g ile dosyanin sonnuna git.
 Satir numaralarin inasil gösterirsin: escape modda:set number
 3 shift g  ile 3. satira gidersin
 kelime degistirme: kelimenin üstüne gel cw yaz sonra yeni kelimeyi yaz
-
+bin & sbin :  executables for all & executanles for root  
 
