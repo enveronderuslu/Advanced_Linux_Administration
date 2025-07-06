@@ -1,4 +1,4 @@
-PAM Nedir?
+PAM Nedirrrrrrr?
 
 PAM (Pluggable Authentication Modules), Linux sistemlerinde kullanıcı kimlik 
 doğrulama işlemlerini esnek ve modüler şekilde yöneten bir çerçevedir. 
