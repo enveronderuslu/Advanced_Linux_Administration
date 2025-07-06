@@ -207,4 +207,7 @@ Satir numaralarin inasil gösterirsin: escape modda:set number
 3 shift g  ile 3. satira gidersin
 kelime degistirme: kelimenin üstüne gel cw yaz sonra yeni kelimeyi yaz
 bin & sbin :  executables for all & executanles for root  
-
+Asagida birsey calistirilmaya calisildiginda nerelerde aranir 
+PATH=/root/.local/bin:/root/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin
+mesela deneme.sh dosyasini bu dizinlerden birine tasi Sonra istedigin yerde direk calistir 
+export PATH=$PATH:/home/rocky2/Skripten (Yeni path plusturacazMevcut path i $PATH ile ekledik )
