@@ -18,7 +18,8 @@ Unterschiede:
 - SELinux basiert auf Kontexten (Kontext: Benutzer, Rolle, Typ) und Politiken.
 - Ein Zugriff kann trotz r/w/x verweigert werden, wenn die SELinux-Politik es nicht erlaubt.
 
-Analogie: r/w/x ist der Schlüssel zur Tür. SELinux ist der Sicherheitsmann, der dich nur reinlässt, wenn du auch auf der Liste stehst – selbst wenn du den Schlüssel hast.
+Analogie: r/w/x ist der Schlüssel zur Tür. SELinux ist der Sicherheitsmann, 
+der dich nur reinlässt, wenn du auch auf der Liste stehst – selbst wenn du den Schlüssel hast.
 
 Frage 3: Grundlegende Befehle und Beispiele
 
