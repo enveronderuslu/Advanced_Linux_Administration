@@ -90,7 +90,7 @@ Kısaca: Veriyi alır, komutlara argüman olarak dönüştürür.
 command 2> /dev/null  özellikle komut ciktisinda cok fazla eror olacaksa bu erorlar temizlenmis olur
 
 find  / -name *.doc 2> /dev/null
-updatedb sonra lpcate deneme.txt  daha hizli bulur
+sudo updatedb sonra lpcate deneme.txt  daha hizli bulur
 grep -r search in subdirectories
 grep -r -i ebenin* recursively tüm dosya isimleri ve iceriklerinde ebenin kelimesiyle baslayan kelemeleri bulur
 -r  -i yerine -ri yazabilrsin
