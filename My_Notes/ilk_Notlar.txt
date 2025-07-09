@@ -8,8 +8,6 @@ date sunucunu Saat localisation
 woami
 WHO SUNUCUYA KIM BAGLI HÖR: REBOOT EDIP MILLETIN ISINI PIC ETME
 top yerine htop  un arayüzü daha güzel
-
-
 -------------------------------------------------------
 sudo echo "ansible ALL=(ALL) NOPASSWD: ALL " >> /etc/sudoers.d/ansible
 ---------------------------------------------------------
@@ -272,7 +270,9 @@ Yedekleme ve Geri Yükleme:
 Yedekleme planları oluşturma
 Sistem ve dosya yedeklerini yönetme
 
-Webmin'in en büyük avantajı, sistem yöneticilerinin karmaşık ayarları web tarayıcısı üzerinden kolayca yapabilmesidir. Böylece terminal komutlarını bilmeyen kullanıcılar bile sistem yönetimini daha rahat gerçekleştirebilir.
+Webmin'in en büyük avantajı, sistem yöneticilerinin karmaşık ayarları 
+web tarayıcısı üzerinden kolayca yapabilmesidir. Böylece terminal komutlarını 
+bilmeyen kullanıcılar bile sistem yönetimini daha rahat gerçekleştirebilir.
 
 
 SysVinit stands for "System V Init," which is a system initialization (init) manager used in Linux and Unix-like operating systems. It is responsible for starting and managing system services (daemons) when the system boots up. SysVinit follows the System V-style initialization, which was developed by Sun Microsystems for Unix systems.
@@ -281,7 +281,25 @@ SysVinit manages services through script files, typically located in the /etc/in
 
 Systemd is a software used as a system and service manager in Linux operating systems. It consists of various components that perform tasks like system initialization, managing services, and collecting logs. Systemd replaces the older init systems and provides advantages such as faster boot times and parallel process execution.
 
+systemd-analyze makinenin baslamasi icin gecen süre 
+systemd-analyze blame   detaylar 
+
+"dnf clean all" şunları temizler:
+
+Metadata cache (depo bilgileri)
+Paket önbelleği (indirilen .rpm dosyaları)
+Geçici dosyalar ve depo verileri
+
+
 cd /lib/systemd/system   services are here
+
+.bashrc (her kullanicinin directorisinde ayri ayri var) degisiklik yap 
+sonra source .bashrc calistir
+Mesela;
+alias sysupdate='dnf -y update'
+alias c='clear'
+alias l='ls -laFtr'
+
 
 -------------------------------------------------------------------
 .target uzantılı dosyalar, systemd sisteminde özel bir rol oynar. Bunlar aslında birer "hedef" (target) dosyalarıdır ve SysVinit’teki runlevel kavramının modern karşılığıdır.
