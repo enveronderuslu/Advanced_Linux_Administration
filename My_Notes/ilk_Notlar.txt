@@ -8,6 +8,8 @@ date sunucunu Saat localisation
 woami
 WHO SUNUCUYA KIM BAGLI HÖR: REBOOT EDIP MILLETIN ISINI PIC ETME
 top yerine htop  un arayüzü daha güzel
+
+
 -------------------------------------------------------
 sudo echo "ansible ALL=(ALL) NOPASSWD: ALL " >> /etc/sudoers.d/ansible
 ---------------------------------------------------------
@@ -17,10 +19,13 @@ echo  $HOME
 echo $PATH
 ------------------------------------------------------
 ls -F hlasör dosa executabl  durumlarini verir
+link olusturma ln -s testdir/file1.txt link1
 useradd  newuser
 passwd newuser
 rm -rf silliklanmadan herseyi siler 
 tail -n 1 /etc/group veya /etc/passwd (eklenen son user/group görürsün)
+
+
 ´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´´
 w shows all current sesions
 pgrep -l -u bob bob isimli user la ilgili processes
@@ -32,7 +37,6 @@ uptime veya cat /proc/loadavg ile bulunur. son 1, 5 ve 15 dakikalik load avarage
 lscpu da degerleri verir 
 
 ----------------------------------------
-alias ll="ls -ltr"
 && önce sol taraf sonra sag taraf calisir
 ubuntu versionu dururken kernel update ile securty issues weg
 metin okurken more yerine less kullan Hersyi hafizaya Almaz büyük dosyalari Rahat okursun.
