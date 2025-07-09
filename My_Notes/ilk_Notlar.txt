@@ -299,7 +299,8 @@ Mesela;
 alias sysupdate='dnf -y update'
 alias c='clear'
 alias l='ls -laFtr'
-
+alias ping='ping -c 5'
+alias ports='netstat -tulanp'
 
 -------------------------------------------------------------------
 .target uzantılı dosyalar, systemd sisteminde özel bir rol oynar. Bunlar aslında birer "hedef" (target) dosyalarıdır ve SysVinit’teki runlevel kavramının modern karşılığıdır.
