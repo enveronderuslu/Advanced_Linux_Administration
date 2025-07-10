@@ -5,9 +5,13 @@ lsblk
 free -m ram ile lgii bilgiler
 df -kh tüm paritions 
 date sunucunu Saat localisation  
-woami
+whoami
 WHO SUNUCUYA KIM BAGLI HÖR: REBOOT EDIP MILLETIN ISINI PIC ETME
 top yerine htop  un arayüzü daha güzel
+top  enterla sonra shift + m yap kim ne kadar resource kullaniyor siralar 
+vmstat mevcut memory durumunu verir
+iotop shows the reading and writing processes on  disk 
+nmon hertürlü istatistigi verir 
 -------------------------------------------------------
 sudo echo "ansible ALL=(ALL) NOPASSWD: ALL " >> /etc/sudoers.d/ansible
 ---------------------------------------------------------
