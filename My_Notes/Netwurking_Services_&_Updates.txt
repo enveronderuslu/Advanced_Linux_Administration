@@ -1,4 +1,7 @@
-NERWORKING; SERVICES AND SYSTEM UPDATES
+NETWORKING; SERVICES AND SYSTEM UPDATES
+dig @4.2.2.2 google.com -> google.com alan adının IP adresini, 
+4.2.2.2 DNS sunucusunu kullanarak sorgular.
+/etc/resolv.conf 
 ns
 switch.conf
 Görevi:
@@ -19,6 +22,14 @@ davranacağını kontrol eder.
 burada ip adresini manuelmi yoksa DHCP denmi alacaksin onu belirlersin
 nmcli temiz network device adress bilgisi veriyor
 nmcli connection show buda devices gösteriyor
+
+nmcli connectin show  network adapterlari gösterrir
+nmcli connectin show ens23 ens23 ün detaylarini gösterir 
+nmcli connectin delete ens23 bu adaptörü siler
+nmcli connection modify ens224 connection.interface-name "wired connection 3"
+cnnection.interface-name kismini show ens23 komutunda görüyorsun ve tab ile geliyor
+
+
 
 BASKA VARMI
 nmtui

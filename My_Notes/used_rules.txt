@@ -4,8 +4,9 @@ Bash script te cift tirnak kullan
 multiline comment icin 
 umask set the defaults of file/directory  creation 
 umask /etc/bashrc icinde bu degeri degistirebilirsun
-rpm -qa  veya dpkg -l  shows the installed packages
-
+rpm -qa | grep -i libre* veya dpkg -l  shows the installed packages
+ dnf -y remove libreoffice*
+ 
 ORPHAN PACKAGES 
 A paketi B paketine bagli . B yi kaldirdin.
 A atil kalsi. iste A ya Orphan package denir.  
@@ -87,8 +88,23 @@ top
 | `%MEM`    | Memory Usage Percent | İşlemin RAM kullanım yüzdesi                        |
 | `TIME+`   | CPU Time (total)     | İşlemin toplam CPU süresi (saniye+salise)           |
 
+DISK OPERATIONS 
+ fdisk -l gives the list of disks 
+ fdisk /dev/nvme0n2  bu bizim VMWare de sonradan ekledigimiz disk 
+ Bu  komuttan sonra m yazip enterlayinca opsiyonlar karsina cikar 
+ n ebter: add a new partition
+ df -h disk usage
+MOUNT ETME ISLEME 
+ mkdir -p /home/enver/Desktop/disk2 
+ yukaridaki komutta -p ; aradaki parent klasörler yoksa onlarida olusturur. 
+ mkfs.ext4 /dev/nvme0n2   # önce formatladim
+ mkdir -p /home/enver/Desktop/disk2 # diski mount edecegim dosyayi olusturdum
+ mount /dev/nvme0n2 /home/enver/Desktop/Disk2   # simdide mount ettim
+ Gparted  disk islemlerini komutsuz arayüz ile hallet
+ 
 
-df -h disk usage
+
+
 
 dmesg hardware ile ilgili hersey burada
 | Section                | Description                                                               |
