@@ -8,7 +8,7 @@ boot it- name: Handlers. Degisiklik olursa sunu yap
         dest: /tmp/test.txt
       register: config_copy
 
-    - name: Değişiklik varsa reboot it
+    - name: Değişiklik varsa reboot et
       ansible.builtin.reboot:
         reboot_timeout: 60
 
