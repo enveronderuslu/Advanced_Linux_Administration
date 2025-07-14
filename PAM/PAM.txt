@@ -1,20 +1,19 @@
 Was ist PAM ?
-
-PAM (Pluggable Authentication Modules), Linux sistemlerinde kullanıcı kimlik 
-doğrulama işlemlerini esnek ve modüler şekilde yöneten bir çerçevedir. 
+PAM (Pluggable Authentication Modules) is a library suite that allows a Linux system 
+administrator to configure methods to authenticate users. 
+It provides a flexible and centralized way to switch authentication methods 
+for secured applications using configuration files instead of changing application code.
 Her servis (örneğin sshd, sudo, login) kendi PAM yapılandırma dosyasına sahiptir.
 
 Konfigürasyon Dosyaları
 
 PAM yapılandırması genellikle iki yerde yapılır:
-- /etc/pam.conf: Tüm servisleri tek bir dosyada tanımlamak için kullanılır (nadiren tercih edilir).
-- /etc/pam.d/: Her servis için ayrı ayrı dosya içerir (modern sistemlerde tercih edilir Güvenlik açısından 
-/etc/pam.d/ daha esnek ve tercih edilir yapıdadır).
+/etc/pam.conf: Tüm servisleri tek bir dosyada tanımlamak için kullanılır (nadiren tercih edilir).
+/etc/pam.d/: Her servis için ayrı ayrı dosya içerir (Güvenlik açısından tercih edilir).
 
 PAM Yapılandırma Satır Formatı
 
 Her PAM yapılandırma satırı üç temel sütundan oluşur:
-
 <module-type>  <control-flag>  <module-path> [options]
 
 1. Module Type (Modül Türü)
@@ -106,8 +105,6 @@ auth required pam_tally2.so deny=3
 
 Burada, pam_tally2.so başarısızsa kullanıcı giriş yapamaz.
 
-
-
 PAM, sistem güvenliği ve kimlik doğrulama politikalarını merkezi 
 olarak yönetmeyi sağlar. Her satırın türü, kontrol bayrağı ve modülü, 
 sistemin kullanıcılarla nasıl etkileşim kuracağını belirler.
@@ -162,18 +159,10 @@ kursun istersen PAM  lazim
  Linux ignores  /etc/pam.conf when /etc/pam.d exits 
  Ne zaman konfigürasyon yapılır?
 Şifre politikalarını (örneğin karmaşıklık, süresi) belirlemek istiyorsan
-
 SSH oturumlarının kısıtlanması gerekiyorsa
-
 Belirli kullanıcı gruplarına erişim izni vermek/engellemek istiyorsan
-
 Oturum açma denemelerini sınırlamak istiyorsan (örneğin 3 kez yanlış girişte kilitleme)
-
 İki faktörlü kimlik doğrulama (2FA) eklemek istiyorsan 
-
-
 PAM loglari  /var/log/messages veya /var/log/secure dosyalarina gider
-
 Tüm modüller lib/security ve lib64/security dosyalrinda
-
 man modülpath  detayli bilgi wedinirsin

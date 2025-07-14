@@ -5,4 +5,3 @@ server3 ansible_host=192.168.178.117
 
 [all:vars]
 ansible_user=ansible 
-
