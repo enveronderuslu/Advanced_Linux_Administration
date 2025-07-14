@@ -1,0 +1,41 @@
+kontrol edilecek tüm serverlarda ansible isimli user olusturuldu. 
+Hata olmasi durumunda daha rahat takib edilebilir. 
+herstellung von ssh-key-pairs
+ssh-keygen -t rsa -b 4096
+ssh-copy-id -i ~/.ssh/id_rsa.pub ansible@192.168.178.115
+
+====================================================0
+
+# ansible kullanicilarini sudoers grubuna ekledik. islemler sirasinda sifre 
+# sormayacak
+sudo echo "ansible ALL=(ALL) NOPASSWD: ALL " >> /etc/sudoers.d/ansible
+
+sudo usermod -aG sudo ( RHEL de " wheel " yazilir) ansible
+
+==========================================================================
+
+# password ile ssh baglantisi. defaultta password ile ssh baglantisi
+# yoktur. önce "/etc/ssh/sshd_config" icinde buun acarsin. Sonra certifikayi
+# ayarlayip passwd yi tekrar kapatirisin. 
+
+=======================================================================
+
+w3m www.muster.com curl gibi terminalden internet sitesine gider
+
+======================================================================
+
+systemctl list-unit-files | grep enabled |nginx
+enable durumdaki servisleri verir
+
+=====================================================================
+
+ansible-galaxy collection install ansible.posix
+ansible-galaxy collection  list 
+ansible-doc -l # cok genel ve cok satir var
+ansible-doc copy 
+# burada özel olarak copy modülü veriliyor detaylar ve örneklerle borlikte 
+ansible-doc -t callback -l
+
+====================================================================
+
+

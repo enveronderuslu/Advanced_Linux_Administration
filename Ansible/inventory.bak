@@ -1,0 +1,12 @@
+[ubuntu_Servers]
+server1@192.168.178.115 apache=apache2 php_library=libapache2-mod-php
+server2@192.168.178.116 apache=apache2 php_library=libapache2-mod-php
+server3@192.168.178.117 apache=apache2 php_library=libapache2-mod-php
+
+[rhel_Servers]
+rocky@192.168.178.118 apache=httpd php_library=php
+
+[Servers:children]
+ubuntu_Servers
+rhel_Servers
+

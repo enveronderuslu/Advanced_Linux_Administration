@@ -1,0 +1,11 @@
+- name: modul_plugin. copymodulü ve lookup plugin kullanildi
+  hosts: all
+  become: true
+  tasks:
+    - name: Ortam değişkeniyle dosya oluştur
+      copy:
+        dest: /tmp/kimm.txt
+        content: "Bu işlemi yapan kullanıcı: {{ lookup('env', 'USER') }}"
+      
+
+ 

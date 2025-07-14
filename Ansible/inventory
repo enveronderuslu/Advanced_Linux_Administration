@@ -1,0 +1,8 @@
+[web_Servers]
+server1 ansible_host=192.168.178.115
+server2 ansible_host=192.168.178.116
+server3 ansible_host=192.168.178.117
+
+[all:vars]
+ansible_user=ansible 
+

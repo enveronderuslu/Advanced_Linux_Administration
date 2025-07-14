@@ -1,0 +1,17 @@
+---
+
+  - hosts: all
+    become: true
+    tasks:
+    
+    - name: updates apt packet index Ubuntu
+      ansible.builtin.package:
+        upgrade: dist
+        update_cache: yes
+      when: ansible_distribution == "Ubuntu"  
+
+    - name: updates apt packet index Rocky
+      ansible.builtin.package:
+        update_only: yes
+        update_cache: yes
+      when: ansible_distribution == "Rocky"  

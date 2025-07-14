@@ -1,0 +1,16 @@
+---
+ - name: Create a text file and write a message
+   hosts: all
+   become: true
+   tasks:
+
+     - name: Create a text file with a message
+       ansible.builtin.file:
+         path: /home/ansible/hello.txt
+         state: touch
+
+
+     - name: write the messagw
+       ansible.builtin.lineinfile:
+         path: /home/ansible/hello.txt
+         line: 'Hello, this is a test file created by Ansible.'

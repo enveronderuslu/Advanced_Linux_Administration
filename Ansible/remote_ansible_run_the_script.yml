@@ -1,0 +1,18 @@
+---
+  - name: Run a script on remote servers
+    hosts: all
+    become: true
+    tasks:
+    
+    - name: Copy script to remote servers
+      copy: 
+        src: run_the_script.sh
+        dest: /tmp/run_the_script.sh
+        mode: 0755
+    
+    - name: Execute script on remote servers
+      command: /tmp/run_the_script.sh
+      register: script_output
+
+    -  debug:
+        var: script_output.stdout_lines
