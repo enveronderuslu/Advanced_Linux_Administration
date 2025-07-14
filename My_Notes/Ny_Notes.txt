@@ -940,7 +940,7 @@ umask /etc/bashrc icinde bu degeri degistirebilirsun
 
 #### 🧠 What Is Troubleshooting?
 
-Think of your Linux system like a car. Sometimes it won’t start, or it makes weird noises. Troubleshooting is like being a mechanic — you observe the symptoms, identify the problem, and fix it.
+Thi nk of your Linux system like a car. Sometimes it won’t start, or it makes weird noises. Troubleshooting is like being a mechanic — you observe the symptoms, identify the problem, and fix it.
 
 Troubleshooting in Linux means:
 
