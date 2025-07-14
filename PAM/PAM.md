@@ -83,60 +83,34 @@ Eve girmek için birkaç kapıdan geçmen gerekiyor. Ama bu kez bir kapıda yaz�
 
 Gerçek hayat örneği: Eğer bir kullanıcı LDAP’ta varsa (örneğin şirket ağı), Ya şirket ağı üzerinden tanınan bir kullanıcısındır (bu LDAP olur). Ya da bilgisayarda yerel olarak kayıtlı bir kullanıcısındır (örneğin "admin", "backup" gibi).
 
-
-
 OPTIONAL¶
 The module is executed but the result of the request is ignored. If all modules in the chain were marked optional, all requests would always be accepted.
 
-erçek Hayat Örneği:
 Diyelim sistemde şöyle bir PAM kuralı var:
-
-bash
-Kopieren
-Bearbeiten
 session optional pam_motd.so
-Bu ne yapar?
 
-Giriş yaptıktan sonra sana bir "Message of the Day" (günün mesajı) gösterir:
-
-"Have a great day, $USER!" 🌞
-
-Ama:
-
-Bu mesaj çıkmazsa, sistem girişini engellemez.
-
+Giriş yaptıktan sonra sana bir "Message of the Day" gösterir:
+"Have a great day, $USER!". Ama: Bu mesaj çıkmazsa, sistem girişini engellemez. 
 Yani bu işlem sadece isteğe bağlıdır.
 
-🧠 Özetle:
 Durum	Etkisi
-Başarıyla geçti	Sistem devam eder
-Başarısız oldu	Yine sistem devam eder
-Giriş etkilenir mi?	❌ Hayır
-
-
-
-
-
-
-
+Başarıyla geçti	       Sistem devam eder
+Başarısız oldu	          Yine sistem devam eder
+Giriş etkilenir mi?	    ❌ Hayır
 
 ![alt text](image-1.png)
 
-PAM modules¶
-There are many modules for PAM. Here are the most common ones:
+PAM MODULES¶
+the most common modules for PAM are:
+pam_unix          pam_ldap    
+pam_wheel         pam_cracklib      
+pam_console       pam_tally      
+pam_securetty     pam_nologin    
+pam_limits        pam_time    
+pam_access     
 
-pam_unix
-pam_ldap
-pam_wheel
-pam_cracklib
-pam_console
-pam_tally
-pam_securetty
-pam_nologin
-pam_limits
-pam_time
-pam_access
 pam_unix¶
+
 The pam_unix module allows you to manage the global authentication policy.
 
 In /etc/pam.d/system-auth you might add:
