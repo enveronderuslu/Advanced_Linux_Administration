@@ -1,0 +1,243 @@
+### 6.5 SELinux Basics
+SELinux (Security Enhanced Linux )
+Linux mit verbesserter Sicherheit
+
+Frage 1: Erkläre SELinux mit Beispielen und Analogien
+
+SELinux (Security-Enhanced Linux) ist ein Sicherheitsmodul für Linux, das den Zugriff auf Systemressourcen streng kontrolliert. Es erweitert die klassischen r-, w-, x-Rechte (lesen, schreiben, ausführen) um ein zusätzliches Sicherheitsmodell namens MAC (Mandatory Access Control).
+
+Analogie: Stell dir die klassischen Dateirechte als Haustürschlüssel vor. Wenn du den Schlüssel hast, kannst du eintreten. SELinux fügt jedoch ein Sicherheitssystem hinzu: Gesichtserkennung, Kameras und ein Wachmann, der prüft, ob du zur richtigen Zeit am richtigen Ort bist.
+
+Beispiel: Ein Webserver (httpd) versucht, eine Datei außerhalb von `/var/www/html` zu lesen. Auch wenn normale Dateirechte es erlauben, kann SELinux dies verhindern, weil laut SELinux-Politik httpd nur auf bestimmte Pfade zugreifen darf.
+
+Frage 2: Was ist der Unterschied zu r-, w- oder x-Rechten?
+
+r (lesen), w (schreiben), x (ausführen) sind Basis-Dateirechte im Dateisystem. SELinux geht darüber hinaus und kontrolliert, welcher Prozess auf welche Datei unter welchen Bedingungen zugreifen darf – unabhängig davon, ob r/w/x erlaubt sind.
+
+Unterschiede:
+- r/w/x sind einfache Berechtigungen auf Dateisystemebene.
+- SELinux basiert auf Kontexten (Kontext: Benutzer, Rolle, Typ) und Politiken.
+- Ein Zugriff kann trotz r/w/x verweigert werden, wenn die SELinux-Politik es nicht erlaubt.
+
+Analogie: r/w/x ist der Schlüssel zur Tür. SELinux ist der Sicherheitsmann, 
+der dich nur reinlässt, wenn du auch auf der Liste stehst – selbst wenn du den Schlüssel hast.
+
+Frage 3: Grundlegende Befehle und Beispiele
+
+Status von SELinux anzeigen:
+getenforce
+
+Temporär den Modus ändern:
+setenforce 0   # Wechsel in den permissive-Modus
+setenforce 1   # Wechsel in den enforcing-Modus
+
+Dauerhafte Einstellung:
+In der Datei /etc/selinux/config:
+SELINUX=enforcing
+oder
+SELINUX=permissive
+
+Dateikontext anzeigen:
+ls -Z /var/www/html/index.html
+
+Dateikontext ändern:
+chcon -t httpd_sys_content_t /var/www/html/index.html
+
+Standardkontexte wiederherstellen:
+restorecon -Rv /var/www/html/
+
+Logs analysieren:
+ausearch -m avc -ts recent
+oder
+sealert -a /var/log/audit/audit.log
+
+Diese Befehle helfen bei der alltäglichen Arbeit mit SELinux und bei der Fehlersuche.
+
+Was sind die Selinux 
+
+SELINUX=  
+- enforcing  #  SELinux erzwingt die Richtlinien und blockiert unerlaubte Aktionen 
+# SELinux enforces the policies and blocks unauthorized actions  
+
+- permissive # SELinux protokolliert Verstöße, blockiert sie aber nicht (Warnmodus)  
+# SELinux logs violations but does not block them (warning mode) 
+
+- disabled   # SELinux ist komplett deaktiviert
+# SELinux is completely disabled
+
+### 6.5 SELinux Basics
+
+#### 🧠 What is SELinux? (Explained Like You're 10)
+
+Imagine your Linux system is like a big school. Every student (program) is only allowed to go into specific rooms (files or directories) and talk to certain people (other processes). SELinux is like the strict security guard of the school. It watches everyone and says:
+
+> "Hey! You can't go there. You're not allowed!"
+
+Even if a student finds an open door, SELinux might say:
+> "Nope. That room is not on your permission list."
+
+So even if you’re *root*, SELinux still checks what you're doing. It’s an **extra layer of security**, like a double-lock system.
+
+---
+
+#### 🛡️ What Does SELinux Actually Do?
+
+SELinux (Security-Enhanced Linux) controls **what processes can access which files, ports, or other processes**, **based on rules**.
+
+It's not just about *who you are* (like file permissions), but also *what you're trying to do*, *how*, and *from where*.
+
+##### Classic Linux Permissions (Before SELinux):
+- Can be bypassed by root.
+- Only consider user/group/other (read/write/execute).
+
+##### With SELinux:
+- Even root is subject to rules.
+- Uses **labels**, **policies**, and **contexts**.
+
+---
+
+#### 🔍 Core SELinux Concepts
+
+| Term       | Simple Explanation                                         |
+|------------|------------------------------------------------------------|
+| **Label**  | A tag given to files, processes, ports (like name badges). |
+| **Context**| A set of 3–4 fields describing identity, role, type, etc.  |
+| **Policy** | A list of rules saying "who can do what with whom."        |
+| **Modes**  | How strict SELinux is being (enforcing, permissive, or disabled). |
+
+---
+
+#### 📋 SELinux Context Structure
+
+A typical SELinux context looks like this:
+
+```
+user_u:role_r:type_t:level
+```
+
+For example:
+
+```
+system_u:object_r:httpd_sys_content_t:s0
+```
+
+Let’s break it down:
+
+- `system_u`: SELinux user
+- `object_r`: Role (usually "object_r" for files)
+- `httpd_sys_content_t`: **Type** (this is the most important part!)
+- `s0`: Sensitivity level (mostly used in MLS setups)
+
+---
+
+#### 🧪 Basic Commands
+
+##### 🔎 Check if SELinux is enabled:
+```bash
+getenforce
+# Output: Enforcing / Permissive / Disabled
+```
+
+##### 🧭 View SELinux context of files:
+```bash
+ls -Z /var/www/html
+```
+
+##### 🔁 Change SELinux mode temporarily:
+```bash
+setenforce 0    # Switch to Permissive
+setenforce 1    # Switch to Enforcing
+```
+
+##### 🔧 Change file context:
+```bash
+chcon -t httpd_sys_content_t index.html
+```
+
+> 🧠 Note: `chcon` is **temporary** — use `semanage fcontext` + `restorecon` for permanent changes.
+
+---
+
+#### 🔥 Common Example: Apache Can't Access Files
+
+Let’s say you copied a file into `/var/www/html/`:
+
+```bash
+cp /home/user/index.html /var/www/html/
+```
+
+Now try visiting the web page in your browser. It doesn't work.
+
+Why? Because the file still has the wrong SELinux context:
+
+```bash
+ls -Z /var/www/html/index.html
+# Output: unconfined_u:object_r:user_home_t:s0
+```
+
+Apache is only allowed to serve files labeled `httpd_sys_content_t`.
+
+✅ Fix it:
+
+```bash
+chcon -t httpd_sys_content_t /var/www/html/index.html
+```
+
+🔁 Or do it permanently:
+
+```bash
+semanage fcontext -a -t httpd_sys_content_t '/var/www/html/index.html'
+restorecon -v /var/www/html/index.html
+```
+
+---
+
+#### 🎚️ SELinux Modes Explained
+
+| Mode         | What It Does                       |
+|--------------|------------------------------------|
+| **Enforcing**| Blocks and logs unauthorized actions |
+| **Permissive**| Only logs (doesn’t block)          |
+| **Disabled** | SELinux is turned off completely    |
+
+You can change mode temporarily with `setenforce`, or permanently by editing:
+
+```bash
+/etc/selinux/config
+```
+
+Example config:
+```
+SELINUX=enforcing
+SELINUXTYPE=targeted
+```
+
+---
+
+#### ⚠️ Troubleshooting SELinux Issues
+
+1. **Check audit logs**:
+   ```bash
+   ausearch -m avc -ts recent
+   ```
+
+2. **Use `sealert` for readable suggestions**:
+   ```bash
+   sealert -a /var/log/audit/audit.log
+   ```
+
+3. **Temporarily disable SELinux to test**:
+   ```bash
+   setenforce 0
+   ```
+
+---
+
+#### 🧠 Summary
+
+- SELinux is like a security officer for your system.
+- It uses *contexts*, *types*, and *policies* to control access.
+- Even `root` can be blocked if rules say so.
+- Use `ls -Z`, `chcon`, `semanage`, `restorecon`, and audit logs to understand and fix issues.
+- Never disable SELinux permanently — learn to work with it!
+
