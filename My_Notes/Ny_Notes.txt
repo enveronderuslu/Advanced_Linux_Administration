@@ -475,18 +475,12 @@ nmcli network detaylarini verir. device name ve connettion name match olmayabili
 ### 6.3 DNS Setup
 
 systemd icinde resolve.conf var Dns gibi calisir
-
 ss -natp listening portlari cikarir.
-
 rsync remote server sync Damit ist download oder upload möglich
-
 
 crontab -e ile scheduld tak lar ousturabilirsin
 
-
 PAM MATRIX DIYE BISEY VAR ONA BI BAK
-
-
 
 ### 6.4 Firewall Configuration with `firewalld`
 
