@@ -109,12 +109,20 @@ pam_securetty     pam_nologin
 pam_limits        pam_time    
 pam_access     
 
+////////////////****************////////////////////////////
+
 pam_unix¶
 
-The pam_unix module allows you to manage the global authentication policy.
+pam_unix /etc/passwd ve /etc/shadow defterlerini okur.
+pam_unix modülü şu alanlarda görev alabilir:
+
+PAM Aşaması	      Ne işe yarar?
+auth	            Şifre doğru mu diye bakar
+account	         Kullanıcının hesabı aktif mi kontrol eder
+password	         Şifre değişikliği işlemini yapar
+session	         Giriş-çıkış zamanı gibi işlemleri yönetir
 
 In /etc/pam.d/system-auth you might add:
-
 
 password sufficient pam_unix.so sha512 nullok
 Arguments are possible for this module:
@@ -123,8 +131,9 @@ nullok: in the auth mechanism allows an empty login password.
 sha512: in the password mechanism, defines the encryption algorithm.
 debug: sends information to syslog.
 remember=n: Use this to remember the last n passwords used (works in conjunction with the /etc/security/opasswd file, which is to be created by the administrator).
+
 pam_cracklib¶
-The pam_cracklib module allows you to test passwords.
+The pam_cracklib module allows you to test passwords. Yani kullanıcıları, daha güçlü ve karmaşık şifreler kullanmaya zorlar.
 
 In /etc/pam.d/password-auth add:
 
