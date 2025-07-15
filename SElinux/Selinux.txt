@@ -1,6 +1,5 @@
 ### 6.5 SELinux Basics
-SELinux (Security Enhanced Linux )
-Linux mit verbesserter Sicherheit
+
 
 Frage 1: Erkläre SELinux mit Beispielen und Analogien
 
