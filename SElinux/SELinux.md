@@ -109,7 +109,7 @@ A process whose context has security domain D can access objects of type T.
 Domain (D)	Bir süreç için tanımlanmış SELinux güvenlik tipi (örnek: httpd_t)
 Type (T)	   Bir dosya/nesne için tanımlanan SELinux tipi (örnek: httpd_sys_content_t)
 İzin/Red	   SELinux politikası, D domain’inin T tipindeki nesneye erişimini belirler
-
+Domain bir sandbox veya container da olabilir
 Örnek 1 — Web sunucusu httpd
 system_u:system_r:httpd_t   1001 ? 00:00:02 httpd
 httpd işlemi               → httpd_t domain’inde çalışıyor
