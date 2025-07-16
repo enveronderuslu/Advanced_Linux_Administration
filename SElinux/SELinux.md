@@ -1,6 +1,10 @@
 SELinux (Security Enhanced Linux )
 Linux mit verbesserter Sicherheit
 A subjeckt wants to perform an action on an object 
+Traditional system security: Owner determines access priviliges (DAC)
+SELinux: everthing is labelled. Labels have to match (MAC)
+
+Erişim izni verilmesi için hem klasik izinlerin hem de SELinux'un "EVET" demesi gerekir. Biri hayır derse → erişim reddedilir.
 
 When a subject (z.B. an application) tries to access an object (z-B- a file), the SELinux part of the Linux kernel queries its policy database. Depending on the mode of operation (enforcing, permissive, disabled), SELinux authorizes access to the object in case of success, otherwise it records the failure in the file /var/log/messages.
 
