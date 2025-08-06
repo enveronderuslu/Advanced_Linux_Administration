@@ -1,7 +1,23 @@
 # Red Hat Linux Notes
 ## Chapter 0: ## Linux System Basics – Quick Notes
+sudo derdinden kurtulmak istiyorum:
+Hedef makinada şu komutla sudoers dosyasına özel bir kural ekle:
 
-###  System and Hardware Info
+```bash
+sudo visudo
+```
+
+Ve şunu ekle (örnek kullanıcı: ansible):
+```bash
+ansible ALL=(ALL) NOPASSWD: ALL
+```
+
+Eğer sadece reboot komutu için yetki vermek istersen:
+```bash
+ansible ALL=(ALL) NOPASSWD: /sbin/reboot
+```
+
+*** System and Hardware Info ***
 
 - `hostnamectl`  
   Shows full system metadata (hostname, OS, kernel, architecture, etc.)
@@ -27,7 +43,7 @@
 - `who`  
   Lists all users currently connected to the system (DO NOT REBOOT without checking this. you might interrupt someone else's work) 
 
-## Monitoring Tools
+*** Monitoring Tools ***
 
 - `htop`  
   A better, interactive version of `top` with a cleaner UI
@@ -44,7 +60,7 @@
 - `nmon`  
   Powerful monitoring tool for all system statistics
 
-## Aliases & Bash Customization
+*** Aliases & Bash Customization ***
 
 Each user has their own `.bashrc` file in their home directory.  
 To apply changes, run:  
@@ -151,7 +167,7 @@ genellikle diğer servisler buna bağımlı olur.
 ## 2.2 Installing, Updating, and Removing Packages
 ## 2.3 Managing Repositories
 ## 2.4 Querying Package Information
- 2.5 RPM Package Management
+## 2.5 RPM Package Management
 
 - *** Installing packages: *** `dnf install package-name`
 - *** Updating packages: *** `dnf update`
