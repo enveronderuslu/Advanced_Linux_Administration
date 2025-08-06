@@ -6,8 +6,6 @@ herstellung von ssh-key-pairs
 ssh-keygen -t rsa -b 4096
 ssh-copy-id -i ~/.ssh/id_rsa.pub ansible@192.168.178.115
 ```
-
-
 Avoiding sudo password prompts in Ansible
 To get rid of sudo password issues on the target machine, add a custom rule to the sudoers file:
 
@@ -42,7 +40,6 @@ w3m www.muster.com # curl gibi terminalden internet sitesine gider
 ```bash
 systemctl list-unit-files | grep enabled | nginx # enable durumdaki servisleri verir
 ```
-
 
 ansible-galaxy collection install ansible.posix
 ansible-galaxy collection  list 
