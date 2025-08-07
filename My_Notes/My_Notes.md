@@ -455,8 +455,19 @@ netstat -tunp
 | **TIME\_WAIT**            | Bağlantı kapatıldı ama bir süre daha beklemede kalıyor (normaldir).  |
 | **SYN\_SENT / SYN\_RECV** | TCP bağlantısı kurulmaya çalışılıyor. Aşırıysa ağ sorunu olabilir.   |
 
-
-
+*** CASE STUDY ***
+ip_A 192.168.1.A
+ip_C 192.168.2.C 
+ip_B 192.168.1.B 192.168.2.B 
+A 192.168.1.B  aginda C 192.168.2.B aginda ve B her iki agdan ipye sahip. A ile C nasil konusacak. 
+ - A dan C ye ulasmak icin A nin terminalde
+```bash
+ip route add 192.168.2.B.0/24 via 192.168.1.B
+``` 
+ - C den A ya ulasmak icin C nin terminale
+ ```bash
+ ip route add 192.168.1.B/24 via 192.168.2.B
+ ```
 NETWORKING; SERVICES AND SYSTEM UPDATES
 dig @4.2.2.2 google.com -> google.com alan adının IP adresini, 
 4.2.2.2 DNS sunucusunu kullanarak sorgular.
