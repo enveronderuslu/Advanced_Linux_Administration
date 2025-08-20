@@ -1,3 +1,14 @@
+
+``` bash
+ls ; date
+Sample_file  myapp
+Fri Aug 15 09:01:39 PM CEST 2025
+```
+&&  gibi ; kullanilabilir fakat komut1 && komut2 farkli anlama gelir. birinci calisr isi biterse ikinci calisir. ; de birbirinden bagimsiz calisir.
+benzer sekilde komut1 || komut2 var. Bu defa sol taraf hata dönerde sag taraf calisir-  sol taraf calisirsa sag calismaz. XOR gibi 
+
+yine command & ie komutarkada calisir terrmnal sana kalir
+
 # Red Hat Linux Notes
 ## Chapter 0: ## Linux System Basics – Quick Notes
 sudo derdinden kurtulmak istiyorum:
@@ -8,6 +19,7 @@ sudo visudo
 ```
 
 Ve şunu ekle (örnek kullanıcı: ansible):
+
 ```bash
 ansible ALL=(ALL) NOPASSWD: ALL
 ```
@@ -19,46 +31,50 @@ ansible ALL=(ALL) NOPASSWD: /sbin/reboot
 
 *** System and Hardware Info ***
 
-- `hostnamectl`  
-  Shows full system metadata (hostname, OS, kernel, architecture, etc.)
+```bash
+hostnamectl  # Shows full system metadata (hostname, OS, kernel, architecture, etc.)
+```
 
-- `lscpu`  
-  Displays CPU architecture and info
+```bash
+lscpu  # Displays CPU architecture and info
+```
 
-- `lsblk`  
-  Lists block devices (disks, partitions, etc.)
+```bash
+lsblk  # Lists block devices (disks, partitions, etc.)
+```
 
-- `free -m`  
-  Shows memory (RAM) usage in MB
+```bash
+free -m # Shows memory (RAM) usage in MB
+```
 
-- `df -kh`  
-  Displays all mounted partitions and their usage in human-readable format
+```bash
+df -kh # Displays all mounted partitions and their usage in human-readable format
+```
 
-- `date`  
-  Displays current date, time, and timezone (localization info)
+```bash
+ date  # Displays current date, time, and timezone (localization info)
+ ```
 
-- `whoami`  
-  Shows current logged-in user
+```bash
+whoami  # Shows current logged-in user
+```
 
-- `who`  
-  Lists all users currently connected to the system (DO NOT REBOOT without checking this. you might interrupt someone else's work) 
+```bash
+who  # Users currently connected to the system (DO NOT REBOOT without checking this. you might interrupt someone else's work) 
+``` 
 
 *** Monitoring Tools ***
 
-- `htop`  
-  A better, interactive version of `top` with a cleaner UI
+- `htop`  # A better, interactive version of `top` with a cleaner UI
 
 - `top` → press `Enter`, then `Shift + M`  
   Sorts processes by memory usage
 
-- `vmstat`  
-  Reports current memory and system activity
+- `vmstat`  # Reports current memory and system activity
 
-- `iotop`  
-  Displays real-time disk read/write by processes
+- `iotop`  # Displays real-time disk read/write by processes
 
-- `nmon`  
-  Powerful monitoring tool for all system statistics
+- `nmon`  # Powerful monitoring tool for all system statistics
 
 *** Aliases & Bash Customization ***
 
@@ -68,7 +84,6 @@ To apply changes, run:
 ```bash
 source ~/.bashrc
 ```
-
 
 Example aliases (add these to .bashrc):
 
@@ -98,22 +113,21 @@ Everything you see in the terminal will be saved to deneme.txt. Type exit to sto
 
 
 # Chapter 1: System Architecture and Boot Process
-## 1.1 Linux System Architecture Overview
-## 1.2 Boot Process
-### 1.2.1 BIOS/UEFI
+## 1.1 Boot Process
+### BIOS/UEFI
 	BIOS/UEFI** initializes hardware and loads the bootloader.
 
-### 1.2.2 GRUB Bootloader
+### GRUB Bootloader
 	- **GRUB** (GRand Unified Bootloader) presents boot options and loads the kernel.
 
-### 1.2.3 Kernel Initialization
+### Kernel Initialization
 	- **GRUB** (GRand Unified Bootloader) presents boot options and loads the kernel.
 
-### 1.2.4 init/Systemd
+### init/Systemd
 	- **init/systemd** takes over to launch essential services and bring the system to a usable state.
 
 ## 1.3 systemd Overview
-	Modern Red Hat-based systems use **systemd**, a system and service manager that replaces traditional `init` scripts. It uses *targets* instead of runlevels to define system states.
+Modern Red Hat-based systems use **systemd**, a system and service manager that replaces traditional `init` scripts. It uses *targets* instead of runlevels to define system states.
 SysVinit stands for "System V Init," which is a system initialization (init) manager used in Linux and Unix-like operating systems. It is responsible for starting and managing system services (daemons) when the system boots up. SysVinit follows the System V-style initialization, which was developed by Sun Microsystems for Unix systems.
 
 SysVinit manages services through script files, typically located in the /etc/init.d/ directory. These scripts control the starting, stopping, and restarting of various services during the system boot and shutdown process.
@@ -162,25 +176,19 @@ Ağ bağlantısının başlatılmasına hazır olduğunu belirtir. Ağ servisler
 genellikle diğer servisler buna bağımlı olur.
 
 
-# Chapter 2: Package Management with YUM and DNF
-## 2.1 YUM vs DNF
-## 2.2 Installing, Updating, and Removing Packages
-## 2.3 Managing Repositories
-## 2.4 Querying Package Information
-## 2.5 RPM Package Management
-
-- *** Installing packages: *** `dnf install package-name`
-- *** Updating packages: *** `dnf update`
-- *** Removing packages: *** `dnf remove package-name`
-- *** Querying package info: *** `rpm -qi package-name`
-- *** Managing repositories: *** Custom `.repo` files in `/etc/yum.repos.d/`
-
-	"dnf clean all" şunları temizler: Metadata cache (depo bilgileri), Paket önbelleği (indirilen .rpm dosyaları), Geçici  dosyalar ve depo verileri
-
-rpm -qa | grep -i libre* veya dpkg -l  shows the installed packages
- dnf -y remove libreoffice*
+# Package Management with YUM and DNF
+```bash
+dnf install package-name #Installing packages:
+dnf update # Updating packages: 
+dnf remove package-name # Removing packages: 
+rpm -qi package-name # Querying package info: 
+custom .repo files in /etc/yum.repos.d/ # Managing repositories: 
+dnf clean all # it deletes Metadata cache (depo bilgileri), Paket önbelleği (indirilen .rpm dosyaları), Geçici  dosyalar ve depo verileri
+rpm -qa | grep -i libre* ; dpkg -l  # shows the installed packages
+dnf -y remove libreoffice*
+```
  
-ORPHAN PACKAGES 
+### ORPHAN PACKAGES 
 A paketi B paketine bagli . B yi kaldirdin.
 A atil kalsi. iste A ya Orphan package denir.  
 How to remove? dnf repoquery --unneeded
@@ -293,12 +301,10 @@ etc/shadow encrypted password ler burada. Password  policies de burada
 
 passwd username ile bu Userin passwrd unu halledersin
 
-### 4.2 Creating, Modifying, Deleting Users
-### 4.3 Group Administration
+
+## Group Administration
 
 /etc/login.defs - Configuration control definitions for the login package. user login islemlerinin ddetaylari
-
-
 
 sudo chage-l user1   Komutuyla detaylari görürsün. 
 password yönetimine dair bazi kurallar mesela max usage day gibi, nasil degisir. Yine man dan bak belli degisiklikleri yap.  
@@ -318,7 +324,7 @@ Wie wird der Gruppenname geändert  sudo groupmod -n der_neue_Gruppenname gurup1
 Hinzufügen eines Namens zu einer Gruppe sudo usermod -aG IT maldegnegi
 
 
-### 4.4 Password Policies
+## Password Policies
 
 PASSWORD AGING
 chage -m mindays -M maxdays -d lastday
@@ -327,15 +333,13 @@ chage -m mindays -M maxdays -d lastday
 RECOVER ROOT PASSWORD
 edit grub detayi cok fazla sifreni unutma aq
 
-### 4.5 Using `sudo` for Privilege Delegation
+## Using `sudo` for Privilege Delegation
 /etc/sudoers icinde düzenleme yap
 
-## Chapter 5: System Services and Process Management
-### 5.1 Managing Services with `systemctl`
+# System Services and Process Management
+## Managing Services with `systemctl`
 systemctl enable <service> her boot edildiginde sistemi baslatir 
-### 5.2 Enabling and Disabling Services
-### 5.3 Process Monitoring
-- 5.3.1 Using `ps`
+### Using `ps`
 
 ps aux | grep  ssh bununla tüm ssh processlerini ve PID lerini görürsün
 
@@ -347,9 +351,9 @@ systemctl background da calisan tüm programlari verir
 Yine "ps -eo pid,ni,pri,cmd --sort=ni" komutuylada görürsün
 
 
+### SYSTEM MONITORING
+Using `top` and `htop`
 
-- 5.3.2 Using `top` and `htop`
-SYSTEM MONITORING
 top -u user1  user1 ne kullaniyor sadece bunu gösterir
 top 
 
@@ -390,8 +394,8 @@ dmesg | grep -i fail        # Başarısızlıklarla ilgili satırlar
 dmesg | grep eth            # Ethernet veya ağ arayüzü sorunları
 ```
 
-### 5.4 Managing Processes
-- 5.4.1 `kill`, `killall`
+## Managing Processes
+###  `kill`, `killall`
 
 w shows all current sesions
 ```bash 
@@ -406,7 +410,7 @@ pkill -SIGKILL -u newuser # user ile ilgili tüm prosesleri kill yapar
 pstree -p newuser # proses agaci
 ```
 
-### 5.4.2 `nice`, `renice`
+###  `nice`, `renice`
 
 nice : run a program with modified scheduling priority.High priority icin negatif degerler verilir. -20 = en yüksek öncelik. negatif degeri sadece adminler verebilir
 19 = en düşük öncelik (sisteme en az yük olur)
@@ -414,8 +418,8 @@ Neden Kullanılır? Arka planda çalışan ama acelesi olmayan işler için (ör
 
 renice komutuyla siralamayi degistirirsin
 
-## 5.5 Scheduled Tasks
-### 5.5.1 `cron`
+## Scheduled Tasks
+### `cron`
 
 Application=Service
 Script list of instructions
@@ -431,10 +435,10 @@ crontab -l list the crontab entries -r remove
 nice process priority
 mesela nice -n 5 en öncelikli 5 process (degerler -20 ile 19 arasindadir
 )bg sleep 100 (normalde 100 saniye beklersin)
-### 5.5.2 `at`
+### `at`
 
-# Chapter 6: Networking
-## 6.1 Network Configuration
+# Networking
+## Network Configuration
 
 netstat -tunp
 
@@ -468,6 +472,8 @@ ip route add 192.168.2.B.0/24 via 192.168.1.B
  ```bash
  ip route add 192.168.1.B/24 via 192.168.2.B
  ```
+
+/etc/resolv.conf ta search yahoo.com yazdiginda artik subdomain leri uzunuzun yazmana gerek kalmaz. artik curl news  yazdiinda direk curl news.yahoo.com anlasilir
 NETWORKING; SERVICES AND SYSTEM UPDATES
 dig @4.2.2.2 google.com -> google.com alan adının IP adresini, 
 4.2.2.2 DNS sunucusunu kullanarak sorgular.
@@ -499,10 +505,8 @@ nmcli connectin delete ens23 bu adaptörü siler
 nmcli connection modify ens224 connection.interface-name "wired connection 3"
 cnnection.interface-name kismini show ens23 komutunda görüyorsun ve tab ile geliyor
 
-
-
 BASKA VARMI
-nmtui
+`nmtui`
 nm-connection-editor (GUI)
 ************************************************************
 What is the loopback device?
@@ -548,15 +552,14 @@ traceroute www.google.com
 Bunun dinamik olani real time olani mtr dir. 
 mtr www.google.com
 
-### 6.1.1 Using `nmcli`
+### Using `nmcli`
 
 ip addrb  ifconfig  ten fazlasi
 
 nmcli network detaylarini verir. device name ve connettion name match olmayabilir  parametrelerle ayarlamalar yapabörsin
 
-### 6.1.2 Using `nmtui`
-## 6.2 IP Addressing and Hostname Configuration
-## 6.3 DNS Setup
+### Using `nmtui`
+## DNS Setup
 
 systemd icinde resolve.conf var Dns gibi calisir
 ss -natp listening portlari cikarir.
@@ -566,16 +569,16 @@ crontab -e ile scheduld tak lar ousturabilirsin
 
 PAM MATRIX DIYE BISEY VAR ONA BI BAK
 
-## 6.4 Firewall Configuration with `firewalld`
+## Firewall Configuration with `firewalld`
 
-# Chapter 7: Storage and Disk Management
-## 7.1 Disk Partitioning and Formatting Mount Points and Auto Mounting
+# Storage and Disk Management
+## Disk Partitioning and Formatting Mount Points and Auto Mounting
 fdisk -l gives the list of disks 
- fdisk /dev/nvme0n2  bu bizim VMWare de sonradan ekledigimiz disk 
- Bu  komuttan sonra m yazip enterlayinca opsiyonlar karsina cikar 
- n ebter: add a new partition
- df -h disk usage
-MOUNT ETME ISLEME 
+fdisk /dev/nvme0n2  bu bizim VMWare de sonradan ekledigimiz disk 
+Bu  komuttan sonra m yazip enterlayinca opsiyonlar karsina cikar 
+n ebter: add a new partition
+df -h disk usage
+### MOUNT ETME ISLEME 
  mkdir -p /home/enver/Desktop/disk2 
  yukaridaki komutta -p ; aradaki parent klasörler yoksa onlarida olusturur. 
  mkfs.ext4 /dev/nvme0n2   # önce formatladim
@@ -583,11 +586,11 @@ MOUNT ETME ISLEME
  mount /dev/nvme0n2 /home/enver/Desktop/Disk2   # simdide mount ettim
  Gparted  disk islemlerini komutsuz arayüz ile hallet
 
-## 7.4 SWAP Space Management
-## 7.5 Persistent Mounts using `/etc/fstab`
 
-# Chapter 8: Security and SELinux
-## 8.1 Basic Security Practices
+## Persistent Mounts using `/etc/fstab`
+
+# Security and SELinux
+## Basic Security Practices
 
 LINUX OS HARDENING
 - User Account
@@ -626,7 +629,7 @@ LINUX OS HARDENING
 - Keep your OS up to date
  
 
-## 8.2 File and Directory Permissions
+## File and Directory Permissions
 
 head etwas.txt shows first 10 line of the file
 tail etwas.txt shows last 10 line of the file
@@ -758,20 +761,15 @@ umask /etc/bashrc icinde bu degeri degistirebilirsun
 
 
 
-## 8.3 Configuring Firewall
-## 8.4 SELinux Modes and Tools
-### 8.4.1 `getenforce`, `setenforce`
-### 8.4.2 `semanage`, `restorecon`, `getsebool`
+### `getenforce`, `setenforce`
+### `semanage`, `restorecon`, `getsebool`
 
-# Chapter 9: System Monitoring and Performance
-## 9.1 System Monitoring Tools
-### 9.1.1 `top`, `iotop`, `vmstat`, `sar`
-## 9.2 Analyzing Disk and Memory Usage
-## 9.3 Reading Logs with `journalctl`
-## 9.4 Performance Tuning Basics
+# System Monitoring and Performance
+### `top`, `iotop`, `vmstat`, `sar`
+## Reading Logs with `journalctl`
 
-# Chapter 10: Troubleshooting and Recovery
-## 8.0 Troubleshooting and Recovery
+# Troubleshooting and Recovery
+## Troubleshooting and Recovery
 
 ###  What Is Troubleshooting?
 
@@ -925,8 +923,6 @@ exit
 reboot
 ```
 
-
-
 ### System Running Slow? Here’s What to Check
 
 1. **CPU Usage:**
@@ -935,27 +931,24 @@ reboot
    ```
 
 2. **Memory Usage:**
-   ```bash
-   free -m
-   ```
+```bash
+free -m
+```
 
 3. **Disk Space:**
-   ```bash
-   df -h
-   ```
+```bash
+df -h
+```
 
 4. **I/O Wait:**
-   ```bash
-   iostat
-   ```
+```bash
+iostat
+```
 
 5. **Zombie Processes:**
-   ```bash
-   ps aux | grep 'Z'
-   ```
-
----
-
+```bash
+ps aux | grep 'Z'
+```
 ### Application Crashes
 
 When an app crashes:
@@ -971,36 +964,32 @@ When an app crashes:
   coredumpctl info <PID>
   ```
 
----
-
 ### Network Troubleshooting
 
 1. **Check if the interface is up:**
-   ```bash
-   ip a
-   ```
+ ```bash
+ ip a
+ ```
 
 2. **Can you ping your gateway?**
-   ```bash
-   ping 192.168.1.1
-   ```
+```bash
+ping 192.168.1.1
+```
 
 3. **Can you resolve DNS?**
-   ```bash
-   nslookup google.com
-   ```
+```bash
+nslookup google.com
+```
 
 4. **View all connections:**
-   ```bash
-   ss -tunlp
-   ```
+```bash
+ss -tunlp
+```
 
 5. **Firewall issue?**
-   ```bash
-   firewall-cmd --list-all
-   ```
-
----
+```bash
+firewall-cmd --list-all
+```
 
 ###  Summary
 
@@ -1087,22 +1076,10 @@ Log dosyaları
 Yüklü paketler
 Çekirdek bilgileri vs. 
 
-# Chapter 12: Automation and Scripting
-## 12.1 Introduction to Bash Scripting
-## 12.2 Variables, Loops, and Conditions
-## 12.3 Writing and Executing Scripts
-## 12.4 Automating with Cron Jobs
-## 12.5 Logging Script Output
-
-# Chapter 13: Virtualization and Containers
-## 13.1 Introduction to KVM and Virtualization Concepts
 ## 13.2 Managing VMs with `virt-manager`
-## 13.3 Introduction to Podman
-## 13.4 Creating and Managing Containers
-## 13.5 Podman vs Docker Comparison
 
-# Chapter 14: Useful Tools and Tips
-## 14.1 Common Text Editors (vim, nano)
+# Useful Tools and Tips
+## Common Text Editors (vim, nano)
 
 VIM Kullanimi
 yy stir yw kelime kopyalar p yapistirir
@@ -1120,17 +1097,9 @@ kelime degistirme: kelimenin üstüne gel cw yaz sonra yeni kelimeyi yaz
 ### 14.3.1 `grep`, `find`, `locate`
 ## 14.4 System Info Commands
 ### 14.4.1 `uname`, `hostnamectl`, `lsb_release`
-## 14.5 Remote Access via SSH
 
-# Chapter 15: RHEL Certification Guide (Optional)
-## 15.1 RHCSA vs RHCE
-## 15.2 Certification Objectives
-## 15.3 Exam Format and Tips
-## 15.4 Practice Lab Setup
-## 15.5 Common Pitfalls
-
-# Chapter 16: Appendix
-## 16.1 Command Cheat Sheet
+# Appendix
+## Command Cheat Sheet
 SYSTEM UTILITY COMMANDS
 date  uptime(1, 5, 15 dakikalarda cpu kullanimi)   
 hostname   uname   ehich  
@@ -1158,7 +1127,3 @@ Intel’de bu teknolojiye HyperThreading denir.
 Ne işe yarar?
 1 çekirdek = 2 thread olursa, işlemci yoğun işlerde daha fazla işi aynı anda yapabilir.
 Yani işlemcinin verimliliği artar.
-
-## 16.2 Filesystem Permission Reference
-## 16.3 Networking Cheat Sheet
-## 16.4 SELinux Troubleshooting Tips
