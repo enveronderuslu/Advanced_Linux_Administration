@@ -36,61 +36,31 @@ ansible ALL=(ALL) NOPASSWD: /sbin/reboot
 *** System and Hardware Info ***
 
 ```bash
-hostnamectl  # Shows full system metadata (hostname, OS, kernel, architecture, etc.)
-```
-
-```bash
-lscpu  # Displays CPU architecture and info
-```
-
-```bash
-lsblk  # Lists block devices (disks, partitions, etc.)
-```
-
-```bash
-free -m # Shows memory (RAM) usage in MB
-```
-
-```bash
+hostnamectl  # Shows full system metadata (hostname, OS, kernel, architecture, etc.) 
+lscpu  # Displays CPU architecture and info  
+lsblk  # Lists block devices (disks, partitions, etc.) 
+free -m  # Shows memory (RAM) usage in MB 
 df -kh # Displays all mounted partitions and their usage in human-readable format
-```
-
-```bash
- date  # Displays current date, time, and timezone (localization info)
- ```
-
-```bash
-whoami  # Shows current logged-in user
-```
-
-```bash
+date  # Displays current date, time, and timezone (localization info)
+whoami  # Shows current logged-in user 
 who  # Users currently connected to the system (DO NOT REBOOT without checking this. you might interrupt someone else's work) 
 ``` 
-
 *** Monitoring Tools ***
-
 - `htop`  # A better, interactive version of `top` with a cleaner UI
-
 - `top` → press `Enter`, then `Shift + M`  
   Sorts processes by memory usage
-
 - `vmstat`  # Reports current memory and system activity
-
 - `iotop`  # Displays real-time disk read/write by processes
-
 - `nmon`  # Powerful monitoring tool for all system statistics
 
 *** Aliases & Bash Customization ***
-
 Each user has their own `.bashrc` file in their home directory.  
 To apply changes, run:  
 
 ```bash
 source ~/.bashrc
 ```
-
 Example aliases (add these to .bashrc):
-
 ```bash
 alias sysupdate='dnf -y update'
 alias c='clear'
@@ -98,22 +68,14 @@ alias l='ls -laFtr  --color=no'
 alias ping='ping -c 5'
 alias ports='netstat -tulanp'
 ```
-Changing the System Hostname: The hostname is the name of the Linux machine on the network. Two options:
-
-Edit the file directly:
-```bash
-sudo vim /etc/hostname
-```
-then reboot. Use hostnamectl:
-```bash
-sudo hostnamectl set-hostname newname
-```
+Changing the System Hostname: Edit the file directly 
+`sudo vim /etc/hostname`
+then reboot. Or use the code `sudo hostnamectl set-hostname newname`
 
 Script Logging: To log all terminal output into a file:
 ```bash
-script deneme.txt
+script deneme.txt # Type exit to stop and save the log.
 ```
-Everything you see in the terminal will be saved to deneme.txt. Type exit to stop and save the log.
 
 
 # Chapter 1: System Architecture and Boot Process
