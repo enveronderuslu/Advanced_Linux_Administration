@@ -1,3 +1,7 @@
+```bash
+ssh-keygen -t rsa -b 4096
+ssh-copy-id -i ~/.ssh/id_rsa.pub ansible@192.168.178.115
+```
 
 ``` bash
 ls ; date
@@ -90,7 +94,7 @@ Example aliases (add these to .bashrc):
 ```bash
 alias sysupdate='dnf -y update'
 alias c='clear'
-alias l='ls -laFtr'
+alias l='ls -laFtr  --color=no'
 alias ping='ping -c 5'
 alias ports='netstat -tulanp'
 ```
@@ -1105,10 +1109,10 @@ date  uptime(1, 5, 15 dakikalarda cpu kullanimi)
 hostname   uname   ehich  
 cal 11 1976
 bc calculator
-cp  -pr  klasörü icindekilerle  kopyalaar
-cat  -n  satirlari numaralandirarak cikti verir
-cat isimler.txt| sort    satirlari bas harflerine göre siralar
-&& önce sol taraf sonra sag taraf calisir
+`cp  -pr`  klasörü icindekilerle  kopyalaar
+`cat  -n`  satirlari numaralandirarak cikti verir
+`cat isimler.txt| sort`    satirlari bas harflerine göre siralar
+&& önce sol taraf  sonra sol calisirsa sag taraf calisir
 echo -e icerdeki özel karakterleri algila
 yorum satirlari: # ile baslar
 Bash script te cift tirnak kullan
