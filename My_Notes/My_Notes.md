@@ -83,9 +83,7 @@ systemd-analyze + blame # makinenin baslamasi icin süre + detaylat
 
 
 ### .target .service dosyalari
-.target uzantılı dosyalar, SysVinit’teki runlevel kavramının modern karşılığıdır. .service dosyaları bireysel servisleri tanımlar. .target dosyaları ise bu servisleri bir araya getirip topluca yönetir. `/lib/systemd/system/` veya `/etc/systemd/system/` icinde bulunurlar. 
-
-.service dosyası bir servisin kendisini tanımlar. İçinde hangi binary’nin çalıştırılacağı, hangi kullanıcıyla çalışacağı, ne zaman yeniden başlatılacağı gibi bilgiler olur. Örneğin: `myhttp.service` dosyasini olusturalim. 
+.target uzantılı dosyalar, SysVinit’teki runlevel kavramının modern  karşılığıdır. .service dosyaları bireysel servisleri tanımlar. .target dosyaları ise bu servisleri bir araya getirip topluca yönetir. `/lib/systemd/system/` veya `/etc/systemd/system/` icinde bulunurlar. `.service` dosyası bir servisin kendisini tanımlar. İçinde hangi binary’nin çalıştırılacağı, hangi kullanıcıyla çalışacağı, ne zaman yeniden başlatılacağı gibi bilgiler olur. Örneğin: `myhttp.service` dosyasini olusturalim. 
 ```ini
 [Unit]
 Description= Python HTTP Server
