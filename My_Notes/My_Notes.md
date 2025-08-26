@@ -5,47 +5,37 @@ ssh-copy-id -i ~/.ssh/id_rsa.pub ansible@192.168.178.115
 
 ``` bash
 ls ; date
-Sample_file  myapp
+Sample_file  myapp         
 Fri Aug 15 09:01:39 PM CEST 2025
 ```
-&&  gibi ; kullanilabilir fakat komut1 && komut2 farkli anlama gelir. birinci calisr isi biterse ikinci calisir. ; de birbirinden bagimsiz calisir.
+&&  baglacida ; gibi kullanilabilir fakat komut1 && komut2 farkli anlama gelir. birinci calisr isi biterse ikinci calisir. ; de birbirinden bagimsiz calisir.
 benzer sekilde komut1 || komut2 var. Bu defa sol taraf hata dönerde sag taraf calisir-  sol taraf calisirsa sag calismaz. XOR gibi 
 
-yine command & ie komutarkada calisir terrmnal sana kalir
-
+yine command & ie komut arka planda calisir
 # Red Hat Linux Notes
-## Chapter 0: ## Linux System Basics – Quick Notes
+# Linux System Basics – Quick Notes
 sudo derdinden kurtulmak istiyorum:
 Hedef makinada şu komutla sudoers dosyasına özel bir kural ekle:
 
 ```bash
 sudo visudo
+test ALL=(ALL) NOPASSWD: ALL
+# Eğer sadece reboot komutu için yetki vermek istersen:
+test ALL=(ALL) NOPASSWD: /sbin/reboot
 ```
-
-Ve şunu ekle (örnek kullanıcı: ansible):
+## System and Hardware Info
 
 ```bash
-ansible ALL=(ALL) NOPASSWD: ALL
-```
-
-Eğer sadece reboot komutu için yetki vermek istersen:
-```bash
-ansible ALL=(ALL) NOPASSWD: /sbin/reboot
-```
-
-*** System and Hardware Info ***
-
-```bash
-hostnamectl  # Shows full system metadata (hostname, OS, kernel, architecture, etc.) 
+hostnamectl  # Shows full system metadata 
 lscpu  # Displays CPU architecture and info  
 lsblk  # Lists block devices (disks, partitions, etc.) 
 free -m  # Shows memory (RAM) usage in MB 
 df -kh # Displays all mounted partitions and their usage in human-readable format
 date  # Displays current date, time, and timezone (localization info)
 whoami  # Shows current logged-in user 
-who  # Users currently connected to the system (DO NOT REBOOT without checking this. you might interrupt someone else's work) 
+who  # Users currently connected to the system
 ``` 
-*** Monitoring Tools ***
+## Monitoring Tools 
 - `htop`  # A better, interactive version of `top` with a cleaner UI
 - `top` → press `Enter`, then `Shift + M`  
   Sorts processes by memory usage
@@ -53,14 +43,10 @@ who  # Users currently connected to the system (DO NOT REBOOT without checking t
 - `iotop`  # Displays real-time disk read/write by processes
 - `nmon`  # Powerful monitoring tool for all system statistics
 
-*** Aliases & Bash Customization ***
-Each user has their own `.bashrc` file in their home directory.  
-To apply changes, run:  
-
-```bash
-source ~/.bashrc
-```
-Example aliases (add these to .bashrc):
+## Aliases & Bash Customization
+Each user has their own `.bashrc` file. To apply changes, run:  
+`source ~/.bashrc`
+Sample aliases :
 ```bash
 alias sysupdate='dnf -y update'
 alias c='clear'
@@ -69,78 +55,62 @@ alias ping='ping -c 5'
 alias ports='netstat -tulanp'
 ```
 Changing the System Hostname: Edit the file directly 
-`sudo vim /etc/hostname`
-then reboot. Or use the code `sudo hostnamectl set-hostname newname`
+`sudo vim /etc/hostname + reboot` or `sudo hostnamectl set-hostname newname`
+Script Logging: Save terminal output ` script deneme.txt # Type exit to stop`
 
-Script Logging: To log all terminal output into a file:
+# System Architecture and Boot Process
+## Boot Process
+ - BIOS/UEFI initializes hardware and loads the bootloader.
+ - GRUB (GRand Unified Bootloader) presents boot options and loads the kernel.
+ - Kernel Initialization.
+ - init/Systemd launch essential services and bring the system to a usable state.
+
+## systemd Overview
+
+systemd, modern Linux sistemlerinin temelini oluşturan bir sistem ve servis yöneticisidir. Eskiden kullanılan init sisteminin yerini almıştır. Temel olarak şunları yapar:
+ - Sistemi Başlatma (Boot): Cekirdekten sonra ilk çalışan süreçtir (PID 1). Sistemi kullanıma hazır hale getirmek için gerekli servisleri ve süreçleri başlatır. Bunu paralel olarak yaparak sistem açılış süresini önemli ölçüde kısaltır.
+ - Servis Yönetimi: Sistemdeki tüm servisleri (web sunucuları, veritabanı sunucuları, ağ servisleri usw). 
+ - Bağımlılık Yönetimi: Servisler arasındaki bağımlılıkları takip eder ve servislerin doğru sırada başlatılmasını sağlar. Bir servis çalışabilmek için başka bir servisin çalışıyor olmasına ihtiyaç duyabilir. 
+ - Kaynak Yönetimi: Sistem kaynaklarını (CPU, bellek ...) yönetitr izler kontrol eder. 
+ - Günlükleme (Journaling): Sistem olaylarını ve servislerin çıktılarını merkezi bir yerde (journald) toplar. `journalctl`  komutu ile bu günlüklere erişilebilir.
+ - Diğer Özellikler: Zamanlanmış görevler (systemd.timer ile cron yerine), ağ yapılandırması (systemd-networkd), kullanıcı oturum yönetimi (systemd-logind) gibi birçok ek özelliği de bünyesinde barındırır.
 ```bash
-script deneme.txt # Type exit to stop and save the log.
+systemd-analyze + blame # makinenin baslamasi icin süre + detaylat 
+/lib/systemd/system # services are here
 ```
-
-
-# Chapter 1: System Architecture and Boot Process
-## 1.1 Boot Process
-### BIOS/UEFI
-	BIOS/UEFI** initializes hardware and loads the bootloader.
-
-### GRUB Bootloader
-	- **GRUB** (GRand Unified Bootloader) presents boot options and loads the kernel.
-
-### Kernel Initialization
-	- **GRUB** (GRand Unified Bootloader) presents boot options and loads the kernel.
-
-### init/Systemd
-	- **init/systemd** takes over to launch essential services and bring the system to a usable state.
-
-## 1.3 systemd Overview
-Modern Red Hat-based systems use **systemd**, a system and service manager that replaces traditional `init` scripts. It uses *targets* instead of runlevels to define system states.
-SysVinit stands for "System V Init," which is a system initialization (init) manager used in Linux and Unix-like operating systems. It is responsible for starting and managing system services (daemons) when the system boots up. SysVinit follows the System V-style initialization, which was developed by Sun Microsystems for Unix systems.
-
-SysVinit manages services through script files, typically located in the /etc/init.d/ directory. These scripts control the starting, stopping, and restarting of various services during the system boot and shutdown process.
-
-Systemd is a software used as a system and service manager in Linux operating systems. It consists of various components that perform tasks like system initialization, managing services, and collecting logs. Systemd replaces the older init systems and provides advantages such as faster boot times and parallel process execution.
-
-systemd-analyze makinenin baslamasi icin gecen süre 
-systemd-analyze blame   detaylar
-cd /lib/systemd/system   services are here
-
-systemd, modern Linux sistemlerinin temelini oluşturan bir sistem ve servis yöneticisidir. Eskiden kullanılan init sisteminin yerini almıştır ve sistemin başlatılması, servislerin yönetilmesi ve sistem kaynaklarının kontrolü gibi birçok kritik görevi üstlenir.
-
-Temel olarak şunları yapar:
-
-Sistemi Başlatma (Boot): Bilgisayar açıldığında çekirdekten sonra ilk çalışan süreçtir (PID 1). Sistemi kullanıma hazır hale getirmek için gerekli servisleri ve süreçleri başlatır. Bunu paralel olarak yaparak sistem açılış süresini önemli ölçüde kısaltır.
-Servis Yönetimi: Sistemdeki tüm servisleri (arka planda çalışan uygulamalar) yönetir. Bu servislere örnek olarak web sunucuları, veritabanı sunucuları, ağ servisleri verilebilir. Servisleri başlatma, durdurma, yeniden başlatma, durumlarını kontrol etme ve açılışta otomatik olarak başlamalarını ayarlama gibi işlemleri kolaylaştırır. Bu işlemler genellikle systemctl komutu ile yapılır.
-Bağımlılık Yönetimi: Servisler arasındaki bağımlılıkları takip eder ve servislerin doğru sırada başlatılmasını sağlar. Bir servis çalışabilmek için başka bir servisin çalışıyor olmasına ihtiyaç duyabilir. systemd bu bağımlılıkları yönetir.
-Kaynak Yönetimi: Sistem kaynaklarını (CPU, bellek, vb.) yönetmeye yardımcı olur. Servislerin kaynak kullanımını izleyebilir ve kontrol edebilir.
-Günlükleme (Journaling): Sistem olaylarını ve servislerin çıktılarını merkezi bir yerde (journald) toplar. Bu sayede sistemdeki sorunların teşhis edilmesi kolaylaşır. journalctl komutu ile bu günlüklere erişilebilir.
-Diğer Özellikler: Zamanlanmış görevler (systemd.timer ile cron yerine), ağ yapılandırması (systemd-networkd), kullanıcı oturum yönetimi (systemd-logind) gibi birçok ek özelliği de bünyesinde barındırır.
-
-	
-## 1.4 Runlevels and Targets
-.target uzantılı dosyalar, systemd sisteminde özel bir rol oynar. Bunlar aslında birer "hedef" 
-(target) dosyalarıdır ve SysVinit’teki runlevel kavramının modern karşılığıdır.
-
-.service dosyaları bireysel servisleri tanımlar. .target dosyaları ise bu servisleri bir 
-araya getirip topluca yönetir.
+### Runlevels and Targets
+.target uzantılı dosyalar, SysVinit’teki runlevel kavramının modern karşılığıdır. .service dosyaları bireysel servisleri tanımlar. .target dosyaları ise bu servisleri bir araya getirip topluca yönetir.
 
 Nerede bulunurlar? /lib/systemd/system/ veya /etc/systemd/system/
 
-Örnek .target Dosyaları:
+
+### .target .service dosyalari
+.service dosyası bir servisin kendisini tanımlar. İçinde hangi binary’nin çalıştırılacağı, hangi kullanıcıyla çalışacağı, ne zaman yeniden başlatılacağı gibi bilgiler olur. Örneğin: `myhttp.service` dosyasini olusturalim. 
+```ini
+[Unit]
+Description= Python HTTP Server
+[Service]
+ExecStart=/usr/bin/python3 -m http.server 8080
+Restart=always
+User=nobody
+[Install]
+WantedBy=multi-user.target
+```
+Bu dosya kaydedilip `systemctl enable myhttp.service` denildiğinde servis açılışta otomatik başlar.
+
+.target dosyası ise doğrudan bir servis tanımlamaz; sadece bir grup mantıksal hedef sunar. Örneğin:
+```ini
+[Unit]
+Description=Custom Services Target
+Requires=myhttp.service
+Requires=nginx.service
+After=network.target
+```
+Bu custom.target çağrıldığında myhttp.service ve nginx.service beraber yüklenir. default .target dosyalari:
 --- multi-user.target
-Geleneksel olarak runlevel 3’e karşılık gelir (ağ servisleri, çoklu kullanıcı ama GUI yok).
-Ağ, SSH, cron gibi servisleri çalıştırır.
- systemctl status multi-user.target
+(ağ servisleri, çoklu kullanıcı, SSH, cron gibi servisleri çalıştırır. systemctl status multi-user.target
 
---- graphical.target
-GUI içeren sistemler için kullanılır (runlevel 5 karşılığı).
-
---- default.target
-Kontrol etmek için: ls -l /etc/systemd/system/default.target
-
---- network.target
-Ağ bağlantısının başlatılmasına hazır olduğunu belirtir. Ağ servislerini başlatmak için 
-genellikle diğer servisler buna bağımlı olur.
-
+--- graphical.target GUI içeren sistemler için kullanılır. 
 
 # Package Management with YUM and DNF
 ```bash
