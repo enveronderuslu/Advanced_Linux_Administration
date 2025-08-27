@@ -78,10 +78,6 @@ systemd, modern Linux sistemlerinin temelini oluşturan bir sistem ve servis yö
 systemd-analyze + blame # makinenin baslamasi icin süre + detaylat 
 /lib/systemd/system # services are here
 ```
-### Runlevels and Targets
-
-
-
 ### .target .service dosyalari
 .target uzantılı dosyalar, SysVinit’teki runlevel kavramının modern  karşılığıdır. .service dosyaları bireysel servisleri tanımlar. .target dosyaları ise bu servisleri bir araya getirip topluca yönetir. `/lib/systemd/system/` veya `/etc/systemd/system/` icinde bulunurlar. `.service` dosyası bir servisin kendisini tanımlar. İçinde hangi binary’nin çalıştırılacağı, hangi kullanıcıyla çalışacağı, ne zaman yeniden başlatılacağı gibi bilgiler olur. Örneğin: `myhttp.service` dosyasini olusturalim. 
 ```ini
@@ -111,6 +107,7 @@ Bu custom.target çağrıldığında myhttp.service ve nginx.service beraber yü
 --- graphical.target GUI içeren sistemler için kullanılır. 
 
 # Package Management with YUM and DNF
+
 ```bash
 dnf install package-name #Installing packages:
 dnf update # Updating packages: 
@@ -123,118 +120,51 @@ dnf -y remove libreoffice*
 ```
  
 ### ORPHAN PACKAGES 
-A paketi B paketine bagli . B yi kaldirdin.
-A atil kalsi. iste A ya Orphan package denir.  
-How to remove? dnf repoquery --unneeded
+A paketi B paketine bagli . B yi kaldirdin. A atil kaldi. iste A ya Orphan package denir. How to remove?
+```bash
+dnf repoquery --unneeded
 dnf remove $(dnf repoquery --unneeded -q)
+```
+Snap, Canonical (Ubuntu'nun geliştiricisi) tarafından geliştirilen, dağıtımdan bağımsız çalışan bir paket sistemidir. Uygulamalar kendi bağımlılıklarıyla birlikte paketlenir. `sudo snap install App1`
 
-Snap — Canonical (Ubuntu'nun geliştiricisi) tarafından geliştirilen, dağıtımdan bağımsız 
-çalışan bir paket sistemidir. Uygulamalar kendi bağımlılıklarıyla birlikte paketlenir, 
-bu yüzden klasik apt ya da dnf gibi sistemle sıkı sıkıya bağlı değildir
-
-sudo snap install App1
-
-lsblk komutu, Linux’ta bağlı olan blok aygıtlarını (diskler, bölümler, USB bellekler, 
-vs.) listeler. "List block devices" anlamına gelir. 
-Burada görecegin loop lar snap ten kurulan uygulamalar
-
-### 2.6 Case Study
+### Case Study
 	
 sudo  apt install google-chrome-stable_current_amd64.deb
 E: Unable to locate package google-chrome-stable_current_amd64.deb
 apt, bu komuttaki "google-chrome-stable_current_amd64.deb" ifadesini, bir paket deposundaki paket ismi sanıyor. 
-
-sudo apt install Firefox
-komutunda Dogru calisir 
-Ama sen aslında elindeki yerel bir dosyayı kurmaya çalışıyorsun.
-
-Bu yüzden sistem şöyle düşünüyor:
-
-“Benim depolarımda ‘google-chrome-stable_current_amd64.deb’ diye bir paket yok!”
-
-Ve hata veriyor.
-
-apt, .deb dosyalarını paket deposu (package repository) adı gibi algılar.
-Bu yüzden "Unable to locate package" hatası verir.
+`sudo apt install Firefox` komutunda Dogru calisir. Ama sen aslında elindeki yerel bir dosyayı kurmaya çalışıyorsun. Bu yüzden sistem, Benim depolarımda `google-chrome-stable_current_amd64.deb` diye bir paket yok diyor. Ve hata veriyor. apt, .deb dosyalarını paket deposu (package repository) adı gibi algılar. Bu yüzden "Unable to locate package" hatası verir.
 .deb dosyası ile çalışmak için uygun değil.
+`sudo dpkg -i  google-chrome-stable_current_amd64.deb`  -> Doğru kullanım
 
-sudo dpkg -i  google-chrome-stable_current_amd64.deb -> Doğru kullanım
+`sudo apt install firefox` dediğinde, apt markete gider, raftan firefox paketini bulur ve kurar. 
+3. apt = Market görevlisiakip eder.
+4. deb dosyası = Poşet içindeki ürün `sudo dpkg -i ürün.deb`
+5. baska yol: dosyayi indirdigin yerde terminali ac. ` apt install ./sample.deb` yazsan direk calisacakti Aklini s*keyim
 
-ANALOJI
-
- 1. Paket = Ürün
-Her yazılım (örneğin firefox, vlc, gimp) bir "paket"tir.
-Bu paketlerde şunlar vardır:
-
-Uygulamanın kendisi
-
-Gerekli kütüphaneler (bağımlılıklar)
-
-Nasıl kurulacağına dair talimatlar
-
-2. Paket deposu = Market rafları
-Paketler bir paket deposunda (repository) saklanır.
-Bu bir internet sunucusudur. Ubuntu, Debian vb. dağıtımlar kendi resmi depolarını sunar.
- 
-http://archive.ubuntu.com/ubuntu/
-Sen terminalde:
- 
-sudo apt install firefox
-dediğinde, apt markete gider, raftan firefox paketini bulur ve kurar.
-
-3. apt = Market görevlisi
-apt, siparişini alır, paketi bulur, varsa eksik kütüphaneleri de tamamlar ve yükler.
-Ayrıca güncellemeleri de takip eder.
-
-4. .deb dosyası = Poşet içindeki ürün
-Bir .deb dosyası ise marketten bağımsız olarak dışardan getirdiğin ürün gibidir.
-Sen bu ürünü elden getirip evine koyarsın ama içeriğini tanımak için:
- 
-sudo dpkg -i ürün.deb
-dersin.
-
-Ama eğer ürün eksikse (bağımlılıkları yoksa), apt -f install diyerek eksikleri yine marketten tamamlatırsın. 
-
-baska yol: dosyayi indirdigin yerde terminali ac 
-sudo  apt install ./google-chrome-stable_current_amd64.deb
-yazsan direk calisacakti Aklini s*keyim
-
-
-
-## Chapter 3: Filesystem Management
-
-
+# Filesystem Management
 
 SPECIAL PERMISSIONS
 | Bit      | Kullanım Yeri | Etkisi                                                                  | İlgili Komut       | `ls -l` Göstergesi |
 | -------- | ------------- | ----------------------------------------------------------------------- | ------------------ | ------------------ |
-| `setuid` | **Dosya**     | Dosya, **sahibinin yetkileriyle çalışır**                               | `chmod u+s dosya`  | `rws` (x yerine s) |
-| `setgid` | **Dosya**     | Dosya, **grup sahibinin yetkisiyle çalışır**                            | `chmod g+s dosya`  | `rwxr-s`           |
-| `setgid` | **Klasör**    | Klasöre eklenen dosyalar **aynı grup** ile oluşturulur                  | `chmod g+s klasör` | `rwxr-s`           |
-| `sticky` | **Klasör**    | Klasördeki dosyalar, **sadece sahibi veya root tarafından silinebilir** | `chmod +t klasör`  | `rwxrwxrwt`        |
- ortak calisma gruplarinda kullanilir. Gruba bisey ekleyince
- artik o gruptaki herkese ait olur.
-*
-## Chapter 4: User and Group Management
+| `setuid` | **Dosya** | Dosya, **sahibinin yetkileriyle çalışır**                               | `chmod u+s dosya`  | `rws` (x yerine s) |
+| `setgid` | **Dosya** | Dosya, **grup sahibinin yetkisiyle çalışır**                            | `chmod g+s dosya`  | `rwxr-s`           |
+| `setgid` | **Klasör** | Klasöre eklenen dosyalar **aynı grup** ile oluşturulur       | `chmod g+s klasör` | `rwxr-s`           |
+| `sticky` | **Klasör** | Klasördeki dosyalar, **sadece sahibi veya root tarafından silinebilir** | `chmod +t klasör`  | `rwxrwxrwt`        |
+ 
+# User and Group Management
 
-USER ACCOUNT MANAGEMENT
-" su - " superuser yapar 
-useradd
-groupadd
-userdel supi home directory silinmez
-userdel -r supi home directory silinir
-usermod -G heros supiderman (diger gruplardan cikarir. kendi ismine ait grup elbette korumur)
-usermod -aG heros supiderman (diger gruplarda kalmaya devam eder)
-visudo /etc/sudoers
-w veya users makineyi o an kullanan kullanicilari verir
+useradd, groupadd
+userdel <user> home directory silinmez
+userdel -r <user> home directory silinir
+usermod -G <DROUP> <USER> (diger gruplardan cikarir. kendi ismindeki grup korumur)
+usermod -aG <GROUP> <USER> (diger gruplarda kalmaya devam eder)
+visudo /etc/sudoers osyasini acar-
+who veya users makineyi o an kullanan kullanicilari verir
 
-### 4.1 User Accounts and Permissions
+## User Accounts and Permissions
 
 etc/passwd user accountlarla ilgili bilgiler
-etc/shadow encrypted password ler burada. Password  policies de burada
-
-passwd username ile bu Userin passwrd unu halledersin
-
+etc/shadow encrypted password ler burada.
 
 ## Group Administration
 
