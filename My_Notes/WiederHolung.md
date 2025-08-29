@@ -29,4 +29,5 @@ Requires=nginx.service
 After=network.target
 ```
 
+
 Bu custom.target çağrıldığında myhttp.service ve nginx.service beraber yüklenir. Yani .service tekil yapı taşıdır, .target bunları organize eden şemsiye gibidir.
