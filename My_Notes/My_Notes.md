@@ -158,13 +158,10 @@ userdel <user> home directory silinmez
 userdel -r <user> home directory silinir
 usermod -G <DROUP> <USER> (diger gruplardan cikarir. kendi ismindeki grup korumur)
 usermod -aG <GROUP> <USER> (diger gruplarda kalmaya devam eder)
-visudo /etc/sudoers osyasini acar-
-who veya users makineyi o an kullanan kullanicilari verir
+visudo /etc/sudoers dosyasini acar- who veya users makineyi o an kullanan kullanicilari verir
 
-## User Accounts and Permissions
-
-etc/passwd user accountlarla ilgili bilgiler
-etc/shadow encrypted password ler burada.
+`etc/passwd` user accountlarla ilgili bilgiler
+`etc/shadow` encrypted password ler burada.
 
 ## Group Administration
 
