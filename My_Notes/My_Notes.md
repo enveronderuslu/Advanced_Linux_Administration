@@ -143,13 +143,15 @@ apt, bu komuttaki "google-chrome-stable_current_amd64.deb" ifadesini, bir paket 
 
 # Filesystem Management
 
-SPECIAL PERMISSIONS
+## Special Permissions
+
 | Bit      | Kullanım Yeri | Etkisi                                                                  | İlgili Komut       | `ls -l` Göstergesi |
 | -------- | ------------- | ----------------------------------------------------------------------- | ------------------ | ------------------ |
-| `setuid` | **Dosya** | Dosya, **sahibinin yetkileriyle çalışır**                               | `chmod u+s dosya`  | `rws` (x yerine s) |
-| `setgid` | **Dosya** | Dosya, **grup sahibinin yetkisiyle çalışır**                            | `chmod g+s dosya`  | `rwxr-s`           |
-| `setgid` | **Klasör** | Klasöre eklenen dosyalar **aynı grup** ile oluşturulur       | `chmod g+s klasör` | `rwxr-s`           |
-| `sticky` | **Klasör** | Klasördeki dosyalar, **sadece sahibi veya root tarafından silinebilir** | `chmod +t klasör`  | `rwxrwxrwt`        |
+| `setuid` | **Dosya**     | Dosya, **sahibinin yetkileriyle çalışır**                               | `chmod u+s dosya`  | `rws` (x varsa `s`, yoksa `S`) |
+| `setgid` | **Dosya**     | Dosya, **grup sahibinin yetkileriyle çalışır**                          | `chmod g+s dosya`  | `rwxr-s` (x varsa `s`, yoksa `S`) |
+| `setgid` | **Klasör**    | Klasöre eklenen dosyalar **aynı grup** ile oluşturulur                  | `chmod g+s klasör` | `rwxr-s`            |
+| `sticky` | **Klasör**    | Klasördeki dosyalar, **sadece sahibi veya root tarafından silinebilir** | `chmod +t klasör`  | `rwxrwxrwt`        |
+
  
 # User and Group Management
 
@@ -163,89 +165,52 @@ visudo /etc/sudoers dosyasini acar- who veya users makineyi o an kullanan kullan
 `etc/passwd` user accountlarla ilgili bilgiler
 `etc/shadow` encrypted password ler burada.
 
-## Group Administration
-
-/etc/login.defs - Configuration control definitions for the login package. user login islemlerinin ddetaylari
-
-sudo chage-l user1   Komutuyla detaylari görürsün. 
-password yönetimine dair bazi kurallar mesela max usage day gibi, nasil degisir. Yine man dan bak belli degisiklikleri yap.  
-
-her kullanici icin ayri ayri yapmak yerine 
-sudo nano /etc/logindefs  
-dosyasinda bu sayilari düzelt. Loginretries ile  arkaarkaya kac kez yanlis girince kilitlebecegini kac Saniye sonra kilidin kalkacagini yine belirle
-
-FAILED LOGINLER ICIN DETAYLI ISLEM BELIRLEME /etc/security/faillock.conf
-DOSYASINDDA 
-
-/etc/pam.d  icinde config dosyasindada belli ayarlamalar yapilabiliyor
- 
-sudo groupadd groupname  nerede bu gruplar
-less /etc/group
-Wie wird der Gruppenname geändert  sudo groupmod -n der_neue_Gruppenname gurup1
-Hinzufügen eines Namens zu einer Gruppe sudo usermod -aG IT maldegnegi
-
-
 ## Password Policies
 
-PASSWORD AGING
-chage -m mindays -M maxdays -d lastday
-/etc/login.defs icinde ayarlamalari yapar (password aging controls kisminda)
+PASSWORD AGING: chage -m mindays -M maxdays -d lastday
+`sudo nano /etc/logindefs` dosyasinda bu sayilari düzelt. Bu yeni sistemlerde artik yok. Peki ne var: ` /etc/security/pwquality.conf` yine FAILED LOGINLER ICIN `/etc/security/faillock.conf` 
 
-RECOVER ROOT PASSWORD
-edit grub detayi cok fazla sifreni unutma aq
-
-## Using `sudo` for Privilege Delegation
-/etc/sudoers icinde düzenleme yap
-
-# System Services and Process Management
-## Managing Services with `systemctl`
-systemctl enable <service> her boot edildiginde sistemi baslatir 
 ### Using `ps`
 
-ps aux | grep  ssh bununla tüm ssh processlerini ve PID lerini görürsün
+`ps aux | grep  ssh` bununla tüm ssh processlerini ve PID lerini görürsün
 
 ctrl + z ekrandaki islmei arkaya atar
 jobs ile bu islemleri görürsün
 %1 sana arkada calisan 1 numarali processi getirir
 fg veya bg foreground background ta calistirir
-systemctl background da calisan tüm programlari verir
-Yine "ps -eo pid,ni,pri,cmd --sort=ni" komutuylada görürsün
-
 
 ### SYSTEM MONITORING
 Using `top` and `htop`
 
-top -u user1  user1 ne kullaniyor sadece bunu gösterir
+`top -u user1` user1 ne kullaniyor sadece bunu gösterir
 top 
 
-| Kolon     | Açılım (İngilizce)   | Açıklama (Türkçe)                                   |
-| --------- | -------------------- | --------------------------------------------------- |
-| `PID`     | Process ID           | İşlem kimliği                                       |
-| `USER`    | User                 | İşlemi başlatan kullanıcı                           |
-| `PR`      | Priority             | İşlem önceliği                                      |
-| `NI`      | Nice value           | Nice değeri – işlem önceliğini belirleyen değer     |
-| `VIRT`    | Virtual Memory       | Sanal bellek kullanımı (MB/KB)                      |
-| `RES`     | Resident Memory      | Fiziksel RAM kullanımı                              |
-| `SHR`     | Shared Memory        | Paylaşılan bellek miktarı                           |
-| `S`       | State                | İşlem durumu (S: uyku, R: çalışıyor, Z: zombie vs.) |
-| `%CPU`    | CPU Usage Percent    | İşlemin CPU kullanım yüzdesi                        |
-| `%MEM`    | Memory Usage Percent | İşlemin RAM kullanım yüzdesi                        |
-| `TIME+`   | CPU Time (total)     | İşlemin toplam CPU süresi (saniye+salise)           |
+| Kolon     | Açılım               | Açıklama  |
+| --------- | -------------------- | ------------------ |
+| `PID`     | Process ID           | İşlem kimliği  |
+| `USER`    | User                 | İşlemi başlatan kullanıcı |
+| `PR`      | Priority             | İşlem önceliği |
+| `NI`      | Nice value           | Nice islem önceliğini belirler |
+| `VIRT`    | Virtual Memory       | Sanal bellek kullanımı (MB/KB) |
+| `RES`     | Resident Memory      | Fiziksel RAM kullanımı   |
+| `SHR`     | Shared Memory        | Paylaşılan bellek miktarı  |
+| `S`       | State                | İşlem S: uyku, R: çalışıyor, Z: zombie |
+| `%CPU`    | CPU Usage Percent    | İşlemin CPU kullanım yüzdesi   |
+| `%MEM`    | Memory Usage Percent | İşlemin RAM kullanım yüzdesi   |
+| `TIME+`   | CPU Time (total)     | İşlemin toplam CPU süresi |
 
-
-
-dmesg hardware ile ilgili hersey burada
-| Section                | Description                                                               |
-| ---------------------- | ------------------------------------------------------------------------- |
-| **Boot**               | Messages related to system initialization (BIOS, ACPI, EFI).              |
-| **CPU and Memory**     | Information about processors, cores, and memory mapping.                  |
-| **Disks and I/O**      | Detection and status of storage devices (e.g., `sda`, `nvme`, `usb`).     |
-| **Network Interfaces** | Initialization of network devices (e.g., `eth0`, `wlan0`, `enpXsY`).      |
-| **USB Devices**        | Connection/disconnection messages for USB peripherals.                    |
-| **Driver Errors**      | Kernel messages indicating driver or hardware failures (`error`, `fail`). |
-| **Kernel Warnings**    | Serious issues or crashes (`WARNING`, `BUG`, `panic`, `call trace`).      |
-| **Module Loading**     | Messages about kernel modules being loaded (`modprobe`, `insmod`).        |
-| **Timestamps**         | Elapsed time since boot, shown as `[ XX.XXXXXX ]` in each line.           |
+***dmesg*** hardware ile ilgili hersey burada
+| Section                | Description    |
+| ---------------------- | ----------------------- |
+| Boot             | Messages about system initialization BIOS, ACPI, EFI |
+| CPU and Memory   | Information about processors, cores, and memory   |
+| Disks and I/O    | Detection and status of storage devices `sda, nvme,usb`|
+| Ntwrk Interfaces | Initialization of network devices `eth0, wlan0, enpXsY` |
+| USB Devices      | Connection/disconnection messages for USB      |
+| Driver Errors    | Kernel messages indicating driver failures `error, fail`|
+| Kernel Warnings  | issues, crashes `WARNING, BUG, panic, call trace` |
+| Module Loading   | Messages about kernel modules loaded `modprobe, insmod`|
+| Timestamps       | Elapsed time since boot, shown as `[ XX.XXXXXX ]` in each line.|
 
 pratik filtreleme 
 ```bash
@@ -275,50 +240,37 @@ pstree -p newuser # proses agaci
 
 nice : run a program with modified scheduling priority.High priority icin negatif degerler verilir. -20 = en yüksek öncelik. negatif degeri sadece adminler verebilir
 19 = en düşük öncelik (sisteme en az yük olur)
-Neden Kullanılır? Arka planda çalışan ama acelesi olmayan işler için (örn: büyük dosya dönüştürme, yedekleme) Sistem performansını etkilemeden yoğun işler yapmak için. top komutunda öncelikleri görebilirsin. 
 
 renice komutuyla siralamayi degistirirsin
 
 ## Scheduled Tasks
 ### `cron`
 
-Application=Service
-Script list of instructions
-Process when you start a service(app) it starts a Process and process id
-Daemon etwas continuously runs in background doesnt stops. it is also a process
-Threads Service-->Process-->Thread1, thread2, ...
-Job (workorder) Run a service or process at a  schedule time
-
-kill [OPTION] PID manages the processes 
-crontab - e = Edit the crontab table
-crontab -l list the crontab entries -r remove
-/etc/cron* kisminda saatlik aylik yillik seklinde ayri dosyalara var
-nice process priority
-mesela nice -n 5 en öncelikli 5 process (degerler -20 ile 19 arasindadir
-)bg sleep 100 (normalde 100 saniye beklersin)
-### `at`
+Application=Service: Script list of instructions. 
+Process: when you start a service(app) it starts a Process and process id
+Daemon: etwas continuously runs in background doesnt stops. it is also a process
 
 # Networking
-## Network Configuration
-
 netstat -tunp
 
-| Alan                 | Açıklama                                                                               |
-| -------------------- | -------------------------------------------------------------------------------------- |
-| **Proto**            | Protokol türü: TCP, UDP, RAW gibi.                                                     |
-| **Recv-Q / Send-Q**  | Alınan ve gönderilen veri kuyrukları. Genelde sıfır olur, değilse tıkanıklık olabilir. |
-| **Local Address**    | Yerel IP adresi ve portu. Hangi portun hangi IP'de dinlendiğini gösterir.              |
-| **Foreign Address**  | Bağlı olan uzak IP ve port. Hangi istemcinin bağlı olduğunu gösterir.                  |
-| **State**            | Bağlantı durumu: `LISTEN`, `ESTABLISHED`, `TIME_WAIT`, `CLOSE_WAIT`, vs.               |
-| **PID/Program name** | (Bazı sürümlerde) Bağlantıyı kullanan işlem adı ve PID.                                |
-******************DIKKAT******************
-| Durum                     | Ne Anlama Gelir?                                                     |
-| ------------------------- | -------------------------------------------------------------------- |
-| **LISTEN**                | Port dinlemede, gelen bağlantıları kabul etmeye hazır.               |
-| **ESTABLISHED**           | Aktif bir bağlantı var.                                              |
-| **CLOSE\_WAIT**           | Karşı taraf kapattı ama sizin taraf hala kapatmadı — sorun olabilir. |
-| **TIME\_WAIT**            | Bağlantı kapatıldı ama bir süre daha beklemede kalıyor (normaldir).  |
-| **SYN\_SENT / SYN\_RECV** | TCP bağlantısı kurulmaya çalışılıyor. Aşırıysa ağ sorunu olabilir.   |
+| Alan                 |Açıklama    |
+| -------------------- | -------------------------- |
+| **Proto**            | Protokol türü: TCP, UDP, RAW gibi.     |
+| **Recv-Q / Send-Q**  | Alınan ve gönderilen veri kuyrukları. |
+| **Local Address**    | Yerel IP adresi ve portu. Hangi portun hangi IP'de |
+| **Foreign Address**  | Bağlı olan uzak IP ve port. Hangi istemcinin bağlı  |
+| **State**            | Bağlantı durumu: `LISTEN`, `ESTABLISHED` vs.        |
+| **PID/Program name** | (Bazı sürümlerde) Bağlantıyı kullanan işlem adı ve PID |
+
+***DIKKAT***
+
+| Durum              | Ne Anlama Gelir?             |
+| ------------------ | ---------------------------- |
+| **LISTEN**         | Port dinlemede, gelen bağlantıları kabul etmeye hazır. |
+| **ESTABLISHED**    | Aktif bir bağlantı var |
+| **CLOSE\_WAIT**    | Karşı taraf kapattı ama sizin taraf hala kapatmadı |
+| **TIME\_WAIT**     | Bağlantı kapatıldı ama bir süre daha beklemede |
+| **SYN\_SENT / SYN\_RECV** | TCP bağlantısı kurulmaya çalışılıyor.  |
 
 *** CASE STUDY ***
 ip_A 192.168.1.A
@@ -335,15 +287,9 @@ ip route add 192.168.2.B.0/24 via 192.168.1.B
  ```
 
 /etc/resolv.conf ta search yahoo.com yazdiginda artik subdomain leri uzunuzun yazmana gerek kalmaz. artik curl news  yazdiinda direk curl news.yahoo.com anlasilir
-NETWORKING; SERVICES AND SYSTEM UPDATES
-dig @4.2.2.2 google.com -> google.com alan adının IP adresini, 
-4.2.2.2 DNS sunucusunu kullanarak sorgular.
+
+dig @4.2.2.2 google.com -> google.com alan adının IP adresini, 4.2.2.2 DNS sunucusunu kullanarak sorgular.
 /etc/resolv.conf 
-ns
-switch.conf
-Görevi:
-Sistem hangi kaynaktan (örneğin: dosya, DNS, LDAP) kullanıcı, grup, host, şifre, 
-network vb. bilgilerini alacağını ve hangi sırayla deneyeceğini belirtir.
 
 Örnek içerik:
 passwd:     files sss
@@ -352,125 +298,63 @@ hosts:      files dns
 Anlamı:
 passwd: files sss → Önce /etc/passwd, sonra SSSD (örn. LDAP) kullanılacak.
 hosts: files dns → IP/hostname çözümlemesinde önce /etc/hosts, sonra DNS kullanılacak.
-Bu dosya, kimlik doğrulama veya ağ gibi temel sistem fonksiyonlarının nasıl 
-davranacağını kontrol eder.
-*********************************************************
-/etc/NetworkManager/system-connections/ens...
-burada ip adresini manuelmi yoksa DHCP denmi alacaksin onu belirlersin
-nmcli temiz network device adress bilgisi veriyor
-nmcli connection show buda devices gösteriyor
 
-nmcli connectin show  network adapterlari gösterrir
-nmcli connectin show ens23 ens23 ün detaylarini gösterir 
-nmcli connectin delete ens23 bu adaptörü siler
+nmcli temiz network device adress bilgisi veriyor
+nmcli connection show ens23 ens23 ün detaylarini gösterir 
+nmcli connection delete ens23 bu adaptörü siler
 nmcli connection modify ens224 connection.interface-name "wired connection 3"
 cnnection.interface-name kismini show ens23 komutunda görüyorsun ve tab ile geliyor
+`nmtui` nm-connection-editor (GUI) 
 
-BASKA VARMI
-`nmtui`
-nm-connection-editor (GUI)
-************************************************************
-What is the loopback device?
+What is the loopback device? localhost
+NIC bonding: Combining multiple NICs together
 
-The loopback device is a virtual network interface used by a computer to communicate 
-with itself.
-Details:
-Interface name: lo
-IP address: 127.0.0.1 (IPv4), ::1 (IPv6)
-Hostname: localhost
-Uses:
-Local testing of services and applications
-Internal communication between processes
-No traffic is sent to physical network hardware
-****************************************************
-NIC bonding 
-combining multiple NICs together
-**************************************************
 ss COMMAND
-What is the ss command?
-The ss (socket statistics) command is used in Linux to 
-display detailed information about network sockets. 
-It is considered a faster and more modern replacement for netstat.
-
-Basic Usage Examples
-ss               # Show all connections
+It is a faster and more modern replacement for netstat.
+```bash
 ss -tuln         # Show listening TCP/UDP ports with numeric addresses
 ss -s            # Display summary statistics
 ss -plnt         # Show listening TCP sockets with process info
-
-Protocol: Set of rules that computers use to communicate
-how to copy a file from a server to another?
-scp test.txt  kali@192.168.178.114:/home/kali/Desktop
-timedatectl
-timedatectl list-timezones
+```
+Copy a file from a server to another; `scp *.txt  kali@192.168.X.X:/kali/Desktop` 
 timedatectl set-timezone Europe/Berlin
+`traceroute www.google.com` . Bunun dinamik olani real time olani mtr dir.  `mtr www.google.com`. 
 
-traceroute: traceroute is used to display the path that 
-network packets take from your computer to a destination 
-(IP or domain). It helps identify where delays or 
-connection problems occur in the route.
-traceroute www.google.com 
-Bunun dinamik olani real time olani mtr dir. 
-mtr www.google.com
-
-### Using `nmcli`
-
-ip addrb  ifconfig  ten fazlasi
-
-nmcli network detaylarini verir. device name ve connettion name match olmayabilir  parametrelerle ayarlamalar yapabörsin
-
-### Using `nmtui`
 ## DNS Setup
-
-systemd icinde resolve.conf var Dns gibi calisir
-ss -natp listening portlari cikarir.
-rsync remote server sync Damit ist download oder upload möglich
-
-crontab -e ile scheduld tak lar ousturabilirsin
+`/etc/resolve.conf ` Dns gibi calisir
 
 PAM MATRIX DIYE BISEY VAR ONA BI BAK
 
 ## Firewall Configuration with `firewalld`
 
 # Storage and Disk Management
-## Disk Partitioning and Formatting Mount Points and Auto Mounting
+
 fdisk -l gives the list of disks 
 fdisk /dev/nvme0n2  bu bizim VMWare de sonradan ekledigimiz disk 
-Bu  komuttan sonra m yazip enterlayinca opsiyonlar karsina cikar 
-n ebter: add a new partition
 df -h disk usage
+
 ### MOUNT ETME ISLEME 
  mkdir -p /home/enver/Desktop/disk2 
- yukaridaki komutta -p ; aradaki parent klasörler yoksa onlarida olusturur. 
  mkfs.ext4 /dev/nvme0n2   # önce formatladim
  mkdir -p /home/enver/Desktop/disk2 # diski mount edecegim dosyayi olusturdum
+ -p ; aradaki parent klasörler yoksa onlarida olusturur
  mount /dev/nvme0n2 /home/enver/Desktop/Disk2   # simdide mount ettim
  Gparted  disk islemlerini komutsuz arayüz ile hallet
 
-
-## Persistent Mounts using `/etc/fstab`
+ Persistent Mounts using `/etc/fstab`
 
 # Security and SELinux
 ## Basic Security Practices
 
 LINUX OS HARDENING
-- User Account
- Naming conventions. Instead of admin use sadmin, hradmin,  usw. 
- Use user names that are not easily guessted. Useradd ile user 
- olusturdugunda  direk id olusturulur. Begin userid from 10000. 
- also password policies. max min age expire day (one can use chage command)
+
  /etc/login.defs
  /etc/pam.d/system-auth 
  
 - Remove  un-wanted Packages
  rpm -qa kurulu tüm paketleri verir (Debian da "dpkg -l")
  bir paketi kaldirirken dependiec  kismini dikkat et
-- Stop un-used Services
- systemctl -a 
-- Check on Listening Ports
- netstat -tunlp  tcp udp listening Ports
- fuser -k 80/tcp 80 nolu porttaki servisi durdurur ve portu kaoatir
-- Secure SSH Configuration
+
  /etc/ssh/sshd_config
  change port enable 
  PermitRootLogin no yap. kimse root olarak baglanamasin
