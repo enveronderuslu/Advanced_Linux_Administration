@@ -11,11 +11,10 @@ Fri Aug 15 09:01:39 PM CEST 2025
 &&  baglacida ; gibi kullanilabilir fakat komut1 && komut2 farkli anlama gelir. birinci calisr isi biterse ikinci calisir. ; de birbirinden bagimsiz calisir.
 benzer sekilde komut1 || komut2 var. Bu defa sol taraf hata dönerde sag taraf calisir-  sol taraf calisirsa sag calismaz. XOR gibi 
 
-yine command & ie komut arka planda calisir
-# Red Hat Linux Notes
+yine `<command> &` ile komut arka planda calisir
+
 # Linux System Basics – Quick Notes
-sudo derdinden kurtulmak istiyorum:
-Hedef makinada şu komutla sudoers dosyasına özel bir kural ekle:
+sudo derdinden kurtulmak istiyorum: Hedef makinada şu komutla sudoers dosyasına özel bir kural ekle:
 
 ```bash
 sudo visudo
@@ -44,8 +43,8 @@ who  # Users currently connected to the system
 - `nmon`  # Powerful monitoring tool for all system statistics
 
 ## Aliases & Bash Customization
-Each user has their own `.bashrc` file. To apply changes, run:  
-`source ~/.bashrc`
+Users have their own `.bashrc` file. To apply changes, `source ~/.bashrc`
+
 Sample aliases :
 ```bash
 alias sysupdate='dnf -y update'
@@ -54,9 +53,8 @@ alias l='ls -laFtr  --color=no'
 alias ping='ping -c 5'
 alias ports='netstat -tulanp'
 ```
-Changing the System Hostname: Edit the file directly 
-`sudo vim /etc/hostname + reboot` or `sudo hostnamectl set-hostname newname`
-Script Logging: Save terminal output ` script deneme.txt # Type exit to stop`
+Changing the System Hostname: `sudo hostnamectl set-hostname <NewName>`
+Script Logging: `script deneme.txt # Type exit to stop`
 
 # System Architecture and Boot Process
 ## Boot Process
@@ -363,16 +361,9 @@ LINUX OS HARDENING
  firewall-config bir GUI acar
  firewall-cmd  --help
 - Enable Selinux
- Securits Enhanced linux 
- it  is a projeckt of NSE 
- Damit kann man permissions von Prozesse oder Serveces ändern
- sestatus ile kontrol edebilirsin. 
- root@rocky sysconfig]# pwd
+ Security Enhanced linux 
 /etc/sysconfig/selinux burada detaylar var
-- Chande listening Services Port numbers
- mesela ssh portunu 22 den baska bisey yapabilirsin
-- Keep your OS up to date
- 
+- Change listening Services Port numbers
 
 ## File and Directory Permissions
 
@@ -381,73 +372,40 @@ tail etwas.txt shows last 10 line of the file
 tail -n 20 etwas.txt
 sudo tail -f  /var/log/syslog eklendikce yenileri  görürsün
 
-icinde folder1 folder2 folder3 yazan bir folder.txt dosyasi hazirla. cat folder.txt | mkdir  calistirdigin zaman bulundugun klasörde folder1 folder2 folder3 dosyalari olussur . xargs, komut satırında bir komutun argümanlarını dışardan (genellikle stdin'den) alarak çalıştıran bir yardımcı programdır.
-Kısaca: Veriyi alır, komutlara argüman olarak dönüştürür.
+```bash
+ mkdir $(cat folder.txt) 
+ cat folder.txt | xargs mkdir # xargs, komut satırında bir veriyi alır, komutlara argüman olarak dönüştürür
+```
+## `GREP` ve `FIND`
 
-command 2> /dev/null  özellikle komut ciktisinda cok fazla eror olacaksa bu erorlar temizlenmis olur
-
+```bash
 find  / -name *.doc 2> /dev/null
-sudo updatedb sonra locate deneme.txt  daha hizli bulur
-grep -c -i Ali isimleer txt   dosyada ali isminin kac kere gectigini -c , büyük Kücük harf hassasiyetrinden kurtulmayi -i sagllar. 
+sudo updatedb && locate deneme.txt # daha hizli bulur
+grep -c -i Ali names.txt # Dosyada ali isminin kac kere gectigini -c , büyük Kücük harf hassasiyetrinden kurtulmayi -i sagllar. 
 
-grep -r search in subdirectories
-grep -r -i ebenin* recursively tüm dosya isimleri ve iceriklerinde ebenin kelimesiyle baslayan kelemeleri bulur
--r  -i yerine -ri yazabilrsin
+grep -r # search in subdirectories
+grep -ri ebenin* # recursively tüm dosya isimleri ve iceriklerinde ebenin kelimesiyle baslayan kelemeleri bulur
 
-egrep "abc|xyz"  abc veya xyz bulacak
-egrep "^1[0-2]"  ^ satir basinda 10, 11, 12 ile baslayanlar
-sha356sum abc.txt
-
-locate tüm file Lari bir database icinde arar ve süper hizlidir. Fakat sudo updatedb yapmalisin
-
-whereis tüm hardawre da aramaz path de arar 
-which  in farki direk command in nerede calistigini verir
+whereis # tüm hardawre da aramaz path de arar 
+which  # in farki direk command in nerede calistigini verir
 find / -name *.pdf 2> /dev/null
 find / -size +100M 2> /dev/null
-find / -perm /g=w,o=w 2> /dev/null w Hakki olan gruplar ve other people bulunur
+find / -perm /g=w,o=w 2> /dev/null # w Hakki olan gruplar ve other people bulunur
+```
 
-
-chown change owner
 sudo chown cemsit deneme.txt dosyanin owner ini cemsit yapar
-sudo chown -R cemsit klasor  hem klasorun Hemde altinda ne varsa hepinin sahabini degistirdi
+sudo chown -R cemsit Folder_Name # hem klasorun Hemde altinda ne varsa hepinin sahabini degistirdi
 sudo chown -R  cemsit:cemsit klasor/ hem kullanici hem grup degisti
 
--s (setuid veya setgid) argümanı, bir dosya çalıştırıldığında:
-setuid (user): Komut, dosya sahibinin yetkileriyle çalışır.
-setgid (group): Komut, dosya grubunun yetkileriyle çalışır.
-Genellikle chmod u+s veya chmod g+s şeklinde kullanılır.
-
-chmod u+s /usr/bin/example
-
-Bu komut, example dosyasına setuid verir.
-Artık bu dosyayı çalıştıran herkes, onu sahibi gibi (root olabilir) çalıştırır.
-
-chmod g+s /usr/bin/example
-Bu komut, example dosyasına setgid verir.
-Artık dosyadan oluşturulan alt dosyalar, dosyanın grubuna ait olur.
-
-Bir dizine setgid verildiğinde, o dizin içinde oluşturulan tüm dosya ve klasörler, otomatik olarak dizinin grubuna ait olur.
-
-Normalde ne olurdu?
-Varsayılan olarak, bir kullanıcı bir dizine dosya eklediğinde, o dosya kullanıcının aktif grubuna ait olur.
-
-mkdir paylasim
-chown :gelistirici paylasim
-chmod g+s paylasim
-Bu durumda:
-
-mkdir paylasim
-chown :gelistirici paylasim
-chmod g+s paylasim
-
-paylasim klasörüne kim dosya eklerse eklesin,
-Eklenen dosyalar gelistirici grubuna ait olur.
-Bu yöntem, ortak çalışma dizinlerinde grup sahipliğini sabit tutmak için kullanılır.
-
-
+setuid/setgid sadece “komut gibi çalıştırılabilen” dosyalarda anlamlıdır. Metin dosyası yada veri dosyasında etkisi olmaz. Bilmek lazim . Bugünlerde kullaniolmaz. 
+chmod u+s /usr/bin/example bu dosyayı çalıştıran herkes, sahibi gibi çalıştırır.
+chmod g+s /usr/bin/example oluşturulan alt dosyalar, dosyanın grubuna ait olur.
+setfacl daha kullanislidir. 
+ 
 umax file olusturulunca otomatik verilecek yetkileri belirler
 
 cat /etc/fstab  file system table
+
 
 setfacl -m u:cemsit:rw deneme.txt enver kullanicisinin üzerinde 
 Hakki olan deneme.txt dosyasina bir user daha atadim (gruba hak taniyacaksan u yerine g yaz)
@@ -458,51 +416,20 @@ directory icinde setfacl uygulanir fakat inherited olmasi icin :
 sudo setfacl -m u:user1:rw reports/ bununla reports dosyasininicindekilere inherit edemezsin. 
 
 sudo setfacl  -d -R -m  u:user1:rw reports/ yaparsan asagi Dogru gider
-
-ldd library daemon dependecy 
-ldd /bash/vim vm applicationu hangi kütüphaneleri kullaniyor
-/home/enver de -local dosyasi var bunun icinde shred dosyalari saklamak daha dogru.
-
-sudo ldconfig -n /home/enver/.local/lib 
-
-ldconfig: Paylaşımlı kütüphaneleri (.so dosyaları) tarar ve sistemin kullanması için yeni/özel kütüphane yollarını günceller.
-
--n: Sadece belirtilen dizini (/home/enver/.local/lib) işler.
-(Yani /etc/ld.so.conf dosyasını veya diğer yolları dikkate almaz.)
-
-/home/enver/.local/lib: Taratılacak özel kütüphane klasörüdür.
-
-Ne işe yarar?
-Bu komut, /home/enver/.local/lib dizininde bulunan kütüphaneleri sistemin tanımasını sağlar, böylece burada bulunan .so dosyaları çağrılabilir hale gelir.
-Kullanıcı kendi yerel kütüphanelerini derleyip kullanmak istediğinde bu komut sıkça kullanılır.
-
-
 ls .. what is in the parent dirctory
 
 ln mainfile.txt  sonradanolusanfile.txt  link yapma  herhangibirinde yaptigin ddegisiklik digerinde de olusur
 
-find / -perm +rwx  rwx hakkinna sahip file Lari arayacak
-find /usr  -group sales
-find / size +2M
-find komutu cok masraflidir bunnun yerine locate daha iyi. (sudo updatedb) satabase  i kullandigi icin daha Rahat is görür
+file creation default icin umask degeri kullanilir. Mesela 022 aslinda 755 tir. umask degeri 777 den cikarilir umask /etc/bashrc icinde bu degeri degistirebilirsun
 
-whoami ve arkasindan id  command sonucta 100 l id root user olur
+sudo du -h --max-depth=1 /  2>/dev/null  root tan itibren bir dosya aagiya Kadar ne varsa onlaeri ve diskusage leri bulur
 
 
-file creation default icin umask degeri kullanilir. Mesela 022 aslinda 755 tir. umask degeri 777 den cikarilir
-
-sudo du -h --max-depth=1 /  2>/dev/null  root tan itibren bir dosya aagiya Kadar ne vatsa onlaeri ve giskusage leri bulur
-
-
-ls -F hlasör dosa executabl  durumlarini verir
 link olusturma ln -s testdir/file1.txt link1
-useradd  newuser
-passwd newuser
 rm -rf silliklanmadan herseyi siler 
-tail -n 1 /etc/group veya /etc/passwd (eklenen son user/group görürsün)
+tail -n 1 /etc/group veya /etc/passwd 
 
-umask set the defaults of file/directory  creation 
-umask /etc/bashrc icinde bu degeri degistirebilirsun
+
 
 
 
@@ -510,35 +437,28 @@ umask /etc/bashrc icinde bu degeri degistirebilirsun
 ### `semanage`, `restorecon`, `getsebool`
 
 # System Monitoring and Performance
-### `top`, `iotop`, `vmstat`, `sar`
+
 ## Reading Logs with `journalctl`
 
 # Troubleshooting and Recovery
-## Troubleshooting and Recovery
 
-###  What Is Troubleshooting?
+###  What Is Troubleshooting in Linux?
 
-Thi nk of your Linux system like a car. Sometimes it won’t start, or it makes weird noises. Troubleshooting is like being a mechanic — you observe the symptoms, identify the problem, and fix it.
-
-Troubleshooting in Linux means:
-
+Troubleshooting means:
 - Detecting what’s wrong
 - Diagnosing the cause
 - Applying a fix
 - Testing if the fix worked
 
 Recovery is what you do **after something breaks** — like when your system doesn’t boot, or a service crashes.
-LOG MONITORING 
+
+### LOG MONITORING 
 Log directory /var/log 
-boot reboots issues 
-chronyd=NTP 
-cron
-maillog
+
 secure   all login logout activities
 tail -f secure dinamik olarrak log penceresi acik kalir 
-messages important to monitor system  activities
+
 httpd apache application log 
----
 
 ### Common Troubleshooting Tools and Techniques
 
@@ -553,45 +473,24 @@ httpd apache application log
 | `netstat`, `ss`      | Monitor network connections                  |
 | `ping`, `traceroute` | Check connectivity                           |
 | `lsblk`, `df`, `mount` | Diagnose storage and mount issues          |
-load avarage
-uptime veya cat /proc/loadavg ile bulunur. son 1, 5 ve 15 dakikalik load avarage (cpu) kullanimini verir 
-lscpu da degerleri verir 
----
+
+load avarage: uptime veya cat /proc/loadavg ile bulunur. son 1, 5 ve 15 dakikalik load avarage (cpu) kullanimini verir. lscpu da degerleri verir 
+
 
 ### Example: A Service Isn’t Starting
 
-Let’s say your Apache web server isn’t starting.
+Your Apache web server isn’t starting. Step-by-step:
 
-Step-by-step:
-
-1. **Check service status:**
-   ```bash
-   systemctl status httpd
-   ```
-
-2. **View logs:**
-   ```bash
-   journalctl -xeu httpd
-   ```
-
-3. **Look for errors** like:
-   ```
-   Permission denied
-   Port already in use
-   SELinux denial
-   ```
-
-4. **Check configuration syntax:**
-   ```bash
-   apachectl configtest
-   ```
-
-5. **Fix the issue and restart:**
-   ```bash
-   systemctl restart httpd
-   ```
-
----
+```bash
+systemctl status httpd  # Check service status
+journalctl -xeu httpd # View logs
+# Look for errors** like:
+"Permission denied"
+"Port already in use"
+"SELinux denial"
+apachectl configtest  # Check configuration syntax
+systemctl restart httpd # Fix the issue and restart
+```
 
 ### Troubleshooting Boot Issues
 
@@ -628,148 +527,37 @@ Or regenerate for a specific kernel:
 dracut -f /boot/initramfs-$(uname -r).img $(uname -r)
 ```
 
----
-
-### Recovering Root Password
-
-If you forgot the root password:
-
-1. Reboot into GRUB menu.
-2. Edit kernel line (`e`), append:
-   ```
-   rw init=/bin/bash
-   ```
-3. After booting:
-   ```bash
-   passwd
-   ```
-4. Then:
-   ```bash
-   exec /sbin/init
-   ```
-
----
-
-### Reinstalling or Repairing GRUB
-
-If the system shows a `grub>` prompt or cannot find the bootloader:
-
-Boot from a live CD/USB:
-
+### System Running Slow?
 ```bash
-mount /dev/sdaX /mnt
-mount --bind /dev /mnt/dev
-mount --bind /proc /mnt/proc
-mount --bind /sys /mnt/sys
-chroot /mnt
-grub2-install /dev/sda
-grub2-mkconfig -o /boot/grub2/grub.cfg
-exit
-reboot
-```
-
-### System Running Slow? Here’s What to Check
-
-1. **CPU Usage:**
-   ```bash
-   top
-   ```
-
-2. **Memory Usage:**
-```bash
-free -m
-```
-
-3. **Disk Space:**
-```bash
-df -h
-```
-
-4. **I/O Wait:**
-```bash
-iostat
-```
-
-5. **Zombie Processes:**
-```bash
-ps aux | grep 'Z'
+top # CPU Usage
+free -m # Memory Usage
+df -h # Disk Space
+iostat # I/O Wait
+ps aux | grep 'Z'  #Zombie Processes
 ```
 ### Application Crashes
 
 When an app crashes:
 
 - Use `journalctl` to see logs
-- Use `strace` to trace it:
-  ```bash
-  strace ./appname
-  ```
-- Look at core dumps:
-  ```bash
-  coredumpctl list
-  coredumpctl info <PID>
-  ```
-
-### Network Troubleshooting
-
-1. **Check if the interface is up:**
- ```bash
- ip a
- ```
-
-2. **Can you ping your gateway?**
-```bash
-ping 192.168.1.1
-```
-
-3. **Can you resolve DNS?**
-```bash
-nslookup google.com
-```
-
-4. **View all connections:**
-```bash
-ss -tunlp
-```
-
-5. **Firewall issue?**
-```bash
-firewall-cmd --list-all
-```
-
-###  Summary
-
-- Troubleshooting is about identifying, diagnosing, fixing, and testing.
-- Use tools like `journalctl`, `systemctl`, `ping`, and `top`.
-- Boot problems often require GRUB and rescue mode techniques.
-- Recovery includes repairing GRUB, fixing services, and resetting passwords.
-- Learn to read logs — logs are your best friend in troubleshooting.
-
-Practice common scenarios in a virtual machine to build confidence!
+- Use `strace` to trace it: `strace ./appname`
+- Look at core dumps: ` coredumpctl list &&  coredumpctl info <PID>`
 
 DNS problems: Server is not reaxhable
+```bash 
  cat /etc/hosts
  cat /etc/resolv.conf
  cat /etc/nsswitch.conf
  ping gateway
- check physical Connection
+ ```
+ 
 WEBsite or Application is not erreichbar
- Question: Server or sservice on it down?
- ping with ip adress or hostname
- telnet 192.168.178.x 80 port calisip calismadigini gösterir
- baglanamazsan demekki http service is not running
-Can not SSK as root
- as default root connection is disabled
- /etc/ssh/ssh_config  ssh ile giderken yapilan ayarlar 
- /etc/ssh/sshd_config gelen ssh baglantilaei icin ayarlar
- mesela root olarak birisi baglanabilsinmi
- /var/log/secure  burayi tail -f ile izlersen 
- canli tüm loginleri görürsün
-Can not write to a File 
- parent directory permissions 
- anotheruser works with the file
- getfacl  filename ausführliche info über file
-Dusk problems 
- cat /etc/fstab  diskle ilgili bilgiler var 
+ping with ip adress or hostname
+telnet 192.168.178.x 80 port calisip calismadigini gösterir
+/etc/ssh/ssh_config  ssh ile giderken yapilan ayarlar 
+/etc/ssh/sshd_config gelen ssh baglantilaei icin ayarlar
+/var/log/secure  burayi tail -f ile izlersen  canli tüm loginleri görürsün
+cat /etc/fstab  diskle ilgili bilgiler var 
  
 TOP    command 
 PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
@@ -800,17 +588,11 @@ WHAT IS SWAP MEMORY?
  mevcut memory nin iki kati büyüklükte olmasi tavsiye edilir 
  netstat -rnv gives the IP routing table 
 
-
- pwconv, şifreleri güvenli bir şekilde saklamak için kullanılır.
- Şifreler /etc/passwd içindeyse, bu komut onları /etc/shadow'a taşır ve 
- /etc/passwd içindeki şifre alanını x olarak değiştirir.
+pwconv, şifreleri güvenli bir şekilde saklamak için kullanılır. Şifreler /etc/passwd içindeyse, bu komut onları /etc/shadow'a taşır ve /etc/passwd içindeki şifre alanını x olarak değiştirir.
 
 LAST komutu sisteme login olanlari bulur 
 
-Rollback Update Nedir? 
- Rollback update, bir sistem veya yazılım güncellemesi yapıldıktan sonra, 
- eski (önceki) sürüme geri dönme işlemidir.
-
+Rollback Update Nedir? Rollback update, bir sistem veya yazılım güncellemesi yapıldıktan sonra, eski (önceki) sürüme geri dönme işlemidir.
 
 sos report komutu  rhel ve rocky linux sistemlerde;
 Sistem hakkında ayrıntılı teşhis bilgileri toplar:
@@ -821,13 +603,10 @@ Log dosyaları
 Yüklü paketler
 Çekirdek bilgileri vs. 
 
-## 13.2 Managing VMs with `virt-manager`
 
-# Useful Tools and Tips
-## Common Text Editors (vim, nano)
 
 VIM Kullanimi
-yy stir yw kelime kopyalar p yapistirir
+yy satir yw kelime kopyalar p yapistirir
 dd / de satir / üzerinde oldugu kelimeyi  siler 
 /word yazarsan dosya icindeki ilk "word" kelimesini bulur. Sonra n harfine basarak
 sirasiyla digerlerini bulursun. 
@@ -836,16 +615,7 @@ Satir numaralarin inasil gösterirsin: escape modda:set number
 3 shift g  ile 3. satira gidersin
 kelime degistirme: kelimenin üstüne gel cw yaz sonra yeni kelimeyi yaz
 
-## 14.2 File Compression and Archiving
-### 14.2.1 `tar`, `gzip`, `zip`
-## 14.3 Searching Files
-### 14.3.1 `grep`, `find`, `locate`
-## 14.4 System Info Commands
-### 14.4.1 `uname`, `hostnamectl`, `lsb_release`
-
-# Appendix
 ## Command Cheat Sheet
-SYSTEM UTILITY COMMANDS
 date  uptime(1, 5, 15 dakikalarda cpu kullanimi)   
 hostname   uname   ehich  
 cal 11 1976
@@ -855,20 +625,11 @@ bc calculator
 `cat isimler.txt| sort`    satirlari bas harflerine göre siralar
 && önce sol taraf  sonra sol calisirsa sag taraf calisir
 echo -e icerdeki özel karakterleri algila
-yorum satirlari: # ile baslar
 Bash script te cift tirnak kullan
 tmux (Terminal Multplex Command) terminal ekranini birkac bölmeye ayirir
 bin & sbin :  executables for all & executanles for root  
-Asagida birsey calistirilmaya calisildiginda nerelerde aranir 
-PATH=/root/.local/bin:/root/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin
-mesela deneme.sh dosyasini bu dizinlerden birine tasi Sonra istedigin yerde direk calistir 
-export PATH=$PATH:/home/rocky2/Skripten (Yeni path plusturacazMevcut path i $PATH ile ekledik )
+Bir script calisacaksa nerelerde aranir 
+PATH=/root/... Mesela deneme.sh dosyasini bu dizinlerden birine tasi Sonra istedigin yerde direk calistir 
+export PATH=$PATH:/home/rocky2/Skripten (Yeni path olusturacaz. Mevcut path i $PATH ile ekledik )
 
-Thread (İş Parçacığı)
-Ne demek?
-Çekirdeklerin aynı anda birden fazla işi işleyebilmesini sağlayan mantıksal işlem yolları.
-Intel’de bu teknolojiye HyperThreading denir.
-
-Ne işe yarar?
-1 çekirdek = 2 thread olursa, işlemci yoğun işlerde daha fazla işi aynı anda yapabilir.
-Yani işlemcinin verimliliği artar.
+Thread (İş Parçacığı): Çekirdeklerin aynı anda birden fazla işi işleyebilmesini sağlayan mantıksal işlem yolları. Yani işlemcinin verimliliği artar.

@@ -53,3 +53,45 @@ ss -tuln         # Show listening TCP/UDP ports with numeric addresses
 ss -s            # Display summary statistics
 ss -plnt         # Show listening TCP sockets with process info
 ```
+grep -ri ebenin* # recursively tüm dosya isimleri ve iceriklerinde ebenin kelimesiyle baslayan kelemeleri bulur
+find / -perm /g=w,o=w 2> /dev/null # w Hakki olan gruplar ve other people bulunur
+sudo chown -R  cemsit:cemsit Folder/ # hem kullanici hem grup degisti 
+
+setfacl -m u:cemsit:rw deneme.txt enver kullanicisinin üzerinde Hakki olan deneme.txt dosyasina bir user atadim (gruba hak taniyacaksan u yerine g yaz) parent klasörlere hak vermezsen en altta izin aldigin dpsyaya ulasamazsin. Her kapi icin ayri izin lazim. 
+```bash
+gertfacl deneme.txt # ile detaylari görürsün.
+sudo setfacl -m u:user1:rw reports/ # reports dosyasinin icine inherit edemezsin.
+sudo setfacl  -d -R -m  u:user1:rw reports/ # yaparsan asagi dogru gider
+```
+
+ls .. what is in the parent dirctory
+ln mainfile.txt  sonradanolusanfile.txt  link yapma  herhangibirinde yaptigin ddegisiklik digerinde de olusur. `find` komutu cok masraflidir bunnun yerine locate daha iyi. 
+
+Log directory /var/log/secure   all login logout activities
+
+Your Apache web server isn’t starting. Step-by-step:
+
+```bash
+systemctl status httpd  # Check service status
+journalctl -xeu httpd # View logs
+# Look for errors like
+"Permission denied" && "Port already in use" && "SELinux denial"
+apachectl configtest  # Check configuration syntax
+systemctl restart httpd # Fix the issue and restart
+```
+System Running Slow?
+```bash
+top # CPU Usage
+free -m # Memory Usage
+df -h # Disk Space
+iostat # I/O Wait
+ps aux | grep 'Z'  #Zombie Processes
+```
+Network Troubleshooting
+```bash
+ip a # Check if the interface is up
+ping 192.168.1.1 # ping your gateway?
+nslookup google.com # Can you resolve DNS ?
+ss -tunlp # View all connections
+firewall-cmd --list-all # Firewall issue?
+```
