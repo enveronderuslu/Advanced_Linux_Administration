@@ -58,7 +58,7 @@ Changes the authentication token and possibly verifies that it is robust enough 
 Diyelim ki bilgisayarın sana diyor ki: "şifre çok eski, yenisini yap!"
 İşte burada PAM devreye giriyor. PAM, sisteme “bu şifre değiştirilecek” diyor ve bazı sifre politikalariyla ilgili  kontroller yapıyor:
 
-*******************************************************************************
+******************************************************
 
 Control Indicators¶
 The PAM mechanisms (auth, account, session and password) indicate success or failure. The control flags (required, requisite, sufficient, optional) tell PAM how to handle this result.
