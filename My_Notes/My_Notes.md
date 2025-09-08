@@ -5,15 +5,14 @@ ssh-copy-id -i ~/.ssh/id_rsa.pub ansible@192.168.178.115
 
 ``` bash
 ls ; date
-Sample_file  myapp         
-Fri Aug 15 09:01:39 PM CEST 2025
+^Fri Aug 15 09:01:39 PM CEST 2025
 ```
-&&  baglacida ; gibi kullanilabilir fakat komut1 && komut2 farkli anlama gelir. birinci calisr isi biterse ikinci calisir. ; de birbirinden bagimsiz calisir.
-benzer sekilde komut1 || komut2 var. Bu defa sol taraf hata dönerde sag taraf calisir-  sol taraf calisirsa sag calismaz. XOR gibi 
+&&  baglacida ; gibi kullanilabilir fakat komut1 && komut2 farkli anlama gelir. birinci calisr ise ikinci calisir. ; de birbirinden bagimsiz calisir.
+benzer sekilde komut_1 || komut_2 var. Bu defa sol taraf hata dönerde sag taraf calisir-  sol taraf calisirsa sag calismaz. XOR gibi 
 
 yine `<command> &` ile komut arka planda calisir
 
-# Linux System Basics – Quick Notes
+# Linux System Basics 
 sudo derdinden kurtulmak istiyorum: Hedef makinada şu komutla sudoers dosyasına özel bir kural ekle:
 
 ```bash
@@ -69,7 +68,7 @@ systemd, modern Linux sistemlerinin temelini oluşturan bir sistem ve servis yö
  - Sistemi Başlatma (Boot): Cekirdekten sonra ilk çalışan süreçtir (PID 1). Sistemi kullanıma hazır hale getirmek için gerekli servisleri ve süreçleri başlatır. Bunu paralel olarak yaparak sistem açılış süresini önemli ölçüde kısaltır.
  - Servis Yönetimi: Sistemdeki tüm servisleri (web sunucuları, veritabanı sunucuları, ağ servisleri usw). 
  - Bağımlılık Yönetimi: Servisler arasındaki bağımlılıkları takip eder ve servislerin doğru sırada başlatılmasını sağlar. Bir servis çalışabilmek için başka bir servisin çalışıyor olmasına ihtiyaç duyabilir. 
- - Kaynak Yönetimi: Sistem kaynaklarını (CPU, bellek ...) yönetitr izler kontrol eder. 
+ - Kaynak Yönetimi: Sistem kaynaklarını (CPU, bellek ...) yönetitr. 
  - Günlükleme (Journaling): Sistem olaylarını ve servislerin çıktılarını merkezi bir yerde (journald) toplar. `journalctl`  komutu ile bu günlüklere erişilebilir.
  - Diğer Özellikler: Zamanlanmış görevler (systemd.timer ile cron yerine), ağ yapılandırması (systemd-networkd), kullanıcı oturum yönetimi (systemd-logind) gibi birçok ek özelliği de bünyesinde barındırır.
 ```bash
@@ -77,7 +76,14 @@ systemd-analyze + blame # makinenin baslamasi icin süre + detaylat
 /lib/systemd/system # services are here
 ```
 ### .target .service dosyalari
-.target uzantılı dosyalar, SysVinit’teki runlevel kavramının modern  karşılığıdır. .service dosyaları bireysel servisleri tanımlar. .target dosyaları ise bu servisleri bir araya getirip topluca yönetir. `/lib/systemd/system/` veya `/etc/systemd/system/` icinde bulunurlar. `.service` dosyası bir servisin kendisini tanımlar. İçinde hangi binary’nin çalıştırılacağı, hangi kullanıcıyla çalışacağı, ne zaman yeniden başlatılacağı gibi bilgiler olur. Örneğin: `myhttp.service` dosyasini olusturalim. 
+`.service ` dosyaları bireysel servisleri tanımlar. `.target` dosyaları ise bu servisleri bir araya getirip topluca yönetir. `/lib/systemd/system/` veya `/etc/systemd/system/` icinde bulunurlar. 
+`/usr/lib/systemd/` dizinindeki dosyalar sistemin varsayılan, paketle gelen systemd servis ve target tanımlarını içerir. Bu dosyalar güncellemelerle otomatik olarak değiştirilir.
+`/etc/systemd/system/` dizini ise yönetici tarafından yapılan özelleştirmeler içindir. Buradaki dosyalar önceliklidir ve /usr/lib/systemd/ içindeki aynı isimli dosyaları geçersiz kılar.
+Örnek: Varsayılan servis dosyası: /usr/lib/systemd/system/sshd.service
+Özelleştirilmiş servis dosyası: /etc/systemd/system/sshd.service
+Varsayılan dosyaları değiştirmek yerine `systemctl edit etwas.service` komutuyla override dosyası oluştur.
+
+`.service` dosyası bir servisin kendisini tanımlar. İçinde hangi binary’nin çalıştırılacağı, hangi kullanıcıyla çalışacağı, ne zaman yeniden başlatılacağı gibi bilgiler olur. Örneğin: `myhttp.service` dosyasini olusturalim. 
 ```ini
 [Unit]
 Description= Python HTTP Server
@@ -98,14 +104,13 @@ Requires=myhttp.service
 Requires=nginx.service
 After=network.target
 ```
-Bu custom.target çağrıldığında myhttp.service ve nginx.service beraber yüklenir. default .target dosyalari:
---- multi-user.target
-(ağ servisleri, çoklu kullanıcı, SSH, cron gibi servisleri çalıştırır. systemctl status multi-user.target
-
---- graphical.target GUI içeren sistemler için kullanılır. 
+custom.target, ağ servisleri (ör. IP yapılandırması, ağ arabirimlerinin aktif olması) hazır olmadan başlatılmaz. Bu, Requires= ile birlikte kullanıldığında, önce network.target başlar, sonra bu hedefteki servisler çalışır.
+Bazi default .target dosyalari:
+multi-user.target: ağ servisleri, çoklu kullanıcı, SSH, cron gibi servisleri çalıştırır. 
+systemctl status multi-user.target
+graphical.target GUI içeren sistemler için kullanılır. 
 
 # Package Management with YUM and DNF
-
 ```bash
 dnf install package-name #Installing packages:
 dnf update # Updating packages: 
@@ -118,12 +123,12 @@ dnf -y remove libreoffice*
 ```
  
 ### ORPHAN PACKAGES 
-A paketi B paketine bagli . B yi kaldirdin. A atil kaldi. iste A ya Orphan package denir. How to remove?
-```bash
+A paketi B paketine bagli. B ist weg. A atil kaldi. A is a Orphan package
+```py
 dnf repoquery --unneeded
 dnf remove $(dnf repoquery --unneeded -q)
 ```
-Snap, Canonical (Ubuntu'nun geliştiricisi) tarafından geliştirilen, dağıtımdan bağımsız çalışan bir paket sistemidir. Uygulamalar kendi bağımlılıklarıyla birlikte paketlenir. `sudo snap install App1`
+Snap, Canonical (Ubuntu'nun geliştiricisi) tarafından geliştirilen bir paket sistemi. APPs kendi bağımlılıklarıyla paketlenir. `sudo snap install App1`
 
 ### Case Study
 	
@@ -137,64 +142,49 @@ apt, bu komuttaki "google-chrome-stable_current_amd64.deb" ifadesini, bir paket 
 `sudo apt install firefox` dediğinde, apt markete gider, raftan firefox paketini bulur ve kurar. 
 3. apt = Market görevlisiakip eder.
 4. deb dosyası = Poşet içindeki ürün `sudo dpkg -i ürün.deb`
-5. baska yol: dosyayi indirdigin yerde terminali ac. ` apt install ./sample.deb` yazsan direk calisacakti Aklini s*keyim
-
-# Filesystem Management
-
-## Special Permissions
-
-| Bit      | Kullanım Yeri | Etkisi                                                                  | İlgili Komut       | `ls -l` Göstergesi |
-| -------- | ------------- | ----------------------------------------------------------------------- | ------------------ | ------------------ |
-| `setuid` | **Dosya**     | Dosya, **sahibinin yetkileriyle çalışır**                               | `chmod u+s dosya`  | `rws` (x varsa `s`, yoksa `S`) |
-| `setgid` | **Dosya**     | Dosya, **grup sahibinin yetkileriyle çalışır**                          | `chmod g+s dosya`  | `rwxr-s` (x varsa `s`, yoksa `S`) |
-| `setgid` | **Klasör**    | Klasöre eklenen dosyalar **aynı grup** ile oluşturulur                  | `chmod g+s klasör` | `rwxr-s`            |
-| `sticky` | **Klasör**    | Klasördeki dosyalar, **sadece sahibi veya root tarafından silinebilir** | `chmod +t klasör`  | `rwxrwxrwt`        |
-
+5. Dosyayi indirdigin yerde terminalde ` apt install ./sample.deb` yazsan direk calisacakti Aklini s*keyim
  
 # User and Group Management
-
-useradd, groupadd
-userdel <user> home directory silinmez
-userdel -r <user> home directory silinir
-usermod -G <DROUP> <USER> (diger gruplardan cikarir. kendi ismindeki grup korumur)
-usermod -aG <GROUP> <USER> (diger gruplarda kalmaya devam eder)
-visudo /etc/sudoers dosyasini acar- who veya users makineyi o an kullanan kullanicilari verir
-
+```py
+useradd # home directory veya psswrd olusturulmaz
+adduser # home dir ve passwd olusturulur
+adduser # güvenlik acisindan daha iyi
+groupadd
+userdel <user> # home directory silinmez
+userdel -r <user> # home directory silinir
+usermod -G <DROUP> <USER> # diger gruplardan cikarir. kendi ismindeki grup korumur
+usermod -aG <GROUP> <USER> # diger gruplarda kalmaya devam eder
+visudo /etc/sudoers # dosyasini acar 
+who or users # makineyi o an kullanan kullanicilari verir
+```
 `etc/passwd` user accountlarla ilgili bilgiler
 `etc/shadow` encrypted password ler burada.
 
 ## Password Policies
 
-PASSWORD AGING: chage -m mindays -M maxdays -d lastday
-`sudo nano /etc/logindefs` dosyasinda bu sayilari düzelt. Bu yeni sistemlerde artik yok. Peki ne var: ` /etc/security/pwquality.conf` yine FAILED LOGINLER ICIN `/etc/security/faillock.conf` 
+PASSWORD AGING: `chage -m mindays -M maxdays -d lastday`
+`sudo nano /etc/login.defs` dosyasinda bu sayilari düzelt. Bu yeni sistemlerde artik yok. Peki ne var: ` /etc/security/pwquality.conf` yine FAILED LOGINLER ICIN `/etc/security/faillock.conf` 
 
 ### Using `ps`
 
 `ps aux | grep  ssh` bununla tüm ssh processlerini ve PID lerini görürsün
 
-ctrl + z ekrandaki islmei arkaya atar
-jobs ile bu islemleri görürsün
-%1 sana arkada calisan 1 numarali processi getirir
-fg veya bg foreground background ta calistirir
+ctrl + z islmei arkaya atar. jobs ile bu islemleri görürsün. %1 sana arkada calisan 1 numarali processi getirir. fg veya bg foreground background
 
 ### SYSTEM MONITORING
-Using `top` and `htop`
-
 `top -u user1` user1 ne kullaniyor sadece bunu gösterir
 top 
 
 | Kolon     | Açılım               | Açıklama  |
 | --------- | -------------------- | ------------------ |
-| `PID`     | Process ID           | İşlem kimliği  |
-| `USER`    | User                 | İşlemi başlatan kullanıcı |
+| `PID`     | Process ID           | İşlem kimliği |
+| `USER`    | User                 | İşlemi başlatan user |
 | `PR`      | Priority             | İşlem önceliği |
 | `NI`      | Nice value           | Nice islem önceliğini belirler |
 | `VIRT`    | Virtual Memory       | Sanal bellek kullanımı (MB/KB) |
 | `RES`     | Resident Memory      | Fiziksel RAM kullanımı   |
 | `SHR`     | Shared Memory        | Paylaşılan bellek miktarı  |
 | `S`       | State                | İşlem S: uyku, R: çalışıyor, Z: zombie |
-| `%CPU`    | CPU Usage Percent    | İşlemin CPU kullanım yüzdesi   |
-| `%MEM`    | Memory Usage Percent | İşlemin RAM kullanım yüzdesi   |
 | `TIME+`   | CPU Time (total)     | İşlemin toplam CPU süresi |
 
 ***dmesg*** hardware ile ilgili hersey burada
@@ -219,56 +209,48 @@ dmesg | grep eth            # Ethernet veya ağ arayüzü sorunları
 ```
 
 ## Managing Processes
-###  `kill`, `killall`
-
 w shows all current sesions
 ```bash 
 pgrep -l -u bob # bob isimli user la ilgili processes
 ``` 
 
-```bash
-pkill -SIGKILL -u newuser # user ile ilgili tüm prosesleri kill yapar
+```py
+pkill -SIGKILL -u <user> # user ile ilgili tüm prosesleri kill yapar
 ```
 
-```bash
+```py
 pstree -p newuser # proses agaci
 ```
 
 ###  `nice`, `renice`
 
-nice : run a program with modified scheduling priority.High priority icin negatif degerler verilir. -20 = en yüksek öncelik. negatif degeri sadece adminler verebilir
-19 = en düşük öncelik (sisteme en az yük olur)
-
-renice komutuyla siralamayi degistirirsin
+`nice` : scheduling priority. -20 = en yüksek öncelik. negatif degeri sadece adminler verebilir. 19 = en düşük öncelik (sisteme en az yük olur). 
+`renice` komutuyla siralamayi degistirirsin
 
 ## Scheduled Tasks
-### `cron`
 
 Application=Service: Script list of instructions. 
 Process: when you start a service(app) it starts a Process and process id
-Daemon: etwas continuously runs in background doesnt stops. it is also a process
+Daemon: etwas continuously runs in background. It is also a process
 
 # Networking
 netstat -tunp
 
-| Alan                 |Açıklama    |
-| -------------------- | -------------------------- |
-| **Proto**            | Protokol türü: TCP, UDP, RAW gibi.     |
-| **Recv-Q / Send-Q**  | Alınan ve gönderilen veri kuyrukları. |
-| **Local Address**    | Yerel IP adresi ve portu. Hangi portun hangi IP'de |
-| **Foreign Address**  | Bağlı olan uzak IP ve port. Hangi istemcinin bağlı  |
-| **State**            | Bağlantı durumu: `LISTEN`, `ESTABLISHED` vs.        |
-| **PID/Program name** | (Bazı sürümlerde) Bağlantıyı kullanan işlem adı ve PID |
+|         Alan     |               Açıklama                  |
+| ---------------- | ----------------------------------------|
+| Proto            | Protokol türü: TCP, UDP, RAW gibi.      |
+| Recv-Q / Send-Q  | Alınan ve gönderilen veri kuyrukları.   |
+| Foreign Address  | Bağlı olan uzak IP ve port.             |
+| PID/Program name | Bağlantıyı kullanan işlem adı ve PID    |
 
-***DIKKAT***
 
-| Durum              | Ne Anlama Gelir?             |
-| ------------------ | ---------------------------- |
-| **LISTEN**         | Port dinlemede, gelen bağlantıları kabul etmeye hazır. |
-| **ESTABLISHED**    | Aktif bir bağlantı var |
-| **CLOSE\_WAIT**    | Karşı taraf kapattı ama sizin taraf hala kapatmadı |
-| **TIME\_WAIT**     | Bağlantı kapatıldı ama bir süre daha beklemede |
-| **SYN\_SENT / SYN\_RECV** | TCP bağlantısı kurulmaya çalışılıyor.  |
+| Durum               | Ne Anlama Gelir?             |
+| ------------------- | ---------------------------- |
+| LISTEN              | Port dinlemede. |
+| ESTABLISHED         | Aktif bir bağlantı var |
+| CLOSE\_WAIT         | Karşı taraf kapattı ama sizin taraf hala kapatmadı |
+| TIME\_WAIT          | Bağlantı kapatıldı ama bir süre daha beklemede |
+| SYN\_SENT SYN\_RECV | TCP bağlantısı kurulmaya çalışılıyor.  |
 
 *** CASE STUDY ***
 ip_A 192.168.1.A
@@ -284,12 +266,15 @@ ip route add 192.168.2.B.0/24 via 192.168.1.B
  ip route add 192.168.1.B/24 via 192.168.2.B
  ```
 
-/etc/resolv.conf ta search yahoo.com yazdiginda artik subdomain leri uzunuzun yazmana gerek kalmaz. artik curl news  yazdiinda direk curl news.yahoo.com anlasilir
-
 dig @4.2.2.2 google.com -> google.com alan adının IP adresini, 4.2.2.2 DNS sunucusunu kullanarak sorgular.
 /etc/resolv.conf 
 
-Örnek içerik:
+/etc/nsswitch.conf sistemi, kullanıcı, grup, hostname ve benzeri sorguların hangi kaynaktan ve hangi sırayla yapılacağını belirler. Örneğin:
+passwd satırı → Kullanıcı bilgileri aranacak kaynakların sırası.
+group satırı → Grup bilgileri aranacak kaynakların sırası.
+hosts satırı → Hostname/IP çözümleme sırası.
+
+/etc/nsswitch.conf dosyasındaki örnek içerik:
 passwd:     files sss
 group:      files sss
 hosts:      files dns
@@ -297,7 +282,8 @@ Anlamı:
 passwd: files sss → Önce /etc/passwd, sonra SSSD (örn. LDAP) kullanılacak.
 hosts: files dns → IP/hostname çözümlemesinde önce /etc/hosts, sonra DNS kullanılacak.
 
-nmcli temiz network device adress bilgisi veriyor
+nmcli; temiz network device adress bilgisi veriyor
+nmcli device show
 nmcli connection show ens23 ens23 ün detaylarini gösterir 
 nmcli connection delete ens23 bu adaptörü siler
 nmcli connection modify ens224 connection.interface-name "wired connection 3"
@@ -344,7 +330,7 @@ df -h disk usage
 # Security and SELinux
 ## Basic Security Practices
 
-LINUX OS HARDENING
+# LINUX OS HARDENING
 
  /etc/login.defs
  /etc/pam.d/system-auth 
@@ -364,8 +350,6 @@ LINUX OS HARDENING
  Security Enhanced linux 
 /etc/sysconfig/selinux burada detaylar var
 - Change listening Services Port numbers
-
-## File and Directory Permissions
 
 head etwas.txt shows first 10 line of the file
 tail etwas.txt shows last 10 line of the file
@@ -397,25 +381,30 @@ sudo chown cemsit deneme.txt dosyanin owner ini cemsit yapar
 sudo chown -R cemsit Folder_Name # hem klasorun Hemde altinda ne varsa hepinin sahabini degistirdi
 sudo chown -R  cemsit:cemsit klasor/ hem kullanici hem grup degisti
 
-setuid/setgid sadece “komut gibi çalıştırılabilen” dosyalarda anlamlıdır. Metin dosyası yada veri dosyasında etkisi olmaz. Bilmek lazim . Bugünlerde kullaniolmaz. 
-chmod u+s /usr/bin/example bu dosyayı çalıştıran herkes, sahibi gibi çalıştırır.
-chmod g+s /usr/bin/example oluşturulan alt dosyalar, dosyanın grubuna ait olur.
-setfacl daha kullanislidir. 
- 
-umax file olusturulunca otomatik verilecek yetkileri belirler
+# Filesystem Management
+## Special Permissions
 
-cat /etc/fstab  file system table
+`setuid (setguid)`: Dosya; sahibinin (grup) yetkileriyle çalışır `chmod u+s veya (g+s) <dosya>` 
+`setgid` : Klasör; Klasöre eklenen dosyalar aynı grup ile `chmod g+s <klasör>`
+`sticky` : Klasör; Klasördeki dosyalar, sadece sahibi veya root tarafından silinebilir `chmod +t klasör`  
 
-
+setuid/setgid sadece “komut gibi çalıştırılabilen” dosyalarda anlamlıdır. Metin dosyası yada veri dosyasında etkisi olmaz. kabaca bil yeter. Bugünlerde setfacl kullanilir.
+## `setfacl` ve  `getfacl` 
 setfacl -m u:cemsit:rw deneme.txt enver kullanicisinin üzerinde 
-Hakki olan deneme.txt dosyasina bir user daha atadim (gruba hak taniyacaksan u yerine g yaz)
+Hakki olan deneme.txt dosyasina cemsit isimli user atandi (gruba hak taniyacaksan u yerine g yaz)
 gertfacl deneme.txt ile detaylari görürsün.
 
 directory icinde setfacl uygulanir fakat inherited olmasi icin :
 
 sudo setfacl -m u:user1:rw reports/ bununla reports dosyasininicindekilere inherit edemezsin. 
-
 sudo setfacl  -d -R -m  u:user1:rw reports/ yaparsan asagi Dogru gider
+
+
+umax file olusturulunca otomatik verilecek yetkileri belirler
+
+cat /etc/fstab  file system table
+
+
 ls .. what is in the parent dirctory
 
 ln mainfile.txt  sonradanolusanfile.txt  link yapma  herhangibirinde yaptigin ddegisiklik digerinde de olusur

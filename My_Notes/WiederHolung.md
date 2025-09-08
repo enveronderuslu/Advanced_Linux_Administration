@@ -59,7 +59,7 @@ sudo chown -R  cemsit:cemsit Folder/ # hem kullanici hem grup degisti
 
 setfacl -m u:cemsit:rw deneme.txt enver kullanicisinin üzerinde Hakki olan deneme.txt dosyasina bir user atadim (gruba hak taniyacaksan u yerine g yaz) parent klasörlere hak vermezsen en altta izin aldigin dpsyaya ulasamazsin. Her kapi icin ayri izin lazim. 
 ```bash
-gertfacl deneme.txt # ile detaylari görürsün.
+getfacl deneme.txt # ile detaylari görürsün.
 sudo setfacl -m u:user1:rw reports/ # reports dosyasinin icine inherit edemezsin.
 sudo setfacl  -d -R -m  u:user1:rw reports/ # yaparsan asagi dogru gider
 ```
@@ -95,3 +95,13 @@ nslookup google.com # Can you resolve DNS ?
 ss -tunlp # View all connections
 firewall-cmd --list-all # Firewall issue?
 ```
+```bash
+alias sysupdate='dnf -y update'
+alias c='clear'
+alias l='ls -laFtr  --color=no'
+alias ping='ping -c 5'
+alias ports='netstat -tulanp'
+```
+nmcli; temiz network device adress bilgisi veriyor
+nmcli device show
+nmcli connection show ens23 ens23 ün detaylarini gösterir 
