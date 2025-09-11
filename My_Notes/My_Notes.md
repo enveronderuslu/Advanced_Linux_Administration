@@ -307,8 +307,6 @@ timedatectl set-timezone Europe/Berlin
 ## DNS Setup
 `/etc/resolve.conf ` Dns gibi calisir
 
-PAM MATRIX DIYE BISEY VAR ONA BI BAK
-
 ## Firewall Configuration with `firewalld`
 
 # Storage and Disk Management
@@ -328,9 +326,8 @@ df -h disk usage
  Persistent Mounts using `/etc/fstab`
 
 # Security and SELinux
-## Basic Security Practices
 
-# LINUX OS HARDENING
+## LINUX OS HARDENING
 
  /etc/login.defs
  /etc/pam.d/system-auth 
@@ -415,12 +412,8 @@ sudo du -h --max-depth=1 /  2>/dev/null  root tan itibren bir dosya aagiya Kadar
 
 
 link olusturma ln -s testdir/file1.txt link1
-rm -rf silliklanmadan herseyi siler 
+rm -rf öpcelenmeden herseyi siler 
 tail -n 1 /etc/group veya /etc/passwd 
-
-
-
-
 
 ### `getenforce`, `setenforce`
 ### `semanage`, `restorecon`, `getsebool`
@@ -442,9 +435,7 @@ Troubleshooting means:
 Recovery is what you do **after something breaks** — like when your system doesn’t boot, or a service crashes.
 
 ### LOG MONITORING 
-Log directory /var/log 
-
-secure   all login logout activities
+Log directory /var/log/secure   all login logout activities
 tail -f secure dinamik olarrak log penceresi acik kalir 
 
 httpd apache application log 

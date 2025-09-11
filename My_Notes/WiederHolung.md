@@ -100,8 +100,16 @@ alias sysupdate='dnf -y update'
 alias c='clear'
 alias l='ls -laFtr  --color=no'
 alias ping='ping -c 5'
-alias ports='netstat -tulanp'
+alias ports='ss -tulanp'
 ```
-nmcli; temiz network device adress bilgisi veriyor
+```bash
+nmcli # temiz network device adress bilgisi veriyor
 nmcli device show
-nmcli connection show ens23 ens23 ün detaylarini gösterir 
+nmcli connection show ens23 # ens23 ün detaylarini gösterir
+```
+```bash
+grep -ri ebenin* # recursively tüm dosya isimleri ve iceriklerinde ebenin kelimesiyle baslayan kelemeleri bulur
+find / -name *.pdf 2> /dev/null
+```
+LAST komutu sisteme login olanlari bulur 
+
