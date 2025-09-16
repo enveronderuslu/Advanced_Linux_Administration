@@ -1,19 +1,14 @@
+## herstellung von ssh-key-pairs
 kontrol edilecek tüm serverlarda ansible isimli user olusturuldu. Hata olmasi durumunda daha rahat takib edilebilir. 
-herstellung von ssh-key-pairs
 
 ```bash
 ssh-keygen -t rsa -b 4096
 ssh-copy-id -i ~/.ssh/id_rsa.pub ansible@192.168.178.115
-```
-Avoiding sudo password prompts in Ansible, open the sudoers file safely:
 
-```bash
-sudo visudo
-# sudo for the user ansible write
-ansible ALL=(ALL) NOPASSWD: ALL
+sudo visudo # sudo for the user ansible write
+ansible ALL=(ALL) NOPASSWD: ALL # Avoiding sudo password prompts in Ansible
 ```
-
-(Optional) If you only want to allow passwordless sudo for the reboot command:
+If you only want to allow passwordless sudo for the reboot command:
 ```bash
 ansible ALL=(ALL) NOPASSWD: /sbin/reboot
 ```
@@ -267,7 +262,6 @@ To specify the behavior of a service on restart of a unit, use the enabled param
 `enabled: false` to disable (stop)
 Systemd can start disabled units by means of dependencies or socket activation. To stop the unit from starting it can be masked using masked: yes.
 
-# DÜZENLENECEK KISIM
 ```yaml
 - name: Copy the Grok Exporter systemd service file
     ansible.builtin.copy:
@@ -301,60 +295,98 @@ Systemd can start disabled units by means of dependencies or socket activation. 
     daemon_reload: yes
 ```
 The anatomy of the Grok Exporter playbook:
-The first task, Copy the Grok Exporter systemd service file, uses the copy module contains several parts:
-The [Unit] section includes a description, the defined order, and ensures network connection (internet is required, so this check occurs prior to collecting metrics)
+
 The [Service] section includes:
-Type can specified for if the service forks, or in this case just to run it and monitor its state
-the User and Group from which we are running it
-Nice specifies the priority
 ExecStart includes the command, in this case the Grok Exporter (the binary) that the system should start
 Restart:always means if this binary crashes it will be restarted
 StartLimitBurst specifies a number for which, if exceeded, it will fail
 The [Install] section includes the following parameters:
 dest, the destination, of the package. It’s important to note that all user managed services and system-level packages should be located in /etc/systemd/system directory.
-owner and group
-mode: 0644 to specify that the owner can read and write, users within the owner’s group can read, and all users can read.
-The second task in the playbook contains:
-the name of the service, in this case grok
-enabled: yes ensures it starts by default
-started: yes indicates we want it started now
 daemon_reload: yes means we’ve created the file, so reload and update
-The playbook above exemplifies that we can configure all the services we need by using the simple copy (or template) of the service file.
-Override Default Parameters
-Let’s imagine we’re using Apache2 software and we want to add an additional flag and/or environment variable to the service.
-Instead of editing package units in /usr/lib/systemd/system/, which might be overridden by a package update, it is recommended to override starting parameters from package default by creating an override file. We create a directory related to the systemd file we want to change, create the override configuration file, and use the copy module to override parameters configuration as needed.
-We need to ensure the directory for override exists and create the file there:
+The playbook above exemplifies that we can configure all the services.
+
+## how to create/remove group:
+```yaml
+- name: Ensure group "foo" exists
+  hosts: localhost
+  become: true
+  tasks: 
+  - name: create group
+    ansible.builtin.group:
+      name: foo
+      state: present/absent
+```
+## how to create user
 
 ```yaml
-- hosts: localhost
-  become: true
+- name: Create user cole_train
+  ansible.builtin.user:
+    name: cole_train
+    state: present
+    system: yes # system account olarak  olusturuldu
+
+- name: Add cole_train to cog
+  ansible.builtin.user:
+    name: cole_train
+    groups: cog
+    append: yes # varolan gruptan cikarmadan yeni gruba ekler
+```
+## The Password Parameter
+The password parameter can be used to set user password.The hashed password (masked version) should be passed here and not the plaintext password. 
+```yaml
+- name: user 'cardib' with password
+  ansible.builtin.user:
+    name: cardib
+    state: present
+    password: '$6$abc$7JkzWNO0fUbALkqI26avMCt6mdHxHwxPztgnpifwpHxTq3LzQzTHAWAVJpqQblVzRSVFC7JfxlhUjgLAto9d2/'
+```
+## Generating SSH Keys
+Ansible can generate SSH keys for users using the generate_ssh_key parameter:
+```yaml
+- name: create SSH keys for the user
+  ansible.builtin.user:
+    name: cardib
+    state: present
+    generate_ssh_key: true
+    ssh_key_type: ecdsa
+    ssh_key_file: .ssh/id_rsa    
+```
+## IMPORT Files
+Consider the following example:
+```yaml
+- hosts: all
   tasks:
-    - name: Ensure override httpd exists
-        ansible.builtin.file:
-          path: /etc/systemd/system/httpd.service.d
-          state: directory
-          owner: root
-          group: root
-    - name: Create override for httpd envirnoments
-        ansible.builtin.copy:
-          content: |-
-            Environment=LD_LIBRARY_PATH=/opt/vendor/lib
-          dest: /etc/systemd/system/httpd.service.d/libraries.conf
-          owner: root
-          group: root
-          mode: 0644
-        notify: 
-          - Restart httpd
-    - name: ensure httpd started
-      ansible.builtin.systemd:
-        name: httpd
-        enabled: yes
-        started: yes
-        daemon_reload: yes
-  handlers:
-    - name: Restart httpd
-      ansible.builtin.systemd:
-        name: httpd
-        restarted: yes
-        daemon_reload: yes
+    - name: Import my tasks
+      ansible.builtin.import_tasks:
+        file: mytasks.yml
+```
+In this example, the file parameter is importing a specific file. 
+
+## ROLRS
+![alt text](image.png)
+
+## GALAXY MODULES
+For example, if you want to install and configure MongoDB for creating replica data sets, search the following command in the terminal here.
+`ansible-galaxy search mongodb`Or from the Ansible Galaxy homepage, select “Database” repo and search MongoDB.
+### How to install a collection
+`ansible-galaxy collection install community.mongodb `
+By default it will be installed into your q
+
+
+folder, where it will be added to the stack. This is the default because in general it’s not good practice to include code from a third party in your repository.
+Having said this, it is possible to specify different directory like ./collections to keep it with your repo using -p.
+`ansible-galaxy collection install community.mongodb -p ./collections`
+
+
+ansible-galaxy collection install community.mongodb -p /etc/ansible/collections/
+
+
+```yaml
+---
+- hosts: mongodb_servers
+  become: true
+  collections:
+    - community.mongodb
+  roles:
+    - mongodb_install
 ```
