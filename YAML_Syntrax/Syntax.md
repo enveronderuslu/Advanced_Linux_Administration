@@ -1,4 +1,4 @@
-YAML Basics
+YAML Basics
 For Ansible, nearly every YAML file starts with a list. Each item in the list is a list of key/value pairs, commonly called a “hash” or a “dictionary”. YAML files either have the extension .yaml or .yml. All YAML files (regardless of their association with Ansible or not) can optionally begin with --- and end with .... This is part of the YAML format and indicates the start and end of a document.
 
 **********LISTS (In Yaml called as sequence)**************
@@ -57,13 +57,6 @@ firma:
     sehir: İzmir
     posta_kodu: 35000
 ---
-
-
-
-
-
-
-
 
 /*/EXAMPLE:/*/
 More complicated data structures are possible, such as lists of dictionaries, dictionaries whose values are lists or a mix of both:
@@ -226,10 +219,9 @@ While in the above > example all newlines are folded into spaces, there are two 
 fold_some_newlines: >
     a
     b
-
     c
     d
-      e
+     e
     f
 Alternatively, it can be enforced by including newline \n characters:
 
@@ -262,15 +254,6 @@ run: |
    rpm install etwas
    rpm install baskabisey
 Buradaki pipe isareti ile kodlar arka arkaya sirasiyla calisacak. 
-
-
-
-
-
-
-
-
-
 
 
 
