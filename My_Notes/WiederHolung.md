@@ -2,6 +2,8 @@
 systemd-analyze + blame # makinenin baslamasi icin süre + detaylat 
 /lib/systemd/system # services are here
 ```
+ls -d D* bulundugun yerde D ile baslayan directories
+ls -d test_directory test kalsörüyle ilgili özellikler
 
 ### .target .service dosyalari
 .service dosyası bir servisin kendisini tanımlar. İçinde hangi binary’nin çalıştırılacağı, hangi kullanıcıyla çalışacağı, ne zaman yeniden başlatılacağı gibi bilgiler olur. Örneğin:
@@ -101,6 +103,7 @@ alias c='clear'
 alias l='ls -laFtr  --color=no'
 alias ping='ping -c 5'
 alias ports='ss -tulanp'
+PS1='$ '
 ```
 ```bash
 nmcli # temiz network device adress bilgisi veriyor

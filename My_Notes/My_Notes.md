@@ -51,6 +51,7 @@ alias c='clear'
 alias l='ls -laFtr  --color=no'
 alias ping='ping -c 5'
 alias ports='netstat -tulanp'
+PS1='$ ' # ekranda sadec $ isareti olsun istediginde
 ```
 Changing the System Hostname: `sudo hostnamectl set-hostname <NewName>`
 Script Logging: `script deneme.txt # Type exit to stop`
