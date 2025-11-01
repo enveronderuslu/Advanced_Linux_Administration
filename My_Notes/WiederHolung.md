@@ -2,8 +2,13 @@
 systemd-analyze + blame # makinenin baslamasi icin süre + detaylat 
 /lib/systemd/system # services are here
 ```
+
+```bash
 ls -d D* bulundugun yerde D ile baslayan directories
 ls -d test_directory test kalsörüyle ilgili özellikler
+tree <Directory_Name>
+```
+
 
 ### .target .service dosyalari
 .service dosyası bir servisin kendisini tanımlar. İçinde hangi binary’nin çalıştırılacağı, hangi kullanıcıyla çalışacağı, ne zaman yeniden başlatılacağı gibi bilgiler olur. Örneğin:
