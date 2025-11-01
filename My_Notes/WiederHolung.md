@@ -7,9 +7,21 @@ systemd-analyze + blame # makinenin baslamasi icin süre + detaylat
 ls -d D* bulundugun yerde D ile baslayan directories
 ls -d test_directory test kalsörüyle ilgili özellikler
 tree <Directory_Name>
+ln test linktest # test dosyasina hardlink  yaptik. Birini silsen digeri  calismaya devam eder
+ls -li # inode numarasini verir
+ln -s test symlintest # sembolik link olusturur
 ```
+inode dosyaya ait meta data (izinler, tarihler usw.) tutar. Dosya ismi degilde bir numara tutar. farkli isimler ayni numaraya atanabilir. Böylece hardlinkler  olusturulur. Yani iki farkli isim ayni dosyaya isaret edebilir. Symlink ise bir hard link icin shortcut tir.  
 
+```bash
+ls -li test 
+258147 -rw-rw-r-- 2 ubuntu ubuntu 35 Nov  1 16:04 test
+```
+ikinci satirtdaki "2" sayisi ayni inode numarasina sahip dosya sayisini gösterir
 
+find  -perm /4000
+find yavas  locate hizli  uodatedb
+which exact location of binary files
 ### .target .service dosyalari
 .service dosyası bir servisin kendisini tanımlar. İçinde hangi binary’nin çalıştırılacağı, hangi kullanıcıyla çalışacağı, ne zaman yeniden başlatılacağı gibi bilgiler olur. Örneğin:
 ```ini
