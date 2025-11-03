@@ -22,6 +22,11 @@ ikinci satirtdaki "2" sayisi ayni inode numarasina sahip dosya sayisini gösteri
 find  -perm /4000
 find yavas  locate hizli  uodatedb
 which exact location of binary files
+alias yaz 3310 a gönder Sistemdeki alias lari listeler
+cut -d : -f 3 /etc/passwd # 3. sütunu alir
+bashrc icin ayri ayri ugrasma. /etc/profile icine yaz
+ctrl e ile satir sonuna ctrl a ile satirbasina gidersin. 
+
 ### .target .service dosyalari
 .service dosyası bir servisin kendisini tanımlar. İçinde hangi binary’nin çalıştırılacağı, hangi kullanıcıyla çalışacağı, ne zaman yeniden başlatılacağı gibi bilgiler olur. Örneğin:
 ```ini
