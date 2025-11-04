@@ -147,7 +147,7 @@ apt, bu komuttaki "google-chrome-stable_current_amd64.deb" ifadesini, bir paket 
  
 # User and Group Management
 ```py
-useradd # home directory veya psswrd olusturulmaz
+useradd # home directory veya psswrd olusturulmaz. Ek argümanlarla home directory olusturulur
 adduser # home dir ve passwd olusturulur
 adduser # güvenlik acisindan daha iyi
 groupadd
@@ -161,10 +161,23 @@ who or users # makineyi o an kullanan kullanicilari verir
 `etc/passwd` user accountlarla ilgili bilgiler
 `etc/shadow` encrypted password ler burada.
 
-## Password Policies
 
+passwd icinde degisiklik yapacaksan `vipw` kullan (Ayni `visudo` da oldugu gibi) Yaptigin degisiklikleri kontrol eder ve hata varsa uyari verir- group lar icin `vigr`
+/etc/login.defs icinde degisiklikler yaparak yeni olusturulacak user larin özellikleri ayarlanabilir. 
+
+/etc/skel dizini, yeni kullanıcı oluşturulduğunda onun ana dizinine (home directory) otomatik kopyalanacak varsayılan dosyaları içerir.
+
+
+## Password Policies
+`chage -l # current settings`
+sudo chage <USER_NAME> adim adim ayarlamalari yaparsin
 PASSWORD AGING: `chage -m mindays -M maxdays -d lastday`
 `sudo nano /etc/login.defs` dosyasinda bu sayilari düzelt. Bu yeni sistemlerde artik yok. Peki ne var: ` /etc/security/pwquality.conf` yine FAILED LOGINLER ICIN `/etc/security/faillock.conf` 
+## Session Management
+loginctl en yeni arac. `w` veya `who` komutlarida olur. 
+loginctl list-sessions # tüm sessions ve session number
+loginctl show-session <session_number> # detayli bilgi
+loginctl terminate-session <session_number>
 
 ### Using `ps`
 
