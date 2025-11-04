@@ -20,12 +20,34 @@ ls -li test
 ikinci satirtdaki "2" sayisi ayni inode numarasina sahip dosya sayisini gösterir
 
 find  -perm /4000
-find yavas  locate hizli  uodatedb
+find yavas  locate hizli  updatedb
 which exact location of binary files
 alias yaz 3310 a gönder Sistemdeki alias lari listeler
 cut -d : -f 3 /etc/passwd # 3. sütunu alir
-bashrc icin ayri ayri ugrasma. /etc/profile icine yaz
+bashrc icin ayri ayri ugrasma. /etc/profile icine yazMAAAA. Profil.d klasörü icine script yaz.
 ctrl e ile satir sonuna ctrl a ile satirbasina gidersin. 
+
+passwd icinde degisiklik yapacaksan `vipw` kullan (Ayni `visudo` da oldugu gibi) Yaptigin degisiklikleri kontrol eder ve hata varsa uyari verir
+
+### Usecae: Profil.d kulllanimi
+Sistem genelinde tüm kullanıcılar için Vim’i varsayılan editör yapmak için:
+```bash
+sudo vi /etc/profile.d/editor.sh
+```
+Aşağıdaki satırları ekle:
+```bash
+#!/bin/bash
+export EDITOR=$(which vim)
+export VISUAL=$(which vim)
+```
+Dosyayı çalıştırılabilir yap:
+```bash
+sudo chmod +x /etc/profile.d/editor.sh
+```
+
+
+
+Bu ayar tüm kullanıcı oturumlarında otomatik yüklenir.
 
 ### .target .service dosyalari
 .service dosyası bir servisin kendisini tanımlar. İçinde hangi binary’nin çalıştırılacağı, hangi kullanıcıyla çalışacağı, ne zaman yeniden başlatılacağı gibi bilgiler olur. Örneğin:
