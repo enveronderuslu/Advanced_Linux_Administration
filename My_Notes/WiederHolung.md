@@ -31,7 +31,7 @@ passwd icinde degisiklik yapacaksan `vipw` kullan (Ayni `visudo` da oldugu gibi)
 /etc/login.defs icinde degisiklikler yaparak yeni olusturulacak user larin özellikleri ayarlanabilir. 
 
 /etc/skel dizini, yeni kullanıcı oluşturulduğunda onun ana dizinine (home directory) otomatik kopyalanacak varsayılan dosyaları içerir.
-
+y
 ### Usecae: Profil.d kulllanimi
 Sistem genelinde tüm kullanıcılar için Vim’i varsayılan editör yapmak için:
 ```bash
