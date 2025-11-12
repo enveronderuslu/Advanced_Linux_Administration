@@ -6,7 +6,7 @@
 # 0. ESRATES SET 
 
 ## 1. Können Sie sich bitte kurz vorstellen?
-Ich bin Mathematiker und IT-Spezialist mit Schwerpunkt auf Linux-Systemadministration, IT-Sicherheit und Cloud-Technologien. Nach meiner wissenschaftlichen Laufbahn habe ich mich gezielt auf Cybersecurity, DevOps und Informationssicherheit spezialisiert. In den letzten zwei Jahren habe ich mich intensiv mit Themen wie SIEM, Firewalls, EDR und ISO 27001 beschäftigt und praktische Erfahrungen im IT-Betrieb gesammelt.
+Ich bin Mathematiker und IT-Spezialist mit Schwerpunkt auf Linux-Systemadministration, IT-Sicherheit und Cloud-Technologien. Nach meiner wissenschaftlichen Laufbahn habe ich mich gezielt auf Cybersecurity, DevOps und  Informationssicherheit spezialisiert. In den letzten zwei Jahren habe ich mich intensiv mit Themen wie SIEM, Firewalls, EDR und ISO 27001 beschäftigt und praktische Erfahrungen im IT-Betrieb gesammelt.
 
 ---
 
