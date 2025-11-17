@@ -2,7 +2,7 @@ PAM Authentication Modules¶
 
 PAM is a library suite that allows a Linux system administrator to configure methods to authenticate users. It provides a flexible and centralized way to switch authentication methods for secured applications using configuration files instead of changing application code.
 
-Generalities¶
+Generalities¶ 
 Authentication is the phase during which it is verified that you are the person you claim to be. 
 z.B. password, but other forms of authentication exist.
 
