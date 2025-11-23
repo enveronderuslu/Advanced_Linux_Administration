@@ -24,7 +24,7 @@ find yavas  locate hizli  updatedb
 which exact location of binary files
 alias yaz 3310 a gönder Sistemdeki alias lari listeler
 cut -d : -f 3 /etc/passwd # 3. sütunu alir
-bashrc icin ayri ayri ugrasma. /etc/profile icine yazMAAAA. Profil.d klasörü icine script yaz.
+bashrc icin ayri ayri ugrasma. /etc/bash.bashrc ye    yaz gitsin
 ctrl e ile satir sonuna ctrl a ile satirbasina gidersin. 
 
 passwd icinde degisiklik yapacaksan `vipw` kullan (Ayni `visudo` da oldugu gibi) Yaptigin degisiklikleri kontrol eder ve hata varsa uyari verir- group lar icin `vigr`
