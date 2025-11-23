@@ -8,7 +8,7 @@ ls ; date
 ^Fri Aug 15 09:01:39 PM CEST 2025
 ```
 &&  baglacida ; gibi kullanilabilir fakat komut1 && komut2 farkli anlama gelir. birinci calisr ise ikinci calisir. ; de birbirinden bagimsiz calisir.
-benzer sekilde komut_1 || komut_2 var. Bu defa sol taraf hata dönerde sag taraf calisir-  sol taraf calisirsa sag calismaz. XOR gibi 
+benzer sekilde komut_1 || komut_2 var. Bu defa sol taraf hata dönerde sag taraf  calisir-  sol taraf calisirsa sag calismaz. XOR gibi 
 
 yine `<command> &` ile komut arka planda calisir
 
