@@ -4,7 +4,6 @@ git config --global user.email "enveronderuslu@gmail.com" && git config --global
 ssh-keygen -t rsa -b 4096
 ssh-copy-id -i ~/.ssh/id_rsa.pub ansible@192.168.178.115
 ```
-
 ``` bash
 ls ; date
 ^Fri Aug 15 09:01:39 PM CEST 2025
