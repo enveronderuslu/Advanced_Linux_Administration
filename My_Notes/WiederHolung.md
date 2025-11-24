@@ -135,7 +135,14 @@ free -m # Memory Usage
 df -h # Disk Space
 iostat # I/O Wait
 ps aux | grep 'Z'  #Zombie Processes
+ps fax # üarent child processes
 ```
+top komutu ps den daha iyi
+kill basiert auf PID
+killall basiert auf Processname
+
+
+
 Network Troubleshooting
 ```bash
 ip a # Check if the interface is up
