@@ -31,7 +31,7 @@ passwd icinde degisiklik yapacaksan `vipw` kullan (Ayni `visudo` da oldugu gibi)
 /etc/login.defs icinde degisiklikler yaparak yeni olusturulacak user larin özellikleri ayarlanabilir. 
 
 /etc/skel dizini, yeni kullanıcı oluşturulduğunda onun ana dizinine (home directory) otomatik kopyalanacak varsayılan dosyaları içerir.
-y
+
 ### Usecae: Profil.d kulllanimi
 Sistem genelinde tüm kullanıcılar için Vim’i varsayılan editör yapmak için:
 ```bash
@@ -47,8 +47,6 @@ Dosyayı çalıştırılabilir yap:
 ```bash
 sudo chmod +x /etc/profile.d/editor.sh
 ```
-
-
 
 Bu ayar tüm kullanıcı oturumlarında otomatik yüklenir.
 
@@ -139,11 +137,67 @@ ps fax # üarent child processes
 ```
 top komutu ps den daha iyi
 kill basiert auf PID
-killall basiert auf Processname
+killall basiert auf Processname 
 
+## Scheduled Tasks 
+systemd timer en modern olani. Crontab eski sürümlerde var
 
+```bash
+sudo systemctl list-unit-files  -t  timer # systemd timer  Scheduled task lari verir 
+sudo systemctl list-unit-files  backup* # ismi backup ile baslayan dosyalari yakalarsin
+sudo systemctl  cat backup-sysconfig.timer # icerigi yakalar
+```
+The ` wall ` command in Linux is a powerful tool that allows users to send messages to all logged-in users' terminals. 
 
-Network Troubleshooting
+## Syslog vs. Rsyslog
+Syslog is the basic protocol and original daemon, while Rsyslog is an advanced version with many more features. Rsyslog is modern and default for many Linux distributions. 
+
+## Sourcing vs. Running a Script
+# script.sh
+Terminalde  `VAR=1` seklinde bir degisken tanimla.
+sonra  asagidaki Scripti yaz
+
+```bash
+#!/bin/bash
+echo $VAR   # boş, değişken görünmez
+```
+`./script.sh` dersen mevcut shell den bagimsiz calisir ve cikti vermerz. 
+`source script.sh` yaparsan 1, değişkeni mevcut shell’de görünüyor
+
+## KERNEL & KERNEL MODULES
+`findmnt` shows the mounted  devices
+`/etc/fstab` (file system table) dosyası, Linux’ta sistem açılırken hangi dosya sistemlerinin ve cihazların nereye ve nasıl bağlanacağını (mount) belirten yapılandırma dosyasıdır.
+`sudo umount /dev/sr0` ile istedigin cihazi unmoint edersin
+options → bağlama seçenekleri, virgülle ayrılır: 
+
+- defaults → varsayılan seçenekler
+- noauto → otomatik bağlama yok
+- ro → salt okunur
+- rw → okunabilir ve yazılabilir
+
+kernel tuning: çekirdek seviyesinde performans, güvenlik veya kaynak kullanımını optimize etmek için yapılan ayarlamalardır.
+
+### Kernel Tuning
+/proc sistem durumu ve kernel parametrelerini izlemek ve değiştirmek için kullanılan sanal bir arayüzdür erçek disk üzerinde fiziksel olarak var olmaz. Amaç: çekirdek ve sistem bilgilerini kullanıcıya sunmak.
+- Dosyalar fiziksel değil, RAM üzerinden çekirdek tarafından oluşturulur.
+- Bazı dosyalar sadece okunur, bazıları ise kernel parametrelerini değiştirmek için yazılabilir.
+- Dinamik içerik. Sistem çalıştıkça içerik güncellenir.
+
+Örnek Dosyalar ve Klasörler
+Dosya/Klasör	Açıklama
+/proc/cpuinfo	İşlemci bilgileri (model, çekirdek sayısı, hız)
+/proc/meminfo	Bellek durumu (toplam, boş, swap)
+/proc/uptime	Sistem çalışmaya başladığından beri geçen süre
+
+`lsblk` List information about block devices. Özellikle sda lar. 
+`/sys` provide info about devices and their attributes. Donanim ve sürücüler hakkinda bilgi verir. 
+
+`/proc/sys` Kernelin tuning ve runtime yapılandırma parametrelerini sunar.
+sysctl komutunun doğrudan arayüzüdür.
+
+`/sys` (sysfs): Kernel içindeki donanım, sürücü ve çekirdek nesnelerini hiyerarşik şekilde gösterir. Gerçek zamanlı donanım durum bilgisi sağlar.
+
+### Network Troubleshooting
 ```bash
 ip a # Check if the interface is up
 ping 192.168.1.1 # ping your gateway?
