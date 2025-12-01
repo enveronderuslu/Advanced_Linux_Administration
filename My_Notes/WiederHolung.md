@@ -334,8 +334,10 @@ journalctl -u cron.service # cron servisi (unit i ile ilgili) loglari gösterir.
 ## ADVANCED RESOURCING
 ```bash
 /usr/etc/security/limits.conf # config file
-ulimit -a # alll limitations in the system
+ulimit -a # OLD SCHOOL all limitations in the system
+
 ```
+
 ### Network Tr6oubleshooting
 ```bash
 ip a # Check if the interface is up
