@@ -25,10 +25,14 @@ which exact location of binary files
 alias yaz 3310 a gönder Sistemdeki alias lari listeler
 cut -d : -f 3 /etc/passwd # 3. sütunu alir
 bashrc icin ayri ayri ugrasma. /etc/bash.bashrc ye    yaz gitsin
-ctrl e ile satir sonuna ctrl a ile satirbasina gidersin. 
+ctrl e ile satir sonuna ctrl a ile satir basina gidersin. 
 
 passwd icinde degisiklik yapacaksan `vipw` kullan (Ayni `visudo` da oldugu gibi) Yaptigin degisiklikleri kontrol eder ve hata varsa uyari verir- group lar icin `vigr`
 /etc/login.defs icinde degisiklikler yaparak yeni olusturulacak user larin özellikleri ayarlanabilir. 
+
+```bash
+id Test_User # olusturdugun userin hangi gruplarda oldugunu görürsün 
+```
 
 /etc/skel dizini, yeni kullanıcı oluşturulduğunda onun ana dizinine (home directory) otomatik kopyalanacak varsayılan dosyaları içerir.
 
@@ -104,7 +108,7 @@ grep -ri ebenin* # recursively tüm dosya isimleri ve iceriklerinde ebenin kelim
 find / -perm /g=w,o=w 2> /dev/null # w Hakki olan gruplar ve other people bulunur
 sudo chown -R  cemsit:cemsit Folder/ # hem kullanici hem grup degisti 
 
-setfacl -m u:cemsit:rw deneme.txt enver kullanicisinin üzerinde Hakki olan deneme.txt dosyasina bir user atadim (gruba hak taniyacaksan u yerine g yaz) parent klasörlere hak vermezsen en altta izin aldigin dpsyaya ulasamazsin. Her kapi icin ayri izin lazim. 
+setfacl -m u:cemsit:rw deneme.txt enver kullanicisinin üzerinde Hakki olan deneme.txt dosyasina bir user atadim (gruba hak taniyacaksan u yerine g yaz) parent klasörlere hak vermezsen en altta izin aldigin dosyaya ulasamazsin. Her kapi icin ayri izin lazim. 
 ```bash
 getfacl deneme.txt # ile detaylari görürsün.
 sudo setfacl -m u:user1:rw reports/ # reports dosyasinin icine inherit edemezsin.
@@ -153,7 +157,6 @@ The ` wall ` command in Linux is a powerful tool that allows users to send messa
 Syslog is the basic protocol and original daemon, while Rsyslog is an advanced version with many more features. Rsyslog is modern and default for many Linux distributions. 
 
 ## Sourcing vs. Running a Script
-# script.sh
 Terminalde  `VAR=1` seklinde bir degisken tanimla.
 sonra  asagidaki Scripti yaz
 
@@ -184,10 +187,9 @@ kernel tuning: çekirdek seviyesinde performans, güvenlik veya kaynak kullanım
 - Dinamik içerik. Sistem çalıştıkça içerik güncellenir.
 
 Örnek Dosyalar ve Klasörler
-Dosya/Klasör	Açıklama
-/proc/cpuinfo	İşlemci bilgileri (model, çekirdek sayısı, hız)
-/proc/meminfo	Bellek durumu (toplam, boş, swap)
-/proc/uptime	Sistem çalışmaya başladığından beri geçen süre
+- /proc/cpuinfo	İşlemci bilgileri (model, çekirdek sayısı, hız)
+- /proc/meminfo	Bellek durumu (toplam, boş, swap)
+- /proc/uptime	Sistem çalışmaya başladığından beri geçen süre
 
 `lsblk` List information about block devices. Özellikle sda lar. 
 `/sys` provide info about devices and their attributes. Donanim ve sürücüler hakkinda bilgi verir. 
@@ -197,7 +199,144 @@ sysctl komutunun doğrudan arayüzüdür.
 
 `/sys` (sysfs): Kernel içindeki donanım, sürücü ve çekirdek nesnelerini hiyerarşik şekilde gösterir. Gerçek zamanlı donanım durum bilgisi sağlar.
 
-### Network Troubleshooting
+## SYSTEMD (ADVANCED) 
+Systemd, servislerin, boot sürecinin ve sistem bileşenlerinin yönetilmesini sağlayan init sistemidir. Vazifesi sistem açılırken ve çalışırken tüm servisleri başlatmak, durdurmak, izlemek ve düzenlemektir.
+Servis akışını anlamak için `systemctl list-units` çıktısını incele.
+
+Systemd unit, systemd tarafından yönetilen servis, hedef, mount, socket ve benzeri bileşenleri tanımlayan yapılandırma dosyasıdır. Her unit, sistemde bir işlevin nasıl başlatılacağını, durdurulacağını, izleneceğini ve bağımlılıklarının nasıl ele alınacağını belirtir.
+```bash
+sudo systemctl edit unit.type # Z.b. sshd.service
+sudo systemctl edit # activate the changes 
+sudo systemctl show sshd.service # servisle ilgili tüm detaylari görürsün
+```
+- Servislerin (daemons) yönetimi
+- Boot sırasının düzenlenmesi
+- Kaynak bağımlılıklarının tanımlanması
+- Otomasyon ve izleme
+
+En Önemli Unit Türleri
+
+- service: En yaygın tür. Arka plan servisleri.
+- socket: Socket unit (örnek: sshd.socket), bir servisin sadece ihtiyaç olduğunda çalışmasını sağlayan “tetikleme noktasıdır”. Bir servis direkt çalışmak yerine, sistem bir port veya dosya üzerinden istek alınca çalışır. 
+
+```bash
+sshd.socket # 22 numaralı portu dinler
+sshd.service # Bir bağlantı olunca otomatik başlar
+```
+- target: Boot aşamalarını gruplayan mantıksal birimler.
+- mount / automount: Dosya sistemleri montajı.
+- timer: Cron alternatifi zamanlayıcılar.
+
+### Best Practices
+Konfigürasyon Yönetimi
+- Vendor dosyalarını değiştirme; /etc altında override kullan.
+- Aynı serviste çok adım varsa ExecStart= yerine ayrı script kullan.
+
+Bağımlılık ve Sıra Yönetimi
+- Requires= servis gerekliliği, After= başlama sırası
+- Gereksiz bağımlılıklardan kaçın, boot süresini kontrol et.
+
+İzleme
+- sytemctl status, journalctl -u ile sürekli servis durumu takibi.
+- Timer tarafında Persistent= kullanarak kaçırılan zamanlamaları telafi et.
+
+5) Güvenlik
+- Servis çalıştırma ortamını mümkün olduğunca izole et:
+- ProtectSystem=full, ProtectHome=yes, PrivateDevices=yes
+- CapabilityBoundingSet= kullan
+- Düzenli olarak servislerin override.conf yapılarını gözden getir.
+- Güvenlik açısından tüm unit dosyalarında izolasyon ayarlarını standartlaştır.
+
+Systemd servisleri arasında bağımlılık (dependency) tanımları vardır.
+Örnek parametreler:
+- Requires= , Wants= , After= , Before=
+Eğer yanlış bağımlılık kurarsan Sistem her boot sırasında o gereksiz servisi de bekler. Ve Boot süresi uzar. Servis zincirleme olarak gecikme yaratır.
+
+Yanlış tasarım:
+```bash
+[Unit]
+Requires=network-online.target
+After=network-online.target
+```
+Eğer servis aslında ağ gerektirmiyorsa Sistem, network-online.target tamamlanana kadar o servisi başlatmaz.Boot süresi gereksiz yere uzayabilir.
+
+Doğru yaklaşım:
+```bash
+[Unit]
+After=network.target
+```
+Yani servis ağ bağlantısı “olmadan” da başlayabiliyorsa Requires kullanılmamalıdır.
+
+Yanlis tasaraim: Bir log toplama servisi:
+```bash
+Requires=mysql.service
+After=mysql.service
+```
+Bu durumda Log servisi için MySQL’in önce açılması beklenir. MySQL geç açılırsa log servisi de bekler. Boot süresi gereksiz uzar. Doğrusu:
+```bash
+Wants=mysql.service
+After=mysql.service
+```
+Bu durumda Bağımlılık zorunlu değildir; sistem gerekirse MySQL’i başlatmadan da boot eder.
+
+Servis bağımlılıklarını düzenlerken “Requires” yerine mümkün olduğunca “Wants” tercih et.
+
+## SYSTEMD CGROUPS
+Linux sistemlerde systemd cgroups (control groups), işlemlerin CPU, bellek, I/O gibi kaynak kullanımını sınıflandırmak, izlemek ve sınırlandırmak için kullanılan çekirdek mekanizmasının systemd tarafından yönetilen halidir.
+
+Ne işe yarar: 
+1. Servislerin kaynak kullanımını sınırlar (CPU, RAM, I/O).
+```bash
+mkdir -p /etc/systemd/system/httpd.service.d
+cat > /etc/systemd/system/httpd.service.d/limits.conf 
+[Service]
+CPUQuota=40%
+MemoryMax=800M
+IOReadBandwidthMax=/ 10M
+systemctl daemon-reload && systemctl restart httpd
+# Bu yapılandırma httpd servisine CPU, bellek ve I/O sınırı uygular.
+```
+2. Servis seviyesinde izleme ve hata yönetimi yapılmasını sağlar.
+```bash
+systemctl status mariadb
+systemd-cgtop
+# systemd-cgtop servisin CPU ve bellek kullanımını gerçek zamanlı gösterir. 
+``` 
+3. Sistem kararlılığını artırır
+```bash
+[Service]
+MemoryMax=1G
+# Belirlenen sınır aşılırsa kernel OOM, yalnızca o servisi hedef alır.
+```
+4. Kaynak temelli performans teşhisi sağlar.
+```bash
+systemd-cgls
+# Bu komut cgroup hiyerarşisini göstererek hangi servislerin hangi süreçlere sahip olduğunu, hangi grubun yük oluşturduğunu hızlıca ortaya çıkarır.
+# Mesela
+systemd-cgls | grep ssh
+```
+## NETWORK ADVANVECD 
+```bash
+ip link # shows network interfaces
+sudo lshw -class network # deeper information
+nmtui || nmcli # Use NetworkManager for RHEL
+man nmcli-examples # yapabileceklerinle ilgili örnekler. Z.b.
+nmcli device wifi list
+/etc/hosts   # hier stehen die Hostnamen
+/etc/resolv.conf # standart DNS file
+```
+`/etc/nsswitch.conf`, isim çözümleme ve kimlik doğrulama işlemlerinde hangi kaynağın hangi sırayla kullanılacağını belirleyen yapılandırma dosyasıdır.
+örnegin `passwd: files ldap ` Kimlik bilgileri önce yerel dosyalardan, sonra LDAP’tan alınır.
+
+## LINUX LOGGING
+journalctl -u cron.service # cron servisi (unit i ile ilgili) loglari gösterir.
+
+## ADVANCED RESOURCING
+```bash
+/usr/etc/security/limits.conf # config file
+ulimit -a # alll limitations in the system
+```
+### Network Tr6oubleshooting
 ```bash
 ip a # Check if the interface is up
 ping 192.168.1.1 # ping your gateway?
