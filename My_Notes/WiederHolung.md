@@ -1,6 +1,23 @@
 ```bash
+git config --global user.email "enveronderuslu@gmail.com" &&
+git config --global user.name "Enver Onder Uslu"
+
+ssh-keygen -t rsa -b 4096
+ssh-copy-id -i ~/.ssh/id_rsa.pub target_user@target-IP
+```
+
+```bash
+alias sysupdate='dnf -y update'
+alias c='clear'
+alias l='ls -laFtr  --color=no'
+alias ping='ping -c 5'
+alias ports='ss -tulanp'
+PS1='$ '
+```
+
+```bash
 systemd-analyze + blame # makinenin baslamasi icin süre + detaylat 
-/lib/systemd/system # services are here
+/usr/lib/systemd/system # services are here
 ```
 
 ```bash
@@ -335,8 +352,50 @@ journalctl -u cron.service # cron servisi (unit i ile ilgili) loglari gösterir.
 ```bash
 /usr/etc/security/limits.conf # config file
 ulimit -a # OLD SCHOOL all limitations in the system
-
 ```
+SysRq (Magic SysRq Key), SysRq, çekirdek seviyesinde debugging, süreç sonlandırma, senkronizasyon ve güvenli reboot gibi işlemleri gerçekleştiren bir kurtarma arabirimidir.
+
+Örnek. Alt + SysRq + REISUB; Kilitlenmiş sistemi güvenli şekilde yeniden başlatmak için kullanılan sıralı komut seti. Sol el ile Alt tuşuna, Sağ el ile PrintScreen/SysRq tuşuna basılı tut. SysRq tuşunu bırakmadan REISUB harflerine sirayla bas. 
+
+## I/O Monitoring
+`iotop` kullanilabilir. `dnf  install iotop` ile kurmalisin. 
+### dd KOMUTU
+dd, Linux’ta Veriyi bir kaynaktan alıp (if=input_file), hedefe (of=output_file) byte seviyesinde yazar. Genellikle imaj oluşturma, disk yazma, bootable USB hazırlama gibi işlemlerde kullanılır. 
+```bash
+dd if=ornek.iso of=/tmp/kopya.iso bs=1M # Bir dosyayı kopyalama. bs (block size), dd’nin her okuyup yazdığı veri parçasının büyüklüğüdür. 1M, 1 megabaytlık bloklarla okuma/yazma yapılacağı anlamına gelir.
+dd if=/dev/sda of=/tmp/disk.img bs=4M # Bir disk imajı oluşturma
+dd if=ornek.img of=/dev/sdb bs=4M status=progress # Bir imajı diske yazma. status=progress kopyalanan veri miktarını ve hızını terminalde canlı olarak gösterir.
+```
+### D-Bus `busctl list`
+D-Bus (Desktop Bus), Farklı uygulamaların birbirleriyle veri veya komut paylaşmasını sağlar. Merkezi bir iletişim kanalı sağlar. Örneğin, bir uygulama diğerine “bu dosya açıldı” mesajı gönderebilir.
+Bir daemon (genellikle dbus-daemon) sürekli çalışır ve mesajları gönderip alır. Tipik Kullanım: Masaüstü ortamları (GNOME, KDE) ve sistem servisleri arasında iletişim.
+## BOOT OPERATIONS
+### Emergency Mode
+- Reboot your system.
+- Interrupt the boot loader countdown (by pressing a key like "e" ).
+- Locate the kernel command line (often starts with linux or linux16).
+- Append systemd.unit=emergency.target to the end of that line.
+- Boot using the modified parameters (often Ctrl+x or F10, depending on the bootloader instructions). 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ### Network Tr6oubleshooting
 ```bash
@@ -346,14 +405,7 @@ nslookup google.com # Can you resolve DNS ?
 ss -tunlp # View all connections
 firewall-cmd --list-all # Firewall issue?
 ```
-```bash
-alias sysupdate='dnf -y update'
-alias c='clear'
-alias l='ls -laFtr  --color=no'
-alias ping='ping -c 5'
-alias ports='ss -tulanp'
-PS1='$ '
-```
+
 ```bash
 nmcli # temiz network device adress bilgisi veriyor
 nmcli device show
