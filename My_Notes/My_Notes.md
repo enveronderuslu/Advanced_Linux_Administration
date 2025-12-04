@@ -14,7 +14,7 @@ benzer sekilde komut_1 || komut_2 var. Bu defa sol taraf hata dönerde sag taraf
 yine `<command> &` ile komut arka planda calisir
 
 # Linux System Basics 
-sudo derdinden kurtulmak istiyorum: Hedef makinada şu komutla sudoers dosyasına özel bir kural ekle:
+sudo derdinden kurtulmak istiyorum: Hedef makinada sunu ekle:
 
 ```bash
 sudo visudo

@@ -1,141 +1,174 @@
-SELinux (Security Enhanced Linux )
-Linux mit verbesserter Sicherheit
-A subjeckt wants to perform an action on an object 
-Traditional system security: Owner determines access priviliges (DAC)
-SELinux: everthing is labelled. Labels have to match (MAC)
+# SELinux (Security Enhanced Linux)
 
-Erişim izni verilmesi için hem klasik izinlerin hem de SELinux'un "EVET" demesi gerekir. Biri hayır derse → erişim reddedilir.
+"A subject" wants to perform "an action" on "an object".  
+
+Traditional system security: Owner determines access privileges (DAC)  
+SELinux: everything is labelled. Labels have to match (MAC)
+
+Erişim izni verilmesi için hem klasik izinlerin hem de SELinux'un “EVET” demesi gerekir. Biri hayır derse → erişim reddedilir.
 
 When a subject (z.B. an application) tries to access an object (z-B- a file), the SELinux part of the Linux kernel queries its policy database. Depending on the mode of operation (enforcing, permissive, disabled), SELinux authorizes access to the object in case of success, otherwise it records the failure in the file /var/log/messages.
 
+Örnek: Apache web sunucusu /data/private/info.html dosyasına erişmek ister.  
+Apache = subject, info.html = object.  
+SELinux kontrol eder → izin varsa erişim gerçekleşir, yoksa reddeder ve log’a yazar. Eğer erişim reddedilirse /var/log/messages içine bir kayıt düşer:
+```
+type=AVC msg=audit(XXX): denied { read } for pid=1234 comm="httpd" name="info.html"
+1. AVC – Access Vector Cache**: SELinux’un erişim kontrol kararlarını hızlandırmak için kullandığı önbellek.  
+2. comm="httpd" – İşlemi başlatan komutun adı.
+```
+---
 
-Örnek: Diyelim ki Apache web sunucusu (program) /data/private/info.html adlı bir dosyaya erişmek istiyor. Bu durumda: Apache = subject (uygulama), data/private/info.html = object (dosya). Apache (subject) → dosyaya ulaşmaya çalışır (object). SELinux kontrol eder → izin varsa ✔, yoksa ✖ + log dosyasına yazar.
- 
-Eğer erişim reddedilirse, sistem bu olayı /var/log/messages dosyasına şöyle kaydeder:  type=AVC msg=audit(XXX): denied { read } for pid=1234 comm="httpd" name="info.html"
-1. AVC – Access Vector Cache: SELinux’un, erişim izinlerini daha hızlı kontrol edebilmesi için kullandığı bir önbellektir.
+# Generalities
 
-Buradaki log türü type=AVC olduğunda, bu log’un bir erişim denetimi (izin verildi/verilmedi) olayıyla ilgili olduğunu gösterir. AVC logları, SELinux’un bir erişimi neden reddettiğini veya kabul ettiğini gösteren kayıt türüdür.
+SELinux, Mandatory Access Control (MAC) sistemidir.  
+Geleneksel DAC modeli kullanıcı/SUID haklarına dayanır. MAC ise daha sıkı yalıtım sağlar ve süper kullanıcı kavramı SELinux seviyesinde geçerli değildir.
 
-2. comm="httpd" – Command Name. comm, "command" yani çalışan programın adı demektir. 
+SELinux, politika (policy) kuralları kullanır. İki temel politika türü vardır:
 
-Generalities¶
-SELinux (Security Enhanced Linux) is a Mandatory Access Control system. Standard access management security was based on DAC (Discretionary Access Control) systems. An application operated with UID or SUID (Set Owner User Id) rights, which made it possible to evaluate permissions (on files, sockets, and other processes...) according to this user. 
-
-A MAC system reinforces the separation of confidentiality and integrity information to achieve a containment system. The containment system is independent of the traditional rights system and there is no notion of a superuser.
+- **Targeted policy** → çoğu modern dağıtımda varsayılan
+- **Strict policy** → daha katı, tüm süreçleri kapsayan model
 
 ![alt text](image.png)
 
-SELinux uses a set of rules (policies) for this. A set of two standard rule sets (targeted and strict) is provided and each application usually provides its own rules. 
------------------------------------------------------
-The SELinux context¶
-The operation of SELinux is totally different from traditional Unix rights. The SELinux security context is defined by the trio: 
-identity+role+domain
+---
 
-Identity → Sen kimsin? (alice, bob)
-Role → Ne iş yapıyorsun? (student, teacher)
-Domain → Hangi sınıftasın, hangi alanlarda gezebilirsin? (user_t, admin_t, httpd_t)
+# The SELinux Context
 
-SELinux Context Nedir?
-SELinux, dosyaları ve işlemleri şu şekilde etiketler:
-user_u:role_r:type_t
-Bu üçlüye SELinux security context denir.
+SELinux güvenlik bağlamı üçlüden oluşur:  
+**identity + role + domain(type)**
+Örnek biçim:  
+`user_u:role_r:type_t`
+Örnek bağlam:  
+`system_u:object_r:httpd_sys_content_t`
 
+- **identity**: SELinux kullanıcı kimliği  
+- **role**: kullanıcının görev kategorisi  
+- **domain/type**: süreçlerin veya nesnelerin çalışma alanları
+
+Örnek süreç bağlamı:  
+`system_u:system_r:httpd_t 4567 ? 00:00:00 httpd`
+
+Bu demektir ki httpd servisi system_u kimliğiyle, system_r rolüyle ve httpd_t domain’inde çalışmaktadır.
+
+Tablo:
+
+| Kavram      |     Anlamı            |          Örnek           |
+|-------------|-----------------------|---------------------------|
+| Identity    | SELinux kimliği       |       bob_u, system_u     |
+| Role        | Kullanıcının rolü     | user_r, staff_r, system_r |
+| Domain/Type | Sürecin/dosyanın tipi | user_t, httpd_t, httpd_sys_content_t |
+
+---
+
+# Örnek Bağlamlar
+
+**Örnek 1 — httpd Servisi**
+
+`system_u:system_r:httpd_t 1512 ? 00:00:03 httpd`
+
+**system_u (Identity)** SELinux kullanıcısını temsil eder. Burada “system_u”, sistem tarafından oluşturulmuş bir kullanıcıdır (root veya servisler için kullanılır).
+
+**system_r (Role)** Kullanıcının rolünü gösterir. “system_r” rolü, sistem servislerini çalıştırmak için atanmış bir roldür.
+
+**httpd_t (Domain/Type)** Sürecin ait olduğu SELinux domain veya tipi. Burada Apache web sunucusu süreci için domain httpd_t olarak belirlenmiş. Süreç yalnızca belirlenen tipteki dosya ve kaynaklara erişebilir.
+
+**1512 (PID)** Sürecin işlem kimliği (Process ID).
+
+**? (TTY)** Terminal bağlantısı yok. “?” genellikle servislerin doğrudan terminale bağlı olmadığını gösterir.
+
+**00:00:03 (CPU Time)** Sürecin şimdiye kadar kullandığı CPU süresi.
+
+**httpd (Command Name / Program)** Çalışan programın veya servis adını gösterir.
+
+**Örnek 2 — Normal Kullanıcı**
+
+`alice_u:user_r:user_t 1234 pts/0 00:00:00 bash`
+**pts/0**  açılmış ilk sanal terminaldir. pts/1, pts/2 gibi diğer numaralar, farklı oturumları temsil eder.
+
+**Örnek 3 — Root**
+
+`root:sysadm_r:sysadm_t 2310 pts/1 00:00:01 bash`
+
+**Örnek 4 — sshd Servisi**
+
+`system_u:system_r:sshd_t 2840 ? 00:00:00 sshd`
+
+**Örnek 5 — Alice yönetici rolüyle**
+
+`alice_u:sysadm_r:sysadm_t 2234 pts/0 00:00:00 bash`
+
+---
+
+# Domain – Type İlişkisi
+
+Süreçlerin hakları, domain’e (SELinux type) göre değerlendirilir.  
 Örnek:
-system_u:object_r:httpd_sys_content_t
 
-system_u	               Kim? (Identity – sistem kullanıcısı)
-object_r	               Hangi görevle? (Role – bir nesne rolü)
-httpd_sys_content_t	   Nerede, ne tür işlemleri yapabilir? (Domain veya type)
+**Web sunucusu httpd**
 
-Örnek 2: Web Sunucusu (httpd)
-Apache hizmeti çalışıyor:
+- Süreç: `httpd_t`
+- Web içerik dosyaları: `httpd_sys_content_t`
 
-system_u:system_r:httpd_t   4567 ? 00:00:00 httpd
+SELinux politikası:  
+httpd_t domain’i yalnızca httpd_sys_content_t tipindeki dosyaları okuyabilir.
 
-identity = system_u
-role = system_r
-domain/type = httpd_t 
-sadece web içeriğine (mesela httpd_sys_content_t) erişebilir. Başka dosyalara erişemez.
+**Süreç tiplerini görmek için:**  
+`ps -eZ`
 
-Özetle:
-Kavram	      Anlamı	                        Örnek Değer
-Identity	      Kullanıcının SELinux kimliği	   bob_u, system_u
-Role	         Ne tür görev yapabilir?	         user_r, staff_r, system_r
-Domain	      Hangi alanlarda çalışır?	      user_t, httpd_t, admin_t
+**Dosya tiplerini görmek için:**  
+`ls -Z /var/www/html/`
 
-The identity of a user depends directly on his Linux account. An identity is assigned one or more roles, but to each role corresponds to one domain, and only one.
-The naming convention is: user_u:role_r:type_t.
+Örnek ls -Z çıktısı:  
+`-rw-r--r--. root root system_u:object_r:httpd_sys_content_t:s0 index.html`
 
-Örnek 1 — Normal Kullanıcı
-alice_u:user_r:user_t   1234 pts/0 00:00:00 bash
-Identity → alice_u      Role → user_r     Domain (type) → user_t
+---
 
-Bu demektir ki alice kullanıcısı, şu anda user rolünde ve sadece user_t domain’ine göre işlem yapabilir."alice adlı kullanıcı, sıradan bir kullanıcı rolünde (user_r) ve kullanıcı domain'inde (user_t) bir terminal penceresi (pts/0) üzerinden bir bash kabuğu başlatmış. Bu işlem sistemde 1234 ID’siyle çalışıyor ve şu ana kadar işlemci zamanı kullanmamış."
+# SELinux Modları
 
-Örnek 2:
-root:sysadm_r:sysadm_t   2310 pts/1 00:00:01 bash
-"root kullanıcısı, sistem yöneticisi rolünde (sysadm_r) ve sistem yöneticisi domain'inde (sysadm_t) bir terminal (pts/1) üzerinden bir bash kabuğu çalıştırıyor. Bu işlem 2310 PID’siyle çalışıyor ve az miktarda CPU süresi kullanmış."
+- **Enforcing:** Politikalar zorunlu uygulanır.
+- **Permissive:** İhlaller sadece loglanır.
+- **Disabled:** SELinux devre dışıdır.
 
-Örnek 3:
-system_u:system_r:httpd_t   1512 ? 00:00:03 httpd
-"httpd servisi, sistem tarafından (system_u) bir servis rolünde (system_r) ve httpd_t domain’inde çalıştırılmış. Bu işlem 1512 PID’siyle çalışıyor, herhangi bir terminalden başlatılmamış (?), ve 3 saniyelik CPU süresi kullanmış."
+---
 
-Örnek 4:
-system_u:system_r:sshd_t   2840 ? 00:00:00 sshd
-"sshd servisi, sistem kullanıcısı (system_u) tarafından, servis rolünde (system_r) ve sshd_t domain’inde çalıştırılmış. Terminal bağlantısı yok (?), işlem ID’si 2840 ve henüz CPU kullanmamış."
+# Policy Oluşturan Ana Bileşenler
 
-Örnek 5:
-alice_u:sysadm_r:sysadm_t   2234 pts/0 00:00:00 bash
-"alice kullanıcısı, şu anda sistem yöneticisi rolünde (sysadm_r) ve sistem yöneticisi domain’inde (sysadm_t) bir terminal (pts/0) üzerinden bir bash kabuğu çalıştırıyor. Bu işlem sistemde 2234 PID’siyle çalışıyor ve henüz işlemci zamanı kullanmamış."
+SELinux modelleri dört temel unsurla değerlendirilir:
 
-It is according to the domain of the security context (and thus the role) that user's rights on a resource are evaluated. 
+- **Subjects** → süreçler
+- **Objects** → dosyalar, soketler vb.
+- **Policies** → izin kuralları
+- **Mode** → enforcing/permissive/disabled
 
-The terms "domain" and "type" are similar. Typically "domain" refers to a process, while "type" refers to an object.
+---
 
-Consider the the SELinux puzzle: The subjects, The objects, The policies, The mode
+# SELinux’ta Dosya ve Süreç Tiplerinin Kontrolü
 
-When a subject (an application for example) tries to access an object (a file for example), the SELinux part of the Linux kernel queries its policy database. Depending on the mode of operation, SELinux authorizes access to the object in case of success, otherwise it records the failure in the file /var/log/messages.
----------------------------------------------------------------------
-The SELinux context of standard processes¶
+Komutlar:
 
-The rights of a process depend on its security context.
+**Dosya tipi öğrenme:**  
+`ls -Z /path/file`
 
-By default, the security context of the process is defined by the context of the user (identity + role + domain) who launches it.
+**Süreç domain’i öğrenme:**  
+`ps -Z $(pidof httpd)`
 
-A domain is a specific type (in the SELinux sense) linked to a process and inherited (normally) from the user who launched it. Its rights are expressed in terms of authorization or refusal on types linked to objects:
+**Mevcut bağlamı değiştirme:**  
+`chcon -t httpd_sys_content_t /var/www/html/index.html`
 
-A process whose context has security domain D can access objects of type T.
+**Bozulan dosya etiketlerini düzeltme:**  
+`restorecon -Rv /var/www/html/`
 
-Domain (D)	Bir süreç için tanımlanmış SELinux güvenlik tipi (örnek: httpd_t)
-Type (T)	   Bir dosya/nesne için tanımlanan SELinux tipi (örnek: httpd_sys_content_t)
-İzin/Red	   SELinux politikası, D domain’inin T tipindeki nesneye erişimini belirler
-Domain bir sandbox veya container da olabilir
-Örnek 1 — Web sunucusu httpd
-system_u:system_r:httpd_t   1001 ? 00:00:02 httpd
-httpd işlemi               → httpd_t domain’inde çalışıyor
-Web içerik dosyaları       → httpd_sys_content_t tipiyle etiketlenmiş
+---
 
-SELinux Politikası şunu der: Eğer bir süreç httpd_t domain’indeyse, sadece httpd_sys_content_t tipindeki dosyalara okuma erişimi vardır.
+# Basit ve Orta Düzey SELinux Örnekleri
 
-ps -eZ gibi komutların çıktısında sadece süreçlerin SELinux bağlamı (context) görünür. Yani, örneğin şu:
+## Örnek 1 — Apache yeni bir dizine erişemiyor
 
-system_u:system_r:httpd_t   1001 ? 00:00:02 httpd
-Bu sadece süreç (process) için geçerli olan güvenlik bağlamıdır. httpd_sys_content_t gibi şeyler dosyaların SELinux tipi (type) kısmına aittir. Onlar süreçte değil, dosya sisteminde görünür.
+Semptom:  
+Apache /data/web/test.html dosyasını okuyamıyor.
 
-httpd_sys_content_t nerede görünür?
-Bunu görmek için şu komutları kullanırız:
+Neden:  
+Dizin tipi httpd_sys_content_t değil.
 
-ls -Z /var/www/html/
-Bu, ls -l komutuna benzer ama fazladan bir sütun olarak SELinux context gösterir.
-Örnek çıktı:
-
--rw-r--r--. root root system_u:object_r:httpd_sys_content_t:s0 index.html
-Burada httpd_sys_content_t, bu dosyanın SELinux tipi (type)’dir.
-Yani: 
-httpd_t → işlem için domain
-httpd_sys_content_t → dosya için type
-
-SELinux bu iki bilgiyi eşleştirerek “izin ver” ya da “reddet” kararını verir.
-Nerede görünür?	   Ne gösterir?	                  Komut
-ps -eZ, ps -Z	      Process'in SELinux domaini	      httpd_t, user_t, vs
-ls -Z, stat -Z	      Dosyanın SELinux type’ı	         httpd_sys_content_t, vs
+Çözüm:  

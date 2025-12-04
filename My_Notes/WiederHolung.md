@@ -375,10 +375,58 @@ Bir daemon (genellikle dbus-daemon) sürekli çalışır ve mesajları gönderip
 - Interrupt the boot loader countdown (by pressing a key like "e" ).
 - Locate the kernel command line (often starts with linux or linux16).
 - Append systemd.unit=emergency.target to the end of that line.
-- Boot using the modified parameters (often Ctrl+x or F10, depending on the bootloader instructions). 
+- Boot using Ctrl+x or F10, depending on the bootloader instructions). 
 
+### Runtime configuration 
+Runtime configuration; uygulamanın davranışını kod değiştirmeden ve yeniden derlemeden yönetmeye yarar. Z.b. bir web sunucusunun port numarasını veya log seviyesini bir config.yaml dosyasından uygulama her başlatıldığında okuması. Uygulama çalışırken dosya değişirse ve sunucu bu değişikliği yeniden yükleyebiliyorsa, bu bir runtime configuration kullanım örneğidir.
 
+## ADVANCED SECURITY
+```bash
+setfacl -m u:test:--x /root # biseyi calistirma || root listeleme hakki vermez. Sadece gecis yapmayi saglar. baska türlü dosyaya atlayamaz
+setfacl -m u:test:r /root/deneme.txt 
+```
+```bash
+chattr +i dosya.txt # Dosya değiştirilemez
+chattr +a log.txt # Dosyaya sadece ekleme yapılabilir.
+```
 
+### PAM
+```bash
+ldd $(which login) # `which login` login binary’sinin tam yolunu verir Z.b. /usr/bin/login).
+```
+Bu komutun amacı, sistemde kullanılan login programının çalışırken hangi paylaşımlı kütüphanelere (shared libraries) bağlı olduguunu listeler. Kullanım amacı:
+- PAM bağımlılıklarını modüllerini doğrulamak.
+- Bozuk kütüphane bağımlılıklarını teşhis etmek.
+
+Sistemde login işlemi başarısız oluyor ve journal kayıtlarında PAM ile ilgili hata görüyorsunuz:
+```bash
+ldd $(which login) # calistir
+libpam.so.0 => not found
+libpam_misc.so.0 => /lib64/libpam_misc.so.0 (...)
+libc.so.6 => /lib64/libc.so.6 (...)
+```
+Bu çıktıdaki “not found” satırı, login binary’sinin PAM kütüphanesine erişemediğini gösterir. Bu durumda çözüm yolu işletim sistemine göre şu şekilde olur:
+
+```bash
+dnf reinstall pam
+apt --reinstall install libpam0g
+```
+### FIREWALLING
+Mevzu kernelda döner. Input girince forward veya output edilecek pakete karar verilir. `firewalld`  in Redhat and `Ufw` in Ubuntu. 
+```bash
+firewall-cmd --list-services # list, get, set, list, remove bunlari  --help icinde ara
+```
+Zone; firewalld ile tanımlanan bir güvenlik alanıdır. Zone, ağa bağlı arayüzler için farklı güvenlik seviyeleri ve kurallar seti belirler, hangi servis & portların izinli olduğunu kontrol eder. Örneğin:
+```bash
+firewall-cmd --runtime-to-permanent # firewall calisirken yaptigin degisiklikleri kalici yapar
+```
+### Rich Language
+The rich language extends the current zone elements (service, port, icmp-block, icmp-type, masquerade, forward-port and source-port) with additional source and destination addresses, logging, actions and limits for logs and actions.
+```bash
+man 5 firewalld.richlanguage # en sonda örnekler var
+```
+## SeLinux & AppArmor
+AppArmor’da profile; bir uygulamanın hangi dosyalara, dizinlere, ağ kaynaklarına ve sistem çağrılarına erişebileceğini belirleyen güvenlik politikası dosyasıdır. Uygulamanın davranışı bu profile göre kısıtlanır. Var olan profilleri görmek için aa-status komutunu kullanilir. Bir uygulamanın: hangi dizinleri okuyabileceği, hangi dosyalara yazabileceği, hangi binary’leri çalıştırabileceği, hangi ağ işlemlerini yapabileceği tamamen bu profil içinde tanımlanır. 
 
 
 
