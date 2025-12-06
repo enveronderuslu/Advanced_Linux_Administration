@@ -1,4 +1,4 @@
-git config --global user.email "enveronderuslu@gmail.com" && git config --global user.name "Enver Onder Uslu"
+git config --global user.email  "enveronderuslu@gmail.com" && git config --global user.name "Enver Onder Uslu"
 
 ```bash
 ssh-keygen -t rsa -b 4096
