@@ -12,6 +12,7 @@ alias c='clear'
 alias l='ls -laFtr  --color=no'
 alias ping='ping -c 5'
 alias ports='ss -tulanp'
+alias shut='sudo shutdown now'
 PS1='$ '
 ```
 
@@ -35,6 +36,9 @@ ls -li test
 258147 -rw-rw-r-- 2 ubuntu ubuntu 35 Nov  1 16:04 test
 ```
 ikinci satirtdaki "2" sayisi ayni inode numarasina sahip dosya sayisini gösterir
+```bash
+ps auxZ | grep -E 'httpd|COMMAND' # 'httpd|COMMAND' ifadesi, hem httpd içeren satırları hem de başlık satırını (COMMAND) filtreler. Böylece çıktıda işlemler ve sütun başlıkları birlikte görünür.
+```
 
 find  -perm /4000
 find yavas  locate hizli  updatedb
