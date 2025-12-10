@@ -146,12 +146,6 @@ sudo systemctl restart systemd-journald
 ---
 
 
-
-
-
-
-
-
 ```bash
 
 ```

@@ -1,4 +1,4 @@
-PAM Authentication Modules¶
+# PAM Authentication Modules¶
 
 PAM is a library suite that allows a Linux system administrator to configure methods to authenticate users. It provides a flexible and centralized way to switch authentication methods for secured applications using configuration files instead of changing application code.
 
@@ -183,4 +183,19 @@ members of the group my_group
 pam_mount¶
 The pam_mount module allows you to mount a volume for a user session.
 
-In /etc/pam.d/system-auth you'd put:
+
+## USE CASE
+ldd $(which login) # `which login` login binary’sinin tam yolunu verir (Z.b. /usr/bin/login).
+Bu komutun amacı, sistemde kullanılan login programının çalışırken hangi paylaşımlı kütüphanelere (shared libraries) bağlı olduguunu listeler. Kullanım amacı:
+- PAM bağımlılıklarını modüllerini doğrulamak.
+- Bozuk kütüphane bağımlılıklarını teşhis etmek.
+
+Sistemde login işlemi başarısız oluyor ve journal kayıtlarında PAM ile ilgili hata görüyorsunuz:
+ldd $(which login) # calistir
+libpam.so.0 => not found
+libpam_misc.so.0 => /lib64/libpam_misc.so.0 (...)
+libc.so.6 => /lib64/libc.so.6 (...)
+Bu çıktıdaki “not found” satırı, login binary’sinin PAM kütüphanesine erişemediğini gösterir. Bu durumda çözüm yolu işletim sistemine göre şu şekilde olur:
+
+dnf reinstall pam
+apt --reinstall install libpam0g

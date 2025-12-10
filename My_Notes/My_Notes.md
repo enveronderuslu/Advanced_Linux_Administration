@@ -51,11 +51,30 @@ alias sysupdate='dnf -y update'
 alias c='clear'
 alias l='ls -laFtr  --color=no'
 alias ping='ping -c 5'
-alias ports='netstat -tulanp'
+alias ports='ss -tulanp' 
+alias shut='sudo shutdown now'
 PS1='$ ' # ekranda sadec $ isareti olsun istediginde
 ```
 Changing the System Hostname: `sudo hostnamectl set-hostname <NewName>`
 Script Logging: `script deneme.txt # Type exit to stop`
+
+
+alias yaz 3310 a gönder Sistemdeki alias lari listeler
+cut -d : -f 3 /etc/passwd # 3. sütunu alir
+bashrc icin ayri ayri ugrasma. /etc/bash.bashrc ye    yaz gitsin
+ctrl e ile satir sonuna ctrl a ile satir basina gidersin.
+
+
+### Usecae: Profil.d kulllanimi
+Sistem genelinde tüm kullanıcılar için Vim’i varsayılan editör yapmak için:
+sudo vi /etc/profile.d/editor.sh
+Aşağıdaki satırları ekle:
+#!/bin/bash
+export EDITOR=$(which vim)
+export VISUAL=$(which vim)
+Dosyayı çalıştırılabilir yap:
+sudo chmod +x /etc/profile.d/editor.sh
+Bu ayar tüm kullanıcı oturumlarında otomatik yüklenir.
 
 # System Architecture and Boot Process
 ## Boot Process
@@ -77,6 +96,92 @@ systemd, modern Linux sistemlerinin temelini oluşturan bir sistem ve servis yö
 systemd-analyze + blame # makinenin baslamasi icin süre + detaylat 
 /lib/systemd/system # services are here
 ```
+
+
+
+
+## SYSTEMD (ADVANCED) 
+sudo systemctl edit unit.type # Z.b. sshd.service
+sudo systemctl edit # activate the changes 
+sudo systemctl show sshd.service # servisle ilgili tüm detaylari görürsün
+- socket: Socket unit (örnek: sshd.socket), bir servisin sadece ihtiyaç olduğunda çalışmasını sağlayan “tetikleme noktasıdır”. Bir servis direkt çalışmak yerine, sistem bir port veya dosya üzerinden istek alınca çalışır. 
+sshd.socket # 22 numaralı portu dinler
+sshd.service # Bir bağlantı olunca otomatik başlar
+
+### Best Practices
+Konfigürasyon Yönetimi
+- Vendor dosyalarını değiştirme; /etc altında override kullan.
+- Aynı serviste çok adım varsa ExecStart= yerine ayrı script kullan.
+
+Bağımlılık ve Sıra Yönetimi
+- Requires= servis gerekliliği, After= başlama sırası
+- Gereksiz bağımlılıklardan kaçın, boot süresini kontrol et.
+
+İzleme
+- sytemctl status, journalctl -u ile sürekli servis durumu takibi.
+- Timer tarafında Persistent= kullanarak kaçırılan zamanlamaları telafi et.
+
+5) Güvenlik
+- Servis çalıştırma ortamını mümkün olduğunca izole et:
+- ProtectSystem=full, ProtectHome=yes, PrivateDevices=yes
+- CapabilityBoundingSet= kullan
+- Düzenli olarak servislerin override.conf yapılarını gözden getir.
+- Güvenlik açısından tüm unit dosyalarında izolasyon ayarlarını standartlaştır.
+
+Eğer yanlış bağımlılık kurarsan Sistem her boot sırasında o gereksiz servisi de bekler. Ve Boot süresi uzar. Servis zincirleme olarak gecikme yaratır.
+
+Yanlış tasarım:
+[Unit]
+Requires=network-online.target
+After=network-online.target
+
+Doğru yaklaşım:
+[Unit]
+After=network.target
+
+Yanlis tasaraim: Bir log toplama servisi:
+Requires=mysql.service
+After=mysql.service
+Bu durumda Log servisi için MySQL’in önce açılması beklenir. MySQL geç açılırsa log servisi de bekler. Boot süresi gereksiz uzar. Doğrusu:
+Wants=mysql.service
+After=mysql.service
+Bu durumda Bağımlılık zorunlu değildir; sistem gerekirse MySQL’i başlatmadan da boot eder.
+
+Servis bağımlılıklarını düzenlerken “Requires” yerine mümkün olduğunca “Wants” tercih et.
+
+## SYSTEMD CGROUPS
+Ne işe yarar: 
+1. Servislerin kaynak kullanımını sınırlar (CPU, RAM, I/O).
+```Ini
+mkdir -p /etc/systemd/system/httpd.service.d
+cat > /etc/systemd/system/httpd.service.d/limits.conf 
+[Service]
+CPUQuota=40%
+MemoryMax=800M
+IOReadBandwidthMax=/ 10M
+```
+
+```bash
+systemctl daemon-reload && systemctl restart httpd # Bu yapılandırma httpd servisine CPU, bellek ve I/O sınırı uygular. 
+```
+
+2. Servis seviyesinde izleme ve hata yönetimi yapılmasını sağlar.
+```bash
+systemctl status mariadb
+systemd-cgtop # systemd-cgtop servisin CPU ve bellek kullanımını gerçek zamanlı gösterir.
+``` 
+3. Sistem kararlılığını artırır
+```Ini
+[Service]
+MemoryMax=1G # Belirlenen sınır aşılırsa kernel OOM, yalnızca o servisi hedef alır.
+```
+4. Kaynak temelli performans teşhisi sağlar.
+```bash 
+systemd-cgls # Bu komut cgroup hiyerarşisini göstererek hangi servislerin hangi süreçlere sahip olduğunu, hangi grubun yük oluşturduğunu hızlıca ortaya çıkarır.
+# Mesela
+systemd-cgls | grep ssh
+```
+
 ### .target .service dosyalari
 `.service ` dosyaları bireysel servisleri tanımlar. `.target` dosyaları ise bu servisleri bir araya getirip topluca yönetir. `/lib/systemd/system/` veya `/etc/systemd/system/` icinde bulunurlar. 
 `/usr/lib/systemd/` dizinindeki dosyalar sistemin varsayılan, paketle gelen systemd servis ve target tanımlarını içerir. Bu dosyalar güncellemelerle otomatik olarak değiştirilir.
@@ -147,6 +252,7 @@ apt, bu komuttaki "google-chrome-stable_current_amd64.deb" ifadesini, bir paket 
 5. Dosyayi indirdigin yerde terminalde ` apt install ./sample.deb` yazsan direk calisacakti Aklini s*keyim
  
 # User and Group Management
+## 
 ```py
 useradd # home directory veya psswrd olusturulmaz. Ek argümanlarla home directory olusturulur
 adduser # home dir ve passwd olusturulur
@@ -158,6 +264,7 @@ usermod -G <DROUP> <USER> # diger gruplardan cikarir. kendi ismindeki grup korum
 usermod -aG <GROUP> <USER> # diger gruplarda kalmaya devam eder
 visudo /etc/sudoers # dosyasini acar 
 who or users # makineyi o an kullanan kullanicilari verir
+id Test_User # olusturdugun userin hangi gruplarda oldugunu görürsün
 ```
 `etc/passwd` user accountlarla ilgili bilgiler
 `etc/shadow` encrypted password ler burada.
@@ -185,6 +292,9 @@ loginctl terminate-session <session_number>
 `ps aux | grep  ssh` bununla tüm ssh processlerini ve PID lerini görürsün
 
 ctrl + z islmei arkaya atar. jobs ile bu islemleri görürsün. %1 sana arkada calisan 1 numarali processi getirir. fg veya bg foreground background
+
+ps auxZ | grep -E 'httpd|COMMAND' # 'httpd|COMMAND' ifadesi, hem httpd içeren satırları hem de başlık satırını (COMMAND) filtreler. Böylece çıktıda işlemler ve sütun başlıkları birlikte görünür.
+
 
 ### SYSTEM MONITORING
 `top -u user1` user1 ne kullaniyor sadece bunu gösterir
@@ -267,6 +377,24 @@ netstat -tunp
 | TIME\_WAIT          | Bağlantı kapatıldı ama bir süre daha beklemede |
 | SYN\_SENT SYN\_RECV | TCP bağlantısı kurulmaya çalışılıyor.  |
 
+
+
+
+
+
+
+## NETWORK ADVANVECD 
+ip link # shows network interfaces
+sudo lshw -class network # deeper information
+man nmcli-examples # yapabileceklerinle ilgili örnekler. Z.b.
+nmcli device wifi list
+/etc/hosts   # hier stehen die Hostnamen
+
+`/etc/nsswitch.conf`, isim çözümleme ve kimlik doğrulama işlemlerinde hangi kaynağın hangi sırayla kullanılacağını belirleyen yapılandırma dosyasıdır.
+örnegin passwd: files ldap  Kimlik bilgileri önce yerel dosyalardan, sonra LDAP’tan alınır.
+
+
+
 *** CASE STUDY ***
 ip_A 192.168.1.A
 ip_C 192.168.2.C 
@@ -325,7 +453,7 @@ timedatectl set-timezone Europe/Berlin
 ## Firewall Configuration with `firewalld`
 
 # Storage and Disk Management
-
+## 
 fdisk -l gives the list of disks 
 fdisk /dev/nvme0n2  bu bizim VMWare de sonradan ekledigimiz disk 
 df -h disk usage
@@ -339,8 +467,22 @@ df -h disk usage
  Gparted  disk islemlerini komutsuz arayüz ile hallet
 
  Persistent Mounts using `/etc/fstab`
+## ADVANCED RESOURCING
+/usr/etc/security/limits.conf # config file
+ulimit -a # OLD SCHOOL all limitations in the system
+SysRq (Magic SysRq Key), SysRq, çekirdek seviyesinde debugging, süreç sonlandırma, senkronizasyon ve güvenli reboot gibi işlemleri gerçekleştiren bir kurtarma arabirimidir.
+Örnek. Alt + SysRq + REISUB; Kilitlenmiş sistemi güvenli şekilde yeniden başlatmak için kullanılan sıralı komut seti. Sol el ile Alt tuşuna, Sağ el ile PrintScreen/SysRq tuşuna basılı tut. SysRq tuşunu bırakmadan REISUB harflerine sirayla bas. 
+# Security
+## FIREWALLING
+firewall-cmd --list-services # list, get, set, list, remove bunlari  --help icinde ara
+firewall-cmd --runtime-to-permanent # firewall calisirken yaptigin degisiklikleri kalici yapar
 
-# Security and SELinux
+### Rich Language
+The rich language extends the current zone elements (service, port, icmp-block, icmp-type, masquerade, forward-port and source-port) with additional source and destination addresses, logging, actions and limits for logs and actions.
+man 5 firewalld.richlanguage # en sonda örnekler var
+
+
+
 
 ## LINUX OS HARDENING
 
@@ -387,6 +529,8 @@ which  # in farki direk command in nerede calistigini verir
 find / -name *.pdf 2> /dev/null
 find / -size +100M 2> /dev/null
 find / -perm /g=w,o=w 2> /dev/null # w Hakki olan gruplar ve other people bulunur
+find  -perm /4000
+locate # hizli  updatedb
 ```
 
 sudo chown cemsit deneme.txt dosyanin owner ini cemsit yapar
@@ -410,7 +554,11 @@ directory icinde setfacl uygulanir fakat inherited olmasi icin :
 
 sudo setfacl -m u:user1:rw reports/ bununla reports dosyasininicindekilere inherit edemezsin. 
 sudo setfacl  -d -R -m  u:user1:rw reports/ yaparsan asagi Dogru gider
+setfacl -m u:test:--x /root # biseyi calistirma || root listeleme hakki vermez. Sadece gecis yapmayi saglar. baska türlü dosyaya atlayamaz
+setfacl -m u:test:r /root/deneme.txt 
 
+chattr +i dosya.txt # Dosya değiştirilemez
+chattr +a log.txt # Dosyaya sadece ekleme yapılabilir.
 
 umax file olusturulunca otomatik verilecek yetkileri belirler
 
@@ -418,13 +566,21 @@ cat /etc/fstab  file system table
 
 
 ls .. what is in the parent dirctory
-
+ls -d D* bulundugun yerde D ile baslayan directories
+ls -d test_directory test kalsörüyle ilgili özellikler
+tree <Directory_Name>
 ln mainfile.txt  sonradanolusanfile.txt  link yapma  herhangibirinde yaptigin ddegisiklik digerinde de olusur
 
 file creation default icin umask degeri kullanilir. Mesela 022 aslinda 755 tir. umask degeri 777 den cikarilir umask /etc/bashrc icinde bu degeri degistirebilirsun
 
 sudo du -h --max-depth=1 /  2>/dev/null  root tan itibren bir dosya aagiya Kadar ne varsa onlaeri ve diskusage leri bulur
 
+### Hard- Softlink
+
+ln test linktest # test dosyasina hardlink  yaptik. Birini silsen digeri  calismaya devam eder
+ls -li # inode numarasini verir
+ln -s test symlintest # sembolik link olusturur
+ikinci satirtdaki "2" sayisi ayni inode numarasina sahip dosya sayisini gösterir
 
 link olusturma ln -s testdir/file1.txt link1
 rm -rf öpcelenmeden herseyi siler 
@@ -435,11 +591,27 @@ tail -n 1 /etc/group veya /etc/passwd
 
 # System Monitoring and Performance
 
+## I/O Monitoring
+iotop kullanilabilir. dnf  install iotop ile kurmalisin. 
+### dd KOMUTU
+dd if=ornek.iso of=/tmp/kopya.iso bs=1M # Bir dosyayı kopyalama. bs (block size), dd’nin her okuyup yazdığı veri parçasının büyüklüğüdür. 1M, 1 megabaytlık bloklarla okuma/yazma yapılacağı anlamına gelir.
+dd if=/dev/sda of=/tmp/disk.img bs=4M # Bir disk imajı oluşturma
+dd if=ornek.img of=/dev/sdb bs=4M status=progress # Bir imajı diske yazma. status=progress kopyalanan veri miktarını ve hızını terminalde canlı olarak gösterir.
+
+
+
+## BOOT OPERATIONS
+### Emergency Mode
+- Reboot your system.
+- Interrupt the boot loader countdown (by pressing a key like "e" ).
+- Locate the kernel command line (often starts with linux or linux16).
+- Append systemd.unit=emergency.target to the end of that line.
+- Boot using Ctrl+x or F10, depending on the bootloader instructions). 
 ## Reading Logs with `journalctl`
 
 # Troubleshooting and Recovery
 
-###  What Is Troubleshooting in Linux?
+##  What Is Troubleshooting in Linux?
 
 Troubleshooting means:
 - Detecting what’s wrong
@@ -455,6 +627,9 @@ tail -f secure dinamik olarrak log penceresi acik kalir
 
 httpd apache application log 
 
+
+## LINUX LOGGING
+journalctl -u cron.service # cron servisi (unit i ile ilgili) loglari gösterir.
 ### Common Troubleshooting Tools and Techniques
 
 | Tool/Command         | Purpose                                      |
@@ -610,6 +785,8 @@ Satir numaralarin inasil gösterirsin: escape modda:set number
 3 shift g  ile 3. satira gidersin
 kelime degistirme: kelimenin üstüne gel cw yaz sonra yeni kelimeyi yaz
 
+## System Architecture and BOOT Process
+
 ## Command Cheat Sheet
 date  uptime(1, 5, 15 dakikalarda cpu kullanimi)   
 hostname   uname   ehich  
@@ -628,3 +805,10 @@ PATH=/root/... Mesela deneme.sh dosyasini bu dizinlerden birine tasi Sonra isted
 export PATH=$PATH:/home/rocky2/Skripten (Yeni path olusturacaz. Mevcut path i $PATH ile ekledik )
 
 Thread (İş Parçacığı): Çekirdeklerin aynı anda birden fazla işi işleyebilmesini sağlayan mantıksal işlem yolları. Yani işlemcinin verimliliği artar.
+# HARiCi
+## D-Bus busctl list
+D-Bus (Desktop Bus), Farklı uygulamaların birbirleriyle veri veya komut paylaşmasını sağlar. Merkezi bir iletişim kanalı sağlar. Örneğin, bir uygulama diğerine “bu dosya açıldı” mesajı gönderebilir.
+Bir daemon (genellikle dbus-daemon) sürekli çalışır ve mesajları gönderip alır. Tipik Kullanım: Masaüstü ortamları (GNOME, KDE) ve sistem servisleri arasında iletişim.
+
+## Runtime configuration 
+Runtime configuration; uygulamanın davranışını kod değiştirmeden ve yeniden derlemeden yönetmeye yarar. Z.b. bir web sunucusunun port numarasını veya log seviyesini bir config.yaml dosyasından uygulama her başlatıldığında okuması. Uygulama çalışırken dosya değişirse ve sunucu bu değişikliği yeniden yükleyebiliyorsa, bu bir runtime configuration kullanım örneğidir.

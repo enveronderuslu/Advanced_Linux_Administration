@@ -1,4 +1,8 @@
-# SELinux (Security Enhanced Linux)
+## SeLinux & AppArmor
+AppArmor’da profile; bir uygulamanın hangi dosyalara, dizinlere, ağ kaynaklarına ve sistem çağrılarına erişebileceğini belirleyen güvenlik politikası dosyasıdır. Uygulamanın davranışı bu profile göre kısıtlanır. Var olan profilleri görmek için aa-status komutunu kullanilir. Bir uygulamanın: hangi dizinleri okuyabileceği, hangi dosyalara yazabileceği, hangi binary’leri çalıştırabileceği, hangi ağ işlemlerini yapabileceği tamamen bu profil içinde tanımlanır. 
+
+
+## SELinux (Security Enhanced Linux)
 
 "A subject" wants to perform "an action" on "an object".  
 
@@ -19,7 +23,7 @@ type=AVC msg=audit(XXX): denied { read } for pid=1234 comm="httpd" name="info.ht
 ```
 ---
 
-# Generalities
+### Generalities
 
 SELinux, Mandatory Access Control (MAC) sistemidir.  
 Geleneksel DAC modeli kullanıcı/SUID haklarına dayanır. MAC ise daha sıkı yalıtım sağlar ve süper kullanıcı kavramı SELinux seviyesinde geçerli değildir.
@@ -33,7 +37,7 @@ SELinux, politika (policy) kuralları kullanır. İki temel politika türü vard
 
 ---
 
-# The SELinux Context
+### The SELinux Context
 
 SELinux güvenlik bağlamı üçlüden oluşur:  
 **identity + role + domain(type)**
@@ -61,7 +65,7 @@ Tablo:
 
 ---
 
-# Örnek Bağlamlar
+### Örnek Bağlamlar
 
 **Örnek 1 — httpd Servisi**
 
@@ -100,7 +104,7 @@ Tablo:
 
 ---
 
-# Domain – Type İlişkisi
+### Domain – Type İlişkisi
 
 Süreçlerin hakları, domain’e (SELinux type) göre değerlendirilir.  
 Örnek:
@@ -124,7 +128,7 @@ httpd_t domain’i yalnızca httpd_sys_content_t tipindeki dosyaları okuyabilir
 
 ---
 
-# SELinux Modları
+### SELinux Modları
 
 - **Enforcing:** Politikalar zorunlu uygulanır.
 - **Permissive:** İhlaller sadece loglanır.
@@ -132,7 +136,7 @@ httpd_t domain’i yalnızca httpd_sys_content_t tipindeki dosyaları okuyabilir
 
 ---
 
-# Policy Oluşturan Ana Bileşenler
+### Policy Oluşturan Ana Bileşenler
 
 SELinux modelleri dört temel unsurla değerlendirilir:
 
@@ -143,7 +147,7 @@ SELinux modelleri dört temel unsurla değerlendirilir:
 
 ---
 
-# SELinux’ta Dosya ve Süreç Tiplerinin Kontrolü
+### SELinux’ta Dosya ve Süreç Tiplerinin Kontrolü
 
 Komutlar:
 
@@ -161,9 +165,9 @@ Komutlar:
 
 ---
 
-# Basit ve Orta Düzey SELinux Örnekleri
+### Basit ve Orta Düzey SELinux Örnekleri
 
-## Örnek 1 — Apache yeni bir dizine erişemiyor
+**Örnek 1 — Apache yeni bir dizine erişemiyor**
 
 Semptom:  
 Apache /data/web/test.html dosyasını okuyamıyor.
@@ -171,4 +175,4 @@ Apache /data/web/test.html dosyasını okuyamıyor.
 Neden:  
 Dizin tipi httpd_sys_content_t değil.
 
-Çözüm:  
+ 
