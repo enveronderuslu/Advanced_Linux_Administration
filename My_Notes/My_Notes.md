@@ -1,27 +1,5 @@
-git config --global user.email  "enveronderuslu@gmail.com" && git config --global user.name "Enver Onder Uslu"
-
-```bash
-ssh-keygen -t rsa -b 4096
-ssh-copy-id -i ~/.ssh/id_rsa.pub ansible@192.168.178.115
-```
-``` bash
-ls ; date
-^Fri Aug 15 09:01:39 PM CEST 2025
-```
-&&  baglacida ; gibi kullanilabilir fakat komut1 && komut2 farkli anlama gelir. birinci calisr ise ikinci calisir. ; de birbirinden bagimsiz calisir.
-benzer sekilde komut_1 || komut_2 var. Bu defa sol taraf hata dönerde sag taraf  calisir-  sol taraf calisirsa sag calismaz. XOR gibi 
-
-yine `<command> &` ile komut arka planda calisir
-
 # Linux System Basics 
-sudo derdinden kurtulmak istiyorum: Hedef makinada sunu ekle:
 
-```bash
-sudo visudo
-test ALL=(ALL) NOPASSWD: ALL
-# Eğer sadece reboot komutu için yetki vermek istersen:
-test ALL=(ALL) NOPASSWD: /sbin/reboot
-```
 ## System and Hardware Info
 
 ```bash
@@ -34,13 +12,6 @@ date  # Displays current date, time, and timezone (localization info)
 whoami  # Shows current logged-in user 
 who  # Users currently connected to the system
 ``` 
-## Monitoring Tools 
-- `htop`  # A better, interactive version of `top` with a cleaner UI
-- `top` → press `Enter`, then `Shift + M`  
-  Sorts processes by memory usage
-- `vmstat`  # Reports current memory and system activity
-- `iotop`  # Displays real-time disk read/write by processes
-- `nmon`  # Powerful monitoring tool for all system statistics
 
 ## Aliases & Bash Customization
 Users have their own `.bashrc` file. To apply changes, `source ~/.bashrc`
@@ -48,12 +19,8 @@ Users have their own `.bashrc` file. To apply changes, `source ~/.bashrc`
 Sample aliases :
 ```bash
 alias sysupdate='dnf -y update'
-alias c='clear'
-alias l='ls -laFtr  --color=no'
-alias ping='ping -c 5'
-alias ports='ss -tulanp' 
-alias shut='sudo shutdown now'
-PS1='$ ' # ekranda sadec $ isareti olsun istediginde
+alias c='clear' 
+# en sonda  sIk kullanilanlara bak
 ```
 Changing the System Hostname: `sudo hostnamectl set-hostname <NewName>`
 Script Logging: `script deneme.txt # Type exit to stop`
@@ -75,14 +42,12 @@ export VISUAL=$(which vim)
 Dosyayı çalıştırılabilir yap:
 sudo chmod +x /etc/profile.d/editor.sh
 Bu ayar tüm kullanıcı oturumlarında otomatik yüklenir.
-
 # System Architecture and Boot Process
 ## Boot Process
  - BIOS/UEFI initializes hardware and loads the bootloader.
  - GRUB (GRand Unified Bootloader) presents boot options and loads the kernel.
  - Kernel Initialization.
  - init/Systemd launch essential services and bring the system to a usable state.
-
 ## systemd Overview
 
 systemd, modern Linux sistemlerinin temelini oluşturan bir sistem ve servis yöneticisidir. Eskiden kullanılan init sisteminin yerini almıştır. Temel olarak şunları yapar:
@@ -96,17 +61,32 @@ systemd, modern Linux sistemlerinin temelini oluşturan bir sistem ve servis yö
 systemd-analyze + blame # makinenin baslamasi icin süre + detaylat 
 /lib/systemd/system # services are here
 ```
+## SYSTEMD (ADVANCED)
 
-
-
-
-## SYSTEMD (ADVANCED) 
 sudo systemctl edit unit.type # Z.b. sshd.service
 sudo systemctl edit # activate the changes 
 sudo systemctl show sshd.service # servisle ilgili tüm detaylari görürsün
 - socket: Socket unit (örnek: sshd.socket), bir servisin sadece ihtiyaç olduğunda çalışmasını sağlayan “tetikleme noktasıdır”. Bir servis direkt çalışmak yerine, sistem bir port veya dosya üzerinden istek alınca çalışır. 
 sshd.socket # 22 numaralı portu dinler
 sshd.service # Bir bağlantı olunca otomatik başlar
+
+**Örnek**
+[Unit]
+Description=Basit Python HTTP Server
+
+[Service]
+ExecStart=/usr/bin/python3 -m http.server 8080
+Restart=always
+User=nobody
+
+[Install]
+WantedBy=multi-user.target
+Bu dosya kaydedilip systemctl enable myhttp.service denildiğinde servis açılışta otomatik başlar.
+Bu custom.target çağrıldığında myhttp.service ve nginx.service beraber yüklenir. Yani .service tekil yapı taşıdır, .target bunları organize eden şemsiye gibidir.
+
+
+
+
 
 ### Best Practices
 Konfigürasyon Yönetimi
@@ -148,7 +128,6 @@ After=mysql.service
 Bu durumda Bağımlılık zorunlu değildir; sistem gerekirse MySQL’i başlatmadan da boot eder.
 
 Servis bağımlılıklarını düzenlerken “Requires” yerine mümkün olduğunca “Wants” tercih et.
-
 ## SYSTEMD CGROUPS
 Ne işe yarar: 
 1. Servislerin kaynak kullanımını sınırlar (CPU, RAM, I/O).
@@ -216,8 +195,8 @@ Bazi default .target dosyalari:
 multi-user.target: ağ servisleri, çoklu kullanıcı, SSH, cron gibi servisleri çalıştırır. 
 systemctl status multi-user.target
 graphical.target GUI içeren sistemler için kullanılır. 
-
 # Package Management with YUM and DNF
+## Commands
 ```bash
 dnf install package-name #Installing packages:
 dnf update # Updating packages: 
@@ -250,9 +229,8 @@ apt, bu komuttaki "google-chrome-stable_current_amd64.deb" ifadesini, bir paket 
 3. apt = Market görevlisiakip eder.
 4. deb dosyası = Poşet içindeki ürün `sudo dpkg -i ürün.deb`
 5. Dosyayi indirdigin yerde terminalde ` apt install ./sample.deb` yazsan direk calisacakti Aklini s*keyim
- 
 # User and Group Management
-## 
+## Commands
 ```py
 useradd # home directory veya psswrd olusturulmaz. Ek argümanlarla home directory olusturulur
 adduser # home dir ve passwd olusturulur
@@ -274,8 +252,6 @@ passwd icinde degisiklik yapacaksan `vipw` kullan (Ayni `visudo` da oldugu gibi)
 /etc/login.defs icinde degisiklikler yaparak yeni olusturulacak user larin özellikleri ayarlanabilir. 
 
 /etc/skel dizini, yeni kullanıcı oluşturulduğunda onun ana dizinine (home directory) otomatik kopyalanacak varsayılan dosyaları içerir.
-
-
 ## Password Policies
 `chage -l # current settings`
 sudo chage <USER_NAME> adim adim ayarlamalari yaparsin
@@ -332,8 +308,12 @@ dmesg | grep usb            # USB ile ilgili mesajları listeler
 dmesg | grep -i fail        # Başarısızlıklarla ilgili satırlar
 dmesg | grep eth            # Ethernet veya ağ arayüzü sorunları
 ```
-
 ## Managing Processes
+ps fax # parent child processes
+top komutu ps den daha iyi
+kill basiert auf PID
+killall basiert auf Processname 
+
 w shows all current sesions
 ```bash 
 pgrep -l -u bob # bob isimli user la ilgili processes
@@ -351,15 +331,61 @@ pstree -p newuser # proses agaci
 
 `nice` : scheduling priority. -20 = en yüksek öncelik. negatif degeri sadece adminler verebilir. 19 = en düşük öncelik (sisteme en az yük olur). 
 `renice` komutuyla siralamayi degistirirsin
-
 ## Scheduled Tasks
+ 
+systemd timer en modern olani. Crontab eski sürümlerde var
+sudo systemctl list-unit-files  -t  timer # systemd timer  Scheduled task lari verir 
+sudo systemctl list-unit-files  backup* # ismi backup ile baslayan dosyalari yakalarsin
+sudo systemctl  cat backup-sysconfig.timer # icerigi yakalar
+The ` wall ` command in Linux is a powerful tool that allows users to send messages to all logged-in users' terminals. 
+### Örnek
 
-Application=Service: Script list of instructions. 
-Process: when you start a service(app) it starts a Process and process id
-Daemon: etwas continuously runs in background. It is also a process
+- Schedule a tasks that writes the text "good morning" to the default system logging system every day at 5 AM
+Create the file /etc/systemd/system/goodmorning.service:
+
+```bash
+[Unit]
+Description=Daily Good Morning Log Message
+[Service]
+Type=oneshot
+User=bob # Ensure this task runs as user bob
+ExecStart=/usr/bin/logger "good morning"
+```
+Unit:  Contains general information.
+Service: Defines the task.
+Type=oneshot: Specifies the service runs the command and then exits.
+ExecStart: The command to run.
+
+Create the file /etc/systemd/system/goodmorning.timer:
+
+```bash 
+[Unit]
+Description=Run goodmorning.service every day at 5 AM
+[Timer]
+OnCalendar=*-*-* 05:00:00
+Unit=goodmorning.service
+[Install]
+WantedBy=timers.target
+```
+
+OnCalendar=*-*-* 05:00:00: It means:
+*: Any day of the week.
+*-*-*: Any year, month, or day of the month.
+05:00:00: Exactly 5 AM .
+Unit=goodmorning.service: Specifies which service unit to activate when the timer expires.
+Install: Specifies that the timer should be active for the timers.target.
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable goodmorning.timer
+sudo systemctl start goodmorning.timer
+systemctl status goodmorning.timer # Verify the Timer
+```
+eski usül;
+log in as bob and then run `crontab -e` and write `0 5 * * * /usr/bin/logger "good morning"`. Veya `sudo nano /etc/crontab` icinde degistir
 
 # Networking
-netstat -tunp
+## netstat -tunp
 
 |         Alan     |               Açıklama                  |
 | ---------------- | ----------------------------------------|
@@ -376,13 +402,6 @@ netstat -tunp
 | CLOSE\_WAIT         | Karşı taraf kapattı ama sizin taraf hala kapatmadı |
 | TIME\_WAIT          | Bağlantı kapatıldı ama bir süre daha beklemede |
 | SYN\_SENT SYN\_RECV | TCP bağlantısı kurulmaya çalışılıyor.  |
-
-
-
-
-
-
-
 ## NETWORK ADVANVECD 
 ip link # shows network interfaces
 sudo lshw -class network # deeper information
@@ -446,12 +465,12 @@ ss -plnt         # Show listening TCP sockets with process info
 Copy a file from a server to another; `scp *.txt  kali@192.168.X.X:/kali/Desktop` 
 timedatectl set-timezone Europe/Berlin
 `traceroute www.google.com` . Bunun dinamik olani real time olani mtr dir.  `mtr www.google.com`. 
-
 ## DNS Setup
 `/etc/resolve.conf ` Dns gibi calisir
-
 ## Firewall Configuration with `firewalld`
-
+fedore ve RHEL de firewall dan port acma 
+sudo firewall-cmd --permanent --add-port=8080/tcp
+sudo firewall-cmd --reload
 # Storage and Disk Management
 ## 
 fdisk -l gives the list of disks 
@@ -480,10 +499,6 @@ firewall-cmd --runtime-to-permanent # firewall calisirken yaptigin degisiklikler
 ### Rich Language
 The rich language extends the current zone elements (service, port, icmp-block, icmp-type, masquerade, forward-port and source-port) with additional source and destination addresses, logging, actions and limits for logs and actions.
 man 5 firewalld.richlanguage # en sonda örnekler var
-
-
-
-
 ## LINUX OS HARDENING
 
  /etc/login.defs
@@ -536,7 +551,6 @@ locate # hizli  updatedb
 sudo chown cemsit deneme.txt dosyanin owner ini cemsit yapar
 sudo chown -R cemsit Folder_Name # hem klasorun Hemde altinda ne varsa hepinin sahabini degistirdi
 sudo chown -R  cemsit:cemsit klasor/ hem kullanici hem grup degisti
-
 # Filesystem Management
 ## Special Permissions
 
@@ -569,7 +583,7 @@ ls .. what is in the parent dirctory
 ls -d D* bulundugun yerde D ile baslayan directories
 ls -d test_directory test kalsörüyle ilgili özellikler
 tree <Directory_Name>
-ln mainfile.txt  sonradanolusanfile.txt  link yapma  herhangibirinde yaptigin ddegisiklik digerinde de olusur
+ln mainfile.txt  sonradanolusanfile.txt  link yapma  herhangibirinde yaptigin degisiklik digerinde de olusur
 
 file creation default icin umask degeri kullanilir. Mesela 022 aslinda 755 tir. umask degeri 777 den cikarilir umask /etc/bashrc icinde bu degeri degistirebilirsun
 
@@ -588,17 +602,55 @@ tail -n 1 /etc/group veya /etc/passwd
 
 ### `getenforce`, `setenforce`
 ### `semanage`, `restorecon`, `getsebool`
-
 # System Monitoring and Performance
-
 ## I/O Monitoring
+### Monitoring Tools 
+
+ps fax # parent child processes
+top komutu ps den daha iyi
+kill basiert auf PID
+killall basiert auf Processname 
+
+
+- `htop`  # A better, interactive version of `top` with a cleaner UI
+- `top` → press `Enter`, then `Shift + M`  
+  Sorts processes by memory usage
+- `vmstat`  # Reports current memory and system activity
+- `iotop`  # Displays real-time disk read/write by processes
+- `nmon`  # Powerful monitoring tool for all system statistics
 iotop kullanilabilir. dnf  install iotop ile kurmalisin. 
 ### dd KOMUTU
 dd if=ornek.iso of=/tmp/kopya.iso bs=1M # Bir dosyayı kopyalama. bs (block size), dd’nin her okuyup yazdığı veri parçasının büyüklüğüdür. 1M, 1 megabaytlık bloklarla okuma/yazma yapılacağı anlamına gelir.
 dd if=/dev/sda of=/tmp/disk.img bs=4M # Bir disk imajı oluşturma
 dd if=ornek.img of=/dev/sdb bs=4M status=progress # Bir imajı diske yazma. status=progress kopyalanan veri miktarını ve hızını terminalde canlı olarak gösterir.
+## KERNEL & KERNEL MODULES
+`findmnt` shows the mounted  devices
+`sudo umount /dev/sr0` ile istedigin cihazi unmoint edersin
+options → bağlama seçenekleri, virgülle ayrılır: 
+- defaults → varsayılan seçenekler
+- noauto → otomatik bağlama yok
+- ro → salt okunur
+- rw → okunabilir ve yazılabilir
 
+kernel tuning: çekirdek seviyesinde performans, güvenlik veya kaynak kullanımını optimize etmek için yapılan ayarlamalardır.
 
+### Kernel Tuning
+/proc sistem durumu ve kernel parametrelerini izlemek ve değiştirmek için kullanılan sanal bir arayüzdür erçek disk üzerinde fiziksel olarak var olmaz. Amaç: çekirdek ve sistem bilgilerini kullanıcıya sunmak.
+- Dosyalar fiziksel değil, RAM üzerinden çekirdek tarafından oluşturulur.
+- Bazı dosyalar sadece okunur, bazıları ise kernel parametrelerini değiştirmek için yazılabilir.
+- Dinamik içerik. Sistem çalıştıkça içerik güncellenir.
+
+Örnek Dosyalar ve Klasörler
+- /proc/cpuinfo İşlemci bilgileri (model, çekirdek sayısı, hız)
+- /proc/meminfo Bellek durumu (toplam, boş, swap)
+- /proc/uptime  Sistem çalışmaya başladığından beri geçen süre
+
+`/sys` provide info about devices and their attributes. Donanim ve sürücüler hakkinda bilgi verir. 
+
+`/proc/sys` Kernelin tuning ve runtime yapılandırma parametrelerini sunar.
+sysctl komutunun doğrudan arayüzüdür.
+
+`/sys` (sysfs): Kernel içindeki donanım, sürücü ve çekirdek nesnelerini hiyerarşik şekilde gösterir. Gerçek zamanlı donanım durum bilgisi sağlar.
 
 ## BOOT OPERATIONS
 ### Emergency Mode
@@ -608,9 +660,9 @@ dd if=ornek.img of=/dev/sdb bs=4M status=progress # Bir imajı diske yazma. stat
 - Append systemd.unit=emergency.target to the end of that line.
 - Boot using Ctrl+x or F10, depending on the bootloader instructions). 
 ## Reading Logs with `journalctl`
-
+## Syslog vs. Rsyslog
+Syslog is the basic protocol and original daemon, while Rsyslog is an advanced version with many more features. Rsyslog is modern and default for many Linux distributions. 
 # Troubleshooting and Recovery
-
 ##  What Is Troubleshooting in Linux?
 
 Troubleshooting means:
@@ -626,8 +678,6 @@ Log directory /var/log/secure   all login logout activities
 tail -f secure dinamik olarrak log penceresi acik kalir 
 
 httpd apache application log 
-
-
 ## LINUX LOGGING
 journalctl -u cron.service # cron servisi (unit i ile ilgili) loglari gösterir.
 ### Common Troubleshooting Tools and Techniques
@@ -784,9 +834,7 @@ asagidan yukari arama: shift + g ile dosyanin sonnuna git.
 Satir numaralarin inasil gösterirsin: escape modda:set number
 3 shift g  ile 3. satira gidersin
 kelime degistirme: kelimenin üstüne gel cw yaz sonra yeni kelimeyi yaz
-
 ## System Architecture and BOOT Process
-
 ## Command Cheat Sheet
 date  uptime(1, 5, 15 dakikalarda cpu kullanimi)   
 hostname   uname   ehich  
@@ -805,10 +853,50 @@ PATH=/root/... Mesela deneme.sh dosyasini bu dizinlerden birine tasi Sonra isted
 export PATH=$PATH:/home/rocky2/Skripten (Yeni path olusturacaz. Mevcut path i $PATH ile ekledik )
 
 Thread (İş Parçacığı): Çekirdeklerin aynı anda birden fazla işi işleyebilmesini sağlayan mantıksal işlem yolları. Yani işlemcinin verimliliği artar.
+
+&&  baglacida ; gibi kullanilabilir fakat komut1 && komut2 farkli anlama gelir. birinci calisr ise ikinci calisir. ; de birbirinden bagimsiz calisir.
+benzer sekilde komut_1 || komut_2 var. Bu defa sol taraf hata dönerde sag taraf  calisir-  sol taraf calisirsa sag calismaz. XOR gibi 
+
+yine `<command> &` ile komut arka planda calisir
 # HARiCi
+## BASlarken (SIK kullanilanlar)
+
+```bash
+git config --global user.email  "enveronderuslu@gmail.com"       git config --global user.name "Enver Onder Uslu"
+ssh-keygen -t rsa -b 4096
+ssh-copy-id -i ~/.ssh/id_rsa.pub remote@192.remote_IP
+```
+```bash
+alias sysupdate='dnf -y update'
+alias c='clear'
+alias l='ls -laFtr  --color=no'
+alias ping='ping -c 5'
+alias ports='ss -tulanp' 
+alias shut='sudo shutdown now'
+PS1='$ ' # ekranda sadec $ isareti olsun istediginde
+```
+### sudo derdinden kurtulmak istiyorum: 
+Hedef makinada sunu ekle:
+```bash
+sudo visudo
+test ALL=(ALL) NOPASSWD: ALL
+# Eğer sadece reboot komutu için yetki vermek istersen:
+test ALL=(ALL) NOPASSWD: /sbin/reboot
+```
 ## D-Bus busctl list
 D-Bus (Desktop Bus), Farklı uygulamaların birbirleriyle veri veya komut paylaşmasını sağlar. Merkezi bir iletişim kanalı sağlar. Örneğin, bir uygulama diğerine “bu dosya açıldı” mesajı gönderebilir.
 Bir daemon (genellikle dbus-daemon) sürekli çalışır ve mesajları gönderip alır. Tipik Kullanım: Masaüstü ortamları (GNOME, KDE) ve sistem servisleri arasında iletişim.
-
 ## Runtime configuration 
-Runtime configuration; uygulamanın davranışını kod değiştirmeden ve yeniden derlemeden yönetmeye yarar. Z.b. bir web sunucusunun port numarasını veya log seviyesini bir config.yaml dosyasından uygulama her başlatıldığında okuması. Uygulama çalışırken dosya değişirse ve sunucu bu değişikliği yeniden yükleyebiliyorsa, bu bir runtime configuration kullanım örneğidir.
+Runtime configuration; uygulamanın davranışını kod değiştirmeden ve yeniden derlemeden yönetmeye yarar. Z.b. bir web sunucusunun port numarasını veya log seviyesini bir config.yaml dosyasından uygulama her başlatıldığında okuması. Uygulama çalışırken dosya değişirse ve sunucu bu değişikliği yeniden yükleyebiliyorsa, bu bir runtime configuration kullanım örneğidir. 
+## Application (service), Process, Daemon
+Application=Service: Script list of instructions. 
+Process: when you start a service(app) it starts a Process and process id
+Daemon: etwas continuously runs in background. It is also a process
+## Sourcing vs. Running a Script
+Terminalde  `VAR=1` seklinde bir degisken tanimla.
+sonra  asagidaki Scripti yaz
+
+#!/bin/bash
+echo $VAR   # boş, değişken görünmez
+`./script.sh` dersen mevcut shell den bagimsiz calisir ve cikti vermerz. 
+`source script.sh` yaparsan 1, değişkeni mevcut shell’de görünüyor
