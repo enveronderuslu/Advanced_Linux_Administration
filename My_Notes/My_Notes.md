@@ -1,4 +1,4 @@
-# **Linux System Basics** 
+**Linux System Basics** 
 
 ## System and Hardware Info
 
@@ -11,7 +11,7 @@ df -kh # Displays all mounted partitions and their usage in human-readable forma
 date  # Displays current date, time, and timezone (localization info)
 whoami  # Shows current logged-in user 
 who  # Users currently connected to the system
-``` 
+```
 ## Aliases & Bash Customization
 Users have their own `.bashrc` file. To apply changes, `source ~/.bashrc`
 
@@ -276,7 +276,7 @@ systemctl daemon-reload && systemctl restart httpd # Bu yapılandırma httpd ser
 ```bash
 systemctl status mariadb
 systemd-cgtop # systemd-cgtop servisin CPU ve bellek kullanımını gerçek zamanlı gösterir.
-``` 
+```
 3. Sistem kararlılığını artırır
 ```Ini
 [Service]
@@ -335,7 +335,7 @@ dnf clean all # it deletes Metadata cache (depo bilgileri), Paket önbelleği (i
 rpm -qa | grep -i libre* ; dpkg -l  # shows the installed packages
 dnf -y remove libreoffice*
 ```
- 
+
 ### ORPHAN PACKAGES 
 A paketi B paketine bagli. B ist weg. A atil kaldi. A is a Orphan package
 ```py
@@ -345,7 +345,7 @@ dnf remove $(dnf repoquery --unneeded -q)
 Snap, Canonical (Ubuntu'nun geliştiricisi) tarafından geliştirilen bir paket sistemi. APPs kendi bağımlılıklarıyla paketlenir. `sudo snap install App1`
 
 ### Case Study
-	
+
 sudo  apt install google-chrome-stable_current_amd64.deb
 E: Unable to locate package google-chrome-stable_current_amd64.deb
 apt, bu komuttaki "google-chrome-stable_current_amd64.deb" ifadesini, bir paket deposundaki paket ismi sanıyor. 
@@ -445,7 +445,7 @@ killall basiert auf Processname
 w shows all current sesions
 ```bash 
 pgrep -l -u bob # bob isimli user la ilgili processes
-``` 
+```
 
 ```py
 pkill -SIGKILL -u <user> # user ile ilgili tüm prosesleri kill yapar
@@ -460,7 +460,7 @@ pstree -p newuser # proses agaci
 `nice` : scheduling priority. -20 = en yüksek öncelik. negatif degeri sadece adminler verebilir. 19 = en düşük öncelik (sisteme en az yük olur). 
 `renice` komutuyla siralamayi degistirirsin
 ## Scheduled Tasks
- 
+
 systemd timer en modern olani. Crontab eski sürümlerde var
 sudo systemctl list-unit-files  -t  timer # systemd timer  Scheduled task lari verir 
 sudo systemctl list-unit-files  backup* # ismi backup ile baslayan dosyalari yakalarsin
@@ -550,7 +550,7 @@ A 192.168.1.B  aginda C 192.168.2.B aginda ve B her iki agdan ipye sahip. A ile 
  - A dan C ye ulasmak icin A nin terminalde
 ```bash
 ip route add 192.168.2.B.0/24 via 192.168.1.B
-``` 
+```
  - C den A ya ulasmak icin C nin terminale
  ```bash
  ip route add 192.168.1.B/24 via 192.168.2.B
@@ -631,10 +631,10 @@ man 5 firewalld.richlanguage # en sonda örnekler var
 
  /etc/login.defs
  /etc/pam.d/system-auth 
- 
+
 - Remove  un-wanted Packages
  rpm -qa kurulu tüm paketleri verir (Debian da "dpkg -l")
- bir paketi kaldirirken dependiec  kismini dikkat et
+  bir paketi kaldirirken dependiec  kismini dikkat et
 
  /etc/ssh/sshd_config
  change port enable 
@@ -642,10 +642,10 @@ man 5 firewalld.richlanguage # en sonda örnekler var
  systemctl restart sshd yapmayi unutma
 - Enable Firewall (firewalld)
  firewall-config bir GUI acar
- firewall-cmd  --help
+  firewall-cmd  --help
 - Enable Selinux
  Security Enhanced linux 
-/etc/sysconfig/selinux burada detaylar var
+ /etc/sysconfig/selinux burada detaylar var
 - Change listening Services Port numbers
 
 head etwas.txt shows first 10 line of the file
@@ -897,8 +897,8 @@ DNS problems: Server is not reaxhable
  cat /etc/resolv.conf
  cat /etc/nsswitch.conf
  ping gateway
- ```
- 
+```
+
 WEBsite or Application is not erreichbar
 ping with ip adress or hostname
 telnet 192.168.178.x 80 port calisip calismadigini gösterir
@@ -906,7 +906,7 @@ telnet 192.168.178.x 80 port calisip calismadigini gösterir
 /etc/ssh/sshd_config gelen ssh baglantilaei icin ayarlar
 /var/log/secure  burayi tail -f ile izlersen  canli tüm loginleri görürsün
 cat /etc/fstab  diskle ilgili bilgiler var 
- 
+
 TOP    command 
 PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
 PID: The Process ID — a unique number that identifies each running process.
