@@ -5,7 +5,7 @@ sudo find  / -size +10M > /tmp/bigfiles # 10mb den büyük dosyalari bulup yazdi
 ln /tmp/bsiles /bfiles # hardlink created 
 ln: failed to create hard link '/bfiles' => '/tmp/bfiles': Invalid cross-device link
 ```
-Bu hata, hard link oluşturmaya çalıştığınızda kaynak ve hedefin farklı dosya sistemlerinde olduğunu gösterir.
+Bu hata, hardlink oluşturmaya çalıştığınızda kaynak ve hedefin farklı dosya sistemlerinde olduğunu gösterir.
 **Hard linkler aynı dosya sistemi içinde çalışır**
 Cok istiyorsan symbolic link : 
 ```bash

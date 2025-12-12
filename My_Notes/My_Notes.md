@@ -985,12 +985,12 @@ Thread (İş Parçacığı): Çekirdeklerin aynı anda birden fazla işi işleye
 &&  baglacida ; gibi kullanilabilir fakat komut1 && komut2 farkli anlama gelir. birinci calisr ise ikinci calisir. ; de birbirinden bagimsiz calisir.
 benzer sekilde komut_1 || komut_2 var. Bu defa sol taraf hata dönerde sag taraf  calisir-  sol taraf calisirsa sag calismaz. XOR gibi 
 
-yine `<command> &` ile komut arka planda calisir
+yine `<command> &` ile komut arka planda calisir. 
 # HARiCi
 ## BASlarken (SIK kullanilanlar)
 
 ```bash
-git config --global user.email  "enveronderuslu@gmail.com"       git config --global user.name "Enver Onder Uslu"
+git config --global user.email  "enveronderuslu@gmail.com"  &&  git config --global user.name "Enver Onder Uslu"
 ssh-keygen -t rsa -b 4096
 ssh-copy-id -i ~/.ssh/id_rsa.pub remote@192.remote_IP
 ```
