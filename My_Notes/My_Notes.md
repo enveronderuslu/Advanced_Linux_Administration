@@ -995,13 +995,25 @@ ssh-keygen -t rsa -b 4096
 ssh-copy-id -i ~/.ssh/id_rsa.pub remote@192.remote_IP
 ```
 ```bash
-alias sysupdate='dnf -y update'
+alias sysupdate='sudo zypper dup'
+alias z='zypper'
 alias c='clear'
 alias l='ls -laFtr  --color=no'
 alias ping='ping -c 5'
 alias ports='ss -tulanp' 
 alias shut='sudo shutdown now'
 PS1='$ ' # ekranda sadec $ isareti olsun istediginde
+```
+
+
+```bash
+# gerekirse sanal makinede port forwarding yaptiktan sonra 
+alias debian1=' ssh  -p 2221 debian1@127.0.0.1'
+alias debian2=' ssh  -p 2222 debian2@127.0.0.1'
+alias fedora1=' ssh  -p 2231 fedora1@127.0.0.1'
+alias fedora2=' ssh  -p 2232 fedora2@127.0.0.1'
+# yine gerekirse anahtar tasima icin
+ssh-copy-id -i ~/.ssh/id_rsa.pub -p 2231 fedora1@127.0.0.1
 ```
 ### sudo derdinden kurtulmak istiyorum: 
 Hedef makinada sunu ekle:
