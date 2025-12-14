@@ -1009,9 +1009,13 @@ PS1='$ ' # ekranda sadec $ isareti olsun istediginde
 ```bash
 # gerekirse sanal makinede port forwarding yaptiktan sonra 
 alias debian1=' ssh  -p 2221 debian1@127.0.0.1'
-alias debian2=' ssh  -p 2222 debian2@127.0.0.1'
-alias fedora1=' ssh  -p 2231 fedora1@127.0.0.1'
-alias fedora2=' ssh  -p 2232 fedora2@127.0.0.1'
+
+
+alias ubuntu2='ssh ubuntu2@192.168.122.120'
+alias ubuntu1='ssh ubuntu1@192.168.122.139'
+alias dhcp='ssh dhcp@192.168.122.239'
+alias dns='ssh dns@192.168.122.55'
+
 # yine gerekirse anahtar tasima icin
 ssh-copy-id -i ~/.ssh/id_rsa.pub -p 2231 fedora1@127.0.0.1
 ```
