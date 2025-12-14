@@ -1007,7 +1007,7 @@ PS1='$ ' # ekranda sadec $ isareti olsun istediginde
 
 
 ```bash
-# gerekirse sanal makinede port forwarding yaptiktan sonra 
+# gerekirse virtualbox ta sanallara ssh baglantisi icin  port forwarding yaptiktan sonra 
 alias debian1=' ssh  -p 2221 debian1@127.0.0.1'
 
 
