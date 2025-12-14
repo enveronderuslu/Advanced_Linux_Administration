@@ -991,8 +991,11 @@ yine `<command> &` ile komut arka planda calisir.
 
 ```bash
 git config --global user.email  "enveronderuslu@gmail.com"  &&  git config --global user.name "Enver Onder Uslu"
+
 ssh-keygen -t rsa -b 4096
 ssh-copy-id -i ~/.ssh/id_rsa.pub remote@192.remote_IP
+
+sudo dpkg-reconfigure console-setup  #ubuntu serverda font VGA 16:32 yap cicek
 ```
 ```bash
 alias sysupdate='sudo zypper dup'
