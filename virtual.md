@@ -1,6 +1,6 @@
 **KVM SANAL MAKİNE KLONLAMA SÜRECİ**
 ---
-
+ 
 Adım 1: Sanal Makineyi Hazırlama ve Kapatma
 
 ```bash
