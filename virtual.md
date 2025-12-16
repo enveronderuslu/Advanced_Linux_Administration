@@ -10,7 +10,7 @@ virsh list --all # VM'nin Durumunu Kontrol
 Adım 2: Disk İmajını Kopyalama
 
 ```bash 
-virsh domblklist kaynak_vm_adi # Kaynak Disk Konumunu Bulun:
+ kaynak_vm_adi # Kaynak Disk Konumunu Bulun:
 sudo cp /var/lib/libvirt/images/kaynak.qcow2 /var/lib/libvirt/images/yeni_vm.qcow2 # Diski Yeni Bir İsimle Kopyalayın:
 ```
 Adım 3: hostname, MAC adresi, SSH anahtarları vb.Temizleme (Sysprep)
