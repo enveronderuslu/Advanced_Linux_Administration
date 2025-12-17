@@ -997,6 +997,7 @@ ssh-copy-id -i ~/.ssh/id_rsa.pub remote@192.remote_IP
 
 sudo dpkg-reconfigure console-setup  #ubuntu serverda font VGA 16:32 yap cicek
 ```
+
 ```bash
 alias sysupdate='sudo zypper dup'
 alias z='zypper'
@@ -1008,17 +1009,9 @@ alias shut='sudo shutdown now'
 PS1='$ ' # ekranda sadec $ isareti olsun istediginde
 ```
 
-
 ```bash
 # gerekirse virtualbox ta sanallara ssh baglantisi icin  port forwarding yaptiktan sonra 
 alias debian1=' ssh  -p 2221 debian1@127.0.0.1'
-
-
-alias ubuntu2='ssh ubuntu2@192.168.122.120'
-alias ubuntu1='ssh ubuntu1@192.168.122.139'
-alias dhcp='ssh dhcp@192.168.122.239'
-alias dns='ssh dns@192.168.122.55'
-
 # yine gerekirse anahtar tasima icin
 ssh-copy-id -i ~/.ssh/id_rsa.pub -p 2231 fedora1@127.0.0.1
 ```
@@ -1026,7 +1019,7 @@ ssh-copy-id -i ~/.ssh/id_rsa.pub -p 2231 fedora1@127.0.0.1
 Hedef makinada sunu ekle:
 ```bash
 sudo visudo
-test ALL=(ALL) NOPASSWD: ALL
+boss ALL=(ALL) NOPASSWD: ALL
 # Eğer sadece reboot komutu için yetki vermek istersen:
 test ALL=(ALL) NOPASSWD: /sbin/reboot
 ```
