@@ -989,6 +989,7 @@ yine `<command> &` ile komut arka planda calisir.
 # HARiCi
 ## BASlarken (SIK kullanilanlar)
 
+
 ```bash
 git config --global user.email  "enveronderuslu@gmail.com"  &&  git config --global user.name "Enver Onder Uslu"
 
