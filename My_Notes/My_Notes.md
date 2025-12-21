@@ -1,5 +1,4 @@
 **Linux System Basics** 
-
 ## System and Hardware Info
 
 ```bash
@@ -1008,6 +1007,11 @@ alias ports='ss -tulanp'
 alias shut='sudo shutdown now'
 PS1='$ ' # ekranda sadec $ isareti olsun istediginde
 ```
+```bash
+sudo usermod -l  fedora1 fedora && sudo usermod -d /home/fedora1 -m fedora1 # user ismi ve homedirectory degistir
+
+```
+
 
 ```bash
 # gerekirse virtualbox ta sanallara ssh baglantisi icin  port forwarding yaptiktan sonra 
