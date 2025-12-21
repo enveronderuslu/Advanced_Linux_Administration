@@ -12,6 +12,6 @@ sudo cp -p "$SOURCE" "$DEST"
 sudo virt-sysprep -a $DEST --hostname $user --root-password password:asd --enable customize,dhcp-client-state,net-hostname,net-hwaddr,machine-id
 
 
-sudo virt-customize -a $DEST  --ssh-inject fedora:file:/root/.ssh/id_rsa.pub
+# sudo virt-customize -a $DEST  --ssh-inject fedora:file:/root/.ssh/id_rsa.pub
 
-sudo virt-install --name $user --ram 2048 --vcpus 2 --disk path=$DEST --import --os-variant fedora42 --network default --graphics vnc --noautoconsole
+sudo virt-install --name $user --ram 2048 --vcpus 2 --disk path=$DEST --import --os-variant fedora41 --network default --graphics vnc --noautoconsole
