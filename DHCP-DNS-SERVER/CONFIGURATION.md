@@ -27,6 +27,6 @@ sudo apt install kea-dhcp4-server -y
 sudo systemctl status  kea-dhcp4-server
 mv /etc/kea/kea-dhcp4.conf /etc/kea/kea-dhcp4.conf.bak # yedekledik
 
-/etc/kea/kea-dhcp4.conf # Simdi virgin dosyanin icine yazacaz
+/etc/kea/kea-dhcp4.conf # Simdi virgin dosyanin icine yazacaz. Gerektiginde eskiye rahat fönmek icin. Dönenin amq
 
 
