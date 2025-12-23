@@ -69,8 +69,8 @@ mv /etc/kea/kea-dhcp4.conf /etc/kea/kea-dhcp4.conf.bak # yedekledik
                         ],
                 "reservations": [
                         {
-                        "hw-address": "52:54:00:2d:d7:70",
-                        "ip-address": "192.168.122.20",
+                        "hw-address": "52:54:00:5b:69:ca",
+                        "ip-address": "192.168.122.4",
                         "hostname": "ubuntu"
                         }
                         ]
@@ -81,6 +81,13 @@ mv /etc/kea/kea-dhcp4.conf /etc/kea/kea-dhcp4.conf.bak # yedekledik
 
 }
 #
-
-
 ```
+vim editor icinde :set syntax=json ile mali kontrol et. sonra servisi yeniden baslat;
+systemctl restart   kea-dhcp4-server # status ile kontrol et
+
+simdi KVM de dhcp  yi devra disi birakacaz. 
+virsh net-edit <network:name> # genelde default. 
+
+Önce edit yapilacak dosyayi 
+"/etc/libvirt/qemu/networks/autostart/default.xml"
+veya "/etc/libvirt/qemu/networks/default.xml" yedekle sonra dhcp ile ilgili 3 satiri sil . virsh net-destroy default sonra net-start default. 

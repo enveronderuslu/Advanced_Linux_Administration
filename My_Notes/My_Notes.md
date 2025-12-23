@@ -995,13 +995,14 @@ ssh-keygen -t  rsa -b 4096
 ssh-copy-id -i ~/.ssh/id_rsa.pub remote@192.remote_IP 
 
 sudo dpkg-reconfigure console-setup  #ubuntu serverda font VGA 16:32 yap cicek 
+
 ```
 
 ```bash
 alias sysupdate='sudo zypper dup'
 alias z='zypper'
 alias c='clear'
-alias l='ls -laFtr  --color=no'
+alias l='ls -laFtr  --color=auto'
 alias ping='ping -c 5'
 alias ports='ss -tulanp' 
 alias shut='sudo shutdown now'
