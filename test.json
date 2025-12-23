@@ -12,11 +12,12 @@
                 {
                 "type": "memfile",
                 "lfc-interval": 3600,
-                "name": "/var/lib/kea/dhcp4.csv"
+                "name": "/var/lib/kea/kea-leases4.csv"
                 },
 
         "subnet4": [
                 {
+                "id": 1,
                 "subnet": "192.168.122.0/24",
                 "pools": [ { "pool": "192.168.122.20-192.168.122.40" } ],
                 "option-data": [
@@ -35,9 +36,9 @@
                         ],
                 "reservations": [
                         {
-                        "hw-address": "1a:1b:1c:1d:1e:1f",
-                        "ip-address": "192.168.122.11",
-                        "hostname": "debserver.example.com"
+                        "hw-address": "52:54:00:2d:d7:70",
+                        "ip-address": "192.168.122.20",
+                        "hostname": "ubuntu"
                         }
                         ]
                 }
@@ -46,4 +47,5 @@
         }
 
 }
-# 
+#
+
