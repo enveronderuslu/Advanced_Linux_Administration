@@ -91,3 +91,7 @@ virsh net-edit <network:name> # genelde default.
 Önce edit yapilacak dosyayi 
 "/etc/libvirt/qemu/networks/autostart/default.xml"
 veya "/etc/libvirt/qemu/networks/default.xml" yedekle sonra dhcp ile ilgili 3 satiri sil . virsh net-destroy default sonra net-start default. 
+
+offer yapan Dhcp server 'sudo nmap --script broadcast-dhcp-discover' ile bulursun. 
+
+Yine DHCP server icinde 'cat /var/lib/kea/kea-leases4.csv ' ile kime hangi ip verildi görürsün
