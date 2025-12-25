@@ -29,13 +29,13 @@ mv /etc/kea/kea-dhcp4.conf /etc/kea/kea-dhcp4.conf.bak # yedekledik
 
 /etc/kea/kea-dhcp4.conf # Simdi virgin dosyanin icine yazacaz. Gerektiginde eskiye rahat fönmek icin. Dönenin amq
 
-Örnek dosya asagida:
+Örnek kea DHCP4  config file asagida:
 ```json
 #
 {
     "Dhcp4": {
         "interfaces-config": {
-            "interfaces": [ "enp1s0" ],
+            "interfaces": [ "eth0" ],
             "dhcp-socket-type": "raw"
         },
         "valid-lifetime": 3600,
@@ -69,14 +69,9 @@ mv /etc/kea/kea-dhcp4.conf /etc/kea/kea-dhcp4.conf.bak # yedekledik
                         ],
                 "reservations": [
                         {
-                        "hw-address": "52:54:00:5b:69:ca",
-                        "ip-address": "192.168.122.4",
-                        "hostname": "ubuntu"
-                        },
-                        {
-                        "hw-address": "52:54:00:5b:69:nn",
-                        "ip-address": "192.168.122.3",
-                        "hostname": "dns1"
+                        "hw-address": "0e:4a:7a:01:2f:77",
+                        "ip-address": "192.168.122.2",
+                        "hostname": "kea"
                         }
                         ]
                 }
@@ -101,4 +96,13 @@ offer yapan Dhcp server 'sudo nmap --script broadcast-dhcp-discover' ile bulursu
 
 Yine DHCP server icinde 'cat /var/lib/kea/kea-leases4.csv ' ile kime hangi ip verildi görürsün
 
-/etc/kea/dhcp4.conf dosyasinda yaptigin degisiklikleri kea-dhcp4 -t  ***.conf ile kontrol edebilirsin
+/etc/kea/dhcp4.conf dosyasinda yaptigin degisiklikleri kea-dhcp4 -t  ***.conf ile kontrol edebilirsin 
+
+## Docker ile DHCP4:
+docker network create --subnet=192.168.122.0/24 --gateway=192.168.122.1 networkkea
+
+docker network inspect  network
+
+docker run -it --name <name> --privileged --network networkkea  ubuntu bash
+
+calismiyo hic ugrasma amk
