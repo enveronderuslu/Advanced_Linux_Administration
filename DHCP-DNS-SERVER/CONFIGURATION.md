@@ -9,10 +9,10 @@ network:
     enp1s0:
       dhcp4: no
       addresses:
-        - 192.168.122.11/24
+        - 10.0.2.5/24
       routes:
         - to: default
-          via: 192.168.122.1
+          via: 10.0.2.1
       
       nameservers:
         addresses: 
@@ -22,7 +22,7 @@ network:
 ```
 sonra `sudo netplan apply` ile uygula. 
 
-## DHCP server kurulumu
+# DHCP server kurulumu
 sudo apt install kea-dhcp4-server -y
 sudo systemctl status  kea-dhcp4-server
 mv /etc/kea/kea-dhcp4.conf /etc/kea/kea-dhcp4.conf.bak # yedekledik
@@ -106,3 +106,9 @@ docker network inspect  network
 docker run -it --name <name> --privileged --network networkkea  ubuntu bash
 
 calismiyo hic ugrasma amk
+# DNS server 
+test.example.com Burada test-->hostname example.com-->domaon name
+server kurulumu icin 
+`apt update && apt install bind9 bind9-utils bind9-dnsutils -y`
+`vim/etc/hosts -> 10.0.2.5 dnas1.example.com dns1`
+yine dhcp server icinde /etc/kea/kea-dhcp4.conf dosyasi icinde dns server ip adresini (10.0.2.5) yaz
