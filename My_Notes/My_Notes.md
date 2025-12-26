@@ -999,6 +999,15 @@ sudo dpkg-reconfigure console-setup  #ubuntu serverda font VGA 16:32 yap cicek
 ```
 
 ```bash
+Local to Remote:
+scp -r /path/to/local_folder username@remote_host:/path/to/destination
+Remote to Local:
+scp -r username@remote_host:/path/to/remote_folder /path/to/local_destination
+```
+
+
+
+```bash
 alias sysupdate='sudo zypper dup'
 alias z='zypper'
 alias c='clear'

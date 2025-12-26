@@ -107,8 +107,57 @@ docker run -it --name <name> --privileged --network networkkea  ubuntu bash
 
 calismiyo hic ugrasma amk
 # DNS server 
-test.example.com Burada test-->hostname example.com-->domaon name
-server kurulumu icin 
-`apt update && apt install bind9 bind9-utils bind9-dnsutils -y`
+bilgi: test.example.com Burada test-->hostname example.com-->domaon name
+serverlarda hostna,e  leri düzenle. Örnegin dns1  serverda ` hostnamextl set-hostname dns1.example.com` yap. Tüm serverlarda asagidakinin benzeri ayarlama yap. 
+Bu server icinde
 `vim/etc/hosts -> 10.0.2.5 dnas1.example.com dns1`
-yine dhcp server icinde /etc/kea/kea-dhcp4.conf dosyasi icinde dns server ip adresini (10.0.2.5) yaz
+
+
+server kurulumu icin `apt update && apt install bind9 bind9-utils bind9-dnsutils -y` calistir
+
+yine dhcp server icinde /etc/kea/kea-dhcp4.conf dosyasi icinde dns server ip adresini (10.0.2.5) yaz (ayarlamalar yapilana kadar bu server internete cikamaz)
+
+dns1 server icinde 
+```bash
+vim /etc/defaultnamed
+OPTIONS="-u bind -4"  # satirini düzenle. sadece IPv4 kullan dedik
+```
+Simdi  /etc/bind/named.conf.options dosyasini  düzenle. önce yedekle (cp file file.bak). Sonra asagidaki parcayi ekle
+
+```vim
+        listen-on  { 10.0.2.5; };
+        allow-query { localhost; 10.0.2.0/24; };
+        allow-transfer { none; };
+
+        forwarders { 10.0.2.1; };
+        recursion yes;
+```
+simdi /etc/bind/named.conf.local modifiye edilecek.  
+```vim
+zone "example.com" 
+	{
+	type master;
+	file "/etc/bind/zones/db.example.com"; 
+	};
+
+zone "2.0.10.in-addr.arpa"
+	{
+	type master;
+	file "/etc/bind/zones/db.2.0.10";
+	};
+```
+birinci kisim 'forward lookup' isimden ip ye 
+ikinci kisim 'reverse lookup' ip den isme. benim network 10.0.2.0/24 oldugundan  network adresi 10.0.2. Reverse yazilacagindan buraya 2-0-10 yazildi 
+Simdi /etc/bindicinde /zones klasörünü olustur. icine db.example.com ve db.2.0.10 dosyalarini ekle. dosyalar üst kalsörde
+Asagidaki komutlarla konfigurasyonu dogrulat
+named-checkzone 
+named-checkzone example.com /etc/bind/zones/db.example.com
+named-checkzone 2.0.10.in-addr.arpa /etc/bind/zones/db.2.0.10
+reboot yap. cicek...
+
+
+
+
+
+
+
