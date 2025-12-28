@@ -1,6 +1,7 @@
 # Configure Static IP (Debian tabanlilar icin)
 `ip link` komutuyla interface  ismini bul (enp1s0, enp3s0 v.b.) 
 Sonra sonra /etc/network klasörü icindeki *.yaml dosyasi icinde asagidakileri yaz. Aq  indentation isine dikkat et
+
 ```yaml
 network:
   version: 2
@@ -9,7 +10,7 @@ network:
     enp1s0:
       dhcp4: no
       addresses:
-        - 10.0.2.5/24
+        - 10.0.2.6/24
       routes:
         - to: default
           via: 10.0.2.1
@@ -17,10 +18,37 @@ network:
       nameservers:
         addresses: 
           - 127.0.0.53
-          - 8.8.8.8
+          - 10.0.2.5
+        search:
+          - example.com 
 
 ```
+
 sonra `sudo netplan apply` ile uygula. 
+
+RHEL tabanli sistemlerde /etc/NetworkManager/system-connections icinde yapilir.
+
+```vim
+[ipv4]
+address1=10.0.2.6/24
+dns=10.0.2.5;
+dns-search=example.com;
+gateway=10.0.2.1
+method=manual
+```
+
+veya komutla 
+
+```bash
+sudo nmcli con mod enp1s0 ipv4.addresses 10.0.2.6/24
+sudo nmcli con mod enp1s0 ipv4.gateway 10.0.2.1
+sudo nmcli con mod enp1s0 ipv4.method manual
+sudo nmcli con mod enp1s0 ipv4.dns "10.0.2.5"
+sudo nmcli con mod enp1s0 ipv4.dns-search "example.com"
+sudo nmcli con up enp1s0
+nmcli device show enp1s0
+```
+systemctl restart NetworkManager yapmayi unutma
 
 # DHCP server kurulumu
 sudo apt install kea-dhcp4-server -y
@@ -30,6 +58,7 @@ mv /etc/kea/kea-dhcp4.conf /etc/kea/kea-dhcp4.conf.bak # yedekledik
 /etc/kea/kea-dhcp4.conf # Simdi virgin dosyanin icine yazacaz. Gerektiginde eskiye rahat fönmek icin. Dönenin amq
 
 Örnek kea DHCP4  config file asagida:
+
 ```json
 #
 {
@@ -82,6 +111,7 @@ mv /etc/kea/kea-dhcp4.conf /etc/kea/kea-dhcp4.conf.bak # yedekledik
 }
 #
 ```
+
 vim editor icinde :set syntax=json ile mali kontrol et. sonra servisi yeniden baslat;
 systemctl restart   kea-dhcp4-server # status ile kontrol et
 
@@ -107,10 +137,12 @@ docker run -it --name <name> --privileged --network networkkea  ubuntu bash
 
 calismiyo hic ugrasma amk
 # DNS server 
-bilgi: test.example.com Burada test-->hostname example.com-->domaon name
-serverlarda hostna,e  leri düzenle. Örnegin dns1  serverda ` hostnamextl set-hostname dns1.example.com` yap. Tüm serverlarda asagidakinin benzeri ayarlama yap. 
+bilgi: test.example.com Burada test-->hostname example.com-->domain name
+resolvectl status # mevcut kullanikan DNS server adresini verir
+
+serverlarda hostname  leri düzenle. Örnegin dns1  serverda ` hostnamextl set-hostname dns1.example.com` yap. Tüm serverlarda asagidakinin benzeri ayarlama yap. 
 Bu server icinde
-`vim/etc/hosts -> 10.0.2.5 dnas1.example.com dns1`
+`vim /etc/hosts -> 10.0.2.5 dnas1.example.com dns1`
 
 
 server kurulumu icin `apt update && apt install bind9 bind9-utils bind9-dnsutils -y` calistir
@@ -118,21 +150,25 @@ server kurulumu icin `apt update && apt install bind9 bind9-utils bind9-dnsutils
 yine dhcp server icinde /etc/kea/kea-dhcp4.conf dosyasi icinde dns server ip adresini (10.0.2.5) yaz (ayarlamalar yapilana kadar bu server internete cikamaz)
 
 dns1 server icinde 
+
 ```bash
-vim /etc/defaultnamed
+vim /etc/default/named
 OPTIONS="-u bind -4"  # satirini düzenle. sadece IPv4 kullan dedik
 ```
+
 Simdi  /etc/bind/named.conf.options dosyasini  düzenle. önce yedekle (cp file file.bak). Sonra asagidaki parcayi ekle
 
 ```vim
-        listen-on  { 10.0.2.5; };
+        listen-on  {127.0.0.1; 10.0.2.5; };
         allow-query { localhost; 10.0.2.0/24; };
         allow-transfer { none; };
 
         forwarders { 10.0.2.1; };
         recursion yes;
 ```
+
 simdi /etc/bind/named.conf.local modifiye edilecek.  
+
 ```vim
 zone "example.com" 
 	{
@@ -146,6 +182,7 @@ zone "2.0.10.in-addr.arpa"
 	file "/etc/bind/zones/db.2.0.10";
 	};
 ```
+
 birinci kisim 'forward lookup' isimden ip ye 
 ikinci kisim 'reverse lookup' ip den isme. benim network 10.0.2.0/24 oldugundan  network adresi 10.0.2. Reverse yazilacagindan buraya 2-0-10 yazildi 
 Simdi /etc/bindicinde /zones klasörünü olustur. icine db.example.com ve db.2.0.10 dosyalarini ekle. dosyalar üst kalsörde
@@ -155,9 +192,40 @@ named-checkzone example.com /etc/bind/zones/db.example.com
 named-checkzone 2.0.10.in-addr.arpa /etc/bind/zones/db.2.0.10
 reboot yap. cicek...
 
+resolvectl ile serverin dns ayarlarina bakarsin. 
+
+# DIRECTORY SERVICES-SERVER
+fedora server kur. static ip ve dns konfig yap sobra;
+ipa-server-install
+
+/tmp icinde ki ipa.system.records.hmei6av6.db dosyasinin icerigini kopyala ve dns server da bind/zones icinde  db.example.com  dosyasiin götüne kopyala. 
+Sonra id1 serverda firewall kurallariyla port lari ac; 
+```bash
+firewall-cmd --list-ports # serbest portlarin listeso
+firewall-cmd --add-port={123,88,464}/udp --permanent
+firewall-cmd --add-port={80,442,689,636,88,464}/tcp --permanent
+firewall-cmd --reload
+firewall-cmd --list-ports # kontrol icin 
+```
+
+freeipa kurduktan sonra ca-agent.p12, cacert.p12(en önemlisi bu) ve .dogtag gibi dosyalar olusur. Bunlari `ipa-backup` ile yedeklemek lazim. 
+
+LDAP dizin verileri (kullanıcılar, gruplar, politikalar), CA (Sertifika Otoritesi) dosyaları, DNS kayıtları ve Kerberos anahtarları yedeklenir ve varsayılan olarak /var/lib/ipa/backup/ dizini saklanır.
+
+## Create Users 
+```bash
+kinit admin  admin olarak sisteme girdin. Obtain Kerberis ticket
+ipa user-add (name:test last name:user)
+ipa user-del test-user
+ipa user-add cemsit-ademov
+ipa user-find --login=c.ademov
+ipa user-find --last=ademov
+ipa user-find --first=CeMsIt # case sensitive degil
+ipa user-find --all ( > users.txt) #basta admin olmak üzere tüm users
 
 
 
+```
 
-
-
+127.0.0.1       localhost localhost.localdomain
+::1             localhost localhost.localdomain ipv6-localhost ipv6-loopback
