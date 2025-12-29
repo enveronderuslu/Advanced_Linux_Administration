@@ -3,7 +3,7 @@
 echo "Yeni ubuntu sanal makine ismi"
 read user
 
-SOURCE="/var/lib/libvirt/images/ubuntu24.04.qcow2"
+SOURCE="/var/lib/libvirt/images/ubuntu-original.qcow2"
 DEST="/var/lib/libvirt/images/$user.qcow2"
 
 sudo cp -p "$SOURCE" "$DEST"

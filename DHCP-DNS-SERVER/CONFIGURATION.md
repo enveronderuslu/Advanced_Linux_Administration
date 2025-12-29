@@ -64,7 +64,7 @@ mv /etc/kea/kea-dhcp4.conf /etc/kea/kea-dhcp4.conf.bak # yedekledik
 {
     "Dhcp4": {
         "interfaces-config": {
-            "interfaces": [ "eth0" ],
+            "interfaces": [ "enp1s0" ],
             "dhcp-socket-type": "raw"
         },
         "valid-lifetime": 3600,
@@ -80,16 +80,16 @@ mv /etc/kea/kea-dhcp4.conf /etc/kea/kea-dhcp4.conf.bak # yedekledik
         "subnet4": [
                 {
                 "id": 1,
-                "subnet": "192.168.122.0/24",
-                "pools": [ { "pool": "192.168.122.20-192.168.122.40" } ],
+                "subnet": "10.0.2.0/24",
+                "pools": [ { "pool": "10.0.2.110-10.0.2.130" } ],
                 "option-data": [
                         {
                         "name": "routers",
-                        "data": "192.168.122.1"},
+                        "data": "10.0.2.1"},
 
                         {
                         "name": "domain-name-servers",
-                        "data": "192.168.122.1"},
+                        "data": "10.0.2.1"},
 
                         {
                         "name": "domain-search",
@@ -98,10 +98,16 @@ mv /etc/kea/kea-dhcp4.conf /etc/kea/kea-dhcp4.conf.bak # yedekledik
                         ],
                 "reservations": [
                         {
-                        "hw-address": "0e:4a:7a:01:2f:77",
-                        "ip-address": "192.168.122.2",
-                        "hostname": "kea"
+                        "hw-address": "52:54:00:26:1c:97",
+                        "ip-address": "10.0.2.4",
+                        "hostname": "dhcp1.example.com"
+                        },
+                        {
+                        "hw-address": "52:54:00:c4:63:97",
+                        "ip-address": "10.0.2.5",
+                        "hostname": "dns1.example.com"
                         }
+
                         ]
                 }
                 ]
@@ -110,6 +116,7 @@ mv /etc/kea/kea-dhcp4.conf /etc/kea/kea-dhcp4.conf.bak # yedekledik
 
 }
 #
+
 ```
 
 vim editor icinde :set syntax=json ile mali kontrol et. sonra servisi yeniden baslat;
@@ -136,6 +143,7 @@ docker network inspect  network
 docker run -it --name <name> --privileged --network networkkea  ubuntu bash
 
 calismiyo hic ugrasma amk
+
 # DNS server 
 bilgi: test.example.com Burada test-->hostname example.com-->domain name
 resolvectl status # mevcut kullanikan DNS server adresini verir

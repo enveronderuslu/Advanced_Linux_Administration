@@ -1,13 +1,16 @@
-$TTL	1w
-@	IN	SOA	debserver.example.com. hostmaster.example.com. (
-			3		; Serial
-			1w 		; Refresh
-			1d		; Retry
-			28d		; Expire
-			1w) 		; Negative Cache TTL
-			 
-; name servers - NS records
-		IN	NS	debserver.example.com.
+$TTL    1d
+$ORIGIN 2.0.10.in-addr.arpa.
+@       IN      SOA     dns1.example.com. hostmaster.example.com. (
+                        3               ; Serial 
+                        1d              ; Refresh
+                        2h              ; Retry
+                        4w              ; Expire
+                        1h )            ; Negative Cache TTL
+
+; Name Server Kayıtları
+@       IN      NS      dns1.example.com.
 
 ; PTR Records
-51.0.in-addr.arpa. 	IN	PTR	debserver.example.com.
+5       IN      PTR     dns1.example.com.
+4       IN      PTR     dhcp1.example.com.
+6       IN      PTR     id1.example.com.
