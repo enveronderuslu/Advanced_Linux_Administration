@@ -48,6 +48,7 @@ sudo nmcli con mod enp1s0 ipv4.dns-search "example.com"
 sudo nmcli con up enp1s0
 nmcli device show enp1s0
 ```
+
 systemctl restart NetworkManager yapmayi unutma
 
 # DHCP server kurulumu
@@ -215,6 +216,7 @@ firewall-cmd --add-port={80,442,689,636,88,464}/tcp --permanent
 firewall-cmd --reload
 firewall-cmd --list-ports # kontrol icin 
 ```
+
 
 freeipa kurduktan sonra ca-agent.p12, cacert.p12(en önemlisi bu) ve .dogtag gibi dosyalar olusur. Bunlari `ipa-backup` ile yedeklemek lazim. 
 
