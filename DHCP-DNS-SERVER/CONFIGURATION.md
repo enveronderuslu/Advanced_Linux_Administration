@@ -204,13 +204,18 @@ reboot yap. cicek...
 resolvectl ile serverin dns ayarlarina bakarsin. 
 
 # DIRECTORY SERVICES-SERVER
+
+sudo dnf update -y && sudo reboot
+sudo dnf install freeipa-server freeipa-server-dns -y
+sudo ipa-server-install
+
 fedora server kur. static ip ve dns konfig yap sobra;
-ipa-server-install
+
 
 /tmp icinde ki ipa.system.records.hmei6av6.db dosyasinin icerigini kopyala ve dns server da bind/zones icinde  db.example.com  dosyasiin götüne kopyala. 
 Sonra id1 serverda firewall kurallariyla port lari ac; 
 ```bash
-firewall-cmd --list-ports # serbest portlarin listeso
+firewall-cmd --list-ports 
 firewall-cmd --add-port={123,88,464}/udp --permanent
 firewall-cmd --add-port={80,442,689,636,88,464}/tcp --permanent
 firewall-cmd --reload
@@ -224,7 +229,7 @@ LDAP dizin verileri (kullanıcılar, gruplar, politikalar), CA (Sertifika Otorit
 
 ## Create Users 
 ```bash
-kinit admin  admin olarak sisteme girdin. Obtain Kerberis ticket
+kinit admin  # admin olarak sisteme girdin. Obtain Kerberis ticket
 ipa user-add (name:test last name:user)
 ipa user-del test-user
 ipa user-add cemsit-ademov
@@ -233,9 +238,63 @@ ipa user-find --last=ademov
 ipa user-find --first=CeMsIt # case sensitive degil
 ipa user-find --all ( > users.txt) #basta admin olmak üzere tüm users
 
-
-
 ```
 
-127.0.0.1       localhost localhost.localdomain
-::1             localhost localhost.localdomain ipv6-localhost ipv6-loopback
+ipa group-find --all
+dn: cn=admins,cn=groups,cn=accounts,dc=example,dc=com
+
+Bu bir DN (Distinguished Name) kaydıdır.
+
+dn: (Distinguished Name): Bu nesnenin dizin ağacındaki tam ve benzersiz adresidir. Dosya sistemindeki /home/user/dosya.txt gibi bir yol (path) mantığıyla çalışır ancak **sağdan sola doğru okunur.**
+
+cn=admins (Common Name): 
+cn=accounts: Grupların ve kullanıcıların bulunduğu ana hesaplar bölümünü ifade eder.
+dc=example,dc=com (Domain Component): Bu, dizinin hangi alan adına (domain) ait olduğunu belirtir. Bu örnekte example.com alan adını temsil eder.
+
+com (En üst seviye domain)
+example (Alt domain)
+accounts (Hesaplar klasörü)
+groups (Gruplar alt klasörü)
+admins (Yönetici grubu nesnesi)
+
+ipa group-add # grup olusturuldu
+
+### Permission ve Privilige arasindaki fark 
+
+Temel Farklar
+Permissions (İzinler): Doğrudan bir nesne (dosya, LDAP kaydı, veritabanı tablosu) üzerinde ne yapılabileceğini tanımlar. Bir nesnenin "özelliğidir".
+Privileges (Ayrıcalıklar): Bir kullanıcı veya rolün sistem genelinde veya belirli bir görev kapsamında sahip olduğu "yetenekler" bütünüdür. Bir aktörün (kişi veya sistem hesabı) "özelliğidir". 
+
+Örneklerle Anlatım
+1. Dosya Sistemi Örneği
+Permission: rapor.pdf dosyası üzerinde "Okuma" ve "Yazma" izni tanımlanmıştır. Bu, o dosyanın kendisine ait bir kuraldır.
+Privilege: Bir sistem yöneticisinin, sahibi olmadığı dosyaları bile silme veya değiştirme "ayrıcalığına" (root/admin yetkisi) sahip olmasıdır. 
+
+2. FreeIPA / LDAP Örneği
+FreeIPA'da bu fark hiyerarşik bir yapıdadır:
+Permission: Bir LDAP kaydındaki "telefon numarası" özniteliğini (attribute) değiştirme hakkıdır.
+Privilege: Birden fazla iznin birleşimidir. Örneğin, "Kullanıcı Yöneticisi" bir ayrıcalıktır ve içinde "Kullanıcı ekleme", "Şifre sıfırlama" ve "Grup üyeliği düzenleme" gibi birçok alt izin barındırır. 
+
+
+Özellik 	Permission (Anahtar)	Privilege (Anahtarlik)
+
+## Accounts
+
+.Hst Account (Sunucu Hesabı)
+Bu hesap, fiziksel veya sanal bir makineyi temsil eder.
+Kullanım Amacı: Sunucunun merkezi sisteme güvenli bir şekilde bağlanması, kendi servisleri için sertifika alması ve ağdaki diğer kaynaklara (örneğin bir dosya paylaşımı) makine düzeyinde erişmesi içindir.
+
+Kimlik Doğrulama: Genellikle bir şifre ile değil, (Kerberos) ile otomatik olarak gerçekleşir.
+
+Örnek: Bir web sunucusunun (web01.example.com), kullanıcıların şifrelerini doğrulamak için FreeIPA ile konuşabilmesi bu hesap sayesinde olur. 
+
+2. User Account (Kullanıcı Hesabı)
+Gerçek bir kişiyi (insanı) temsil eder. 
+Kullanım Amacı: Bir kişinin bilgisayara giriş yapması, e-postalarına bakması veya yetkisi dahilindeki dosyalara erişmesidir.
+Kimlik Doğrulama: Genellikle kullanıcı tarafından girilen bir şifre veya iki faktörlü doğrulama (2FA) ile yapılır.
+Örnek: ahmet.yilmaz hesabı ile bir çalışanın iş bilgisayarını açması. 
+3. Service Account (Servis Hesabı)
+Belirli bir yazılımın veya uygulamanın (insan müdahalesi olmadan) çalışması için oluşturulan hesaplardır. 
+Kullanım Amacı: Arka planda çalışan servislerin (örneğin bir veritabanı yedeği alan betik veya bir web uygulaması) sistem kaynaklarına erişmesini sağlar.
+Kimlik Doğrulama: Genellikle bir uygulama içinde saklanan şifre veya sertifika ile yapılır.
+Örnek: Bir backup_service hesabının her gece saat 03:00'te dosya sunucusuna bağlanıp verileri kopyalaması. 
