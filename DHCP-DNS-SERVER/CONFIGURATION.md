@@ -214,6 +214,7 @@ fedora server kur. static ip ve dns konfig yap sobra;
 
 /tmp icinde ki ipa.system.records.hmei6av6.db dosyasinin icerigini kopyala ve dns server da bind/zones icinde  db.example.com  dosyasiin götüne kopyala. 
 Sonra id1 serverda firewall kurallariyla port lari ac; 
+
 ```bash
 firewall-cmd --list-ports 
 firewall-cmd --add-port={123,88,464}/udp --permanent
@@ -259,42 +260,59 @@ admins (Yönetici grubu nesnesi)
 
 ipa group-add # grup olusturuldu
 
-### Permission ve Privilige arasindaki fark 
+### Permission vs. Privilige  
 
-Temel Farklar
 Permissions (İzinler): Doğrudan bir nesne (dosya, LDAP kaydı, veritabanı tablosu) üzerinde ne yapılabileceğini tanımlar. Bir nesnenin "özelliğidir".
 Privileges (Ayrıcalıklar): Bir kullanıcı veya rolün sistem genelinde veya belirli bir görev kapsamında sahip olduğu "yetenekler" bütünüdür. Bir aktörün (kişi veya sistem hesabı) "özelliğidir". 
 
-Örneklerle Anlatım
-1. Dosya Sistemi Örneği
-Permission: rapor.pdf dosyası üzerinde "Okuma" ve "Yazma" izni tanımlanmıştır. Bu, o dosyanın kendisine ait bir kuraldır.
-Privilege: Bir sistem yöneticisinin, sahibi olmadığı dosyaları bile silme veya değiştirme "ayrıcalığına" (root/admin yetkisi) sahip olmasıdır. 
 
-2. FreeIPA / LDAP Örneği
-FreeIPA'da bu fark hiyerarşik bir yapıdadır:
-Permission: Bir LDAP kaydındaki "telefon numarası" özniteliğini (attribute) değiştirme hakkıdır.
-Privilege: Birden fazla iznin birleşimidir. Örneğin, "Kullanıcı Yöneticisi" bir ayrıcalıktır ve içinde "Kullanıcı ekleme", "Şifre sıfırlama" ve "Grup üyeliği düzenleme" gibi birçok alt izin barındırır. 
-
-
-Özellik 	Permission (Anahtar)	Privilege (Anahtarlik)
+Permission (Anahtar)	Privilege (Anahtarlik)
 
 ## Accounts
 
-.Hst Account (Sunucu Hesabı)
+. Host Account (Sunucu Hesabı)
 Bu hesap, fiziksel veya sanal bir makineyi temsil eder.
 Kullanım Amacı: Sunucunun merkezi sisteme güvenli bir şekilde bağlanması, kendi servisleri için sertifika alması ve ağdaki diğer kaynaklara (örneğin bir dosya paylaşımı) makine düzeyinde erişmesi içindir.
 
-Kimlik Doğrulama: Genellikle bir şifre ile değil, (Kerberos) ile otomatik olarak gerçekleşir.
+Kimlik Doğrulama: Genellikle bir şifre ile değil, (Kerberos) ile otomatik olarak gerçekleşir. Örnek: Bir web sunucusunun (web01.example.com), kullanıcıların şifrelerini doğrulamak için FreeIPA ile konuşabilmesi bu hesap sayesinde olur. 
 
-Örnek: Bir web sunucusunun (web01.example.com), kullanıcıların şifrelerini doğrulamak için FreeIPA ile konuşabilmesi bu hesap sayesinde olur. 
-
-2. User Account (Kullanıcı Hesabı)
+. User Account (Kullanıcı Hesabı)
 Gerçek bir kişiyi (insanı) temsil eder. 
 Kullanım Amacı: Bir kişinin bilgisayara giriş yapması, e-postalarına bakması veya yetkisi dahilindeki dosyalara erişmesidir.
-Kimlik Doğrulama: Genellikle kullanıcı tarafından girilen bir şifre veya iki faktörlü doğrulama (2FA) ile yapılır.
-Örnek: ahmet.yilmaz hesabı ile bir çalışanın iş bilgisayarını açması. 
-3. Service Account (Servis Hesabı)
-Belirli bir yazılımın veya uygulamanın (insan müdahalesi olmadan) çalışması için oluşturulan hesaplardır. 
-Kullanım Amacı: Arka planda çalışan servislerin (örneğin bir veritabanı yedeği alan betik veya bir web uygulaması) sistem kaynaklarına erişmesini sağlar.
-Kimlik Doğrulama: Genellikle bir uygulama içinde saklanan şifre veya sertifika ile yapılır.
-Örnek: Bir backup_service hesabının her gece saat 03:00'te dosya sunucusuna bağlanıp verileri kopyalaması. 
+
+. Service Account (Servis Hesabı)
+Belirli bir yazılımın veya uygulamanın (insan müdahalesi olmadan) çalışması için oluşturulan hesaplardır. Arka planda çalışan servislerin (örneğin bir veritabanı yedeği alan betik veya bir web uygulaması) sistem kaynaklarına erişmesini sağlar.
+
+
+## HOSTS
+ipa host-find --all # finds the hosts on domain
+ipa host-add dhcp1.example.com
+
+## Connecting Client to Directory Server (DS)
+
+client makinede dns ve statik ip ayrlarini yap. Sonra;
+```bash
+sudo dnf install freeipa-client
+sudo ipa-client-install --mkhomedir
+reboot
+```
+
+Ne iskime yarayacak bunlar ?
+. client ta 'kinit admin' yap. Freeipa da olusturulan users sorgula  'id c.ademov' 
+
+. Simdi user lara sudo hakki verilecek. FreeIPA Server Terminalinde:
+```bash
+ipa sudorule-add rule-name-SUDO1
+ipa sudorule-add-user rule-name-SUDO1 --users=c.ademov
+ipa sudorule-add-host rule-name-SUDO1 --hosts=fedoraws1.example.com
+ipa sudorule-mod rule-name-SUDO1 --cmdcat=all
+``` 
+gözünaydin. artik fedoraws1  de c.ademov kullanicisiyla calisabilirsin. 
+
+GUI daha iyi dersen ;
+. Policy → Sudo → Sudo Rules
+. Add ile kural oluştur
+. Users sekmesinden kullanıcı ekle
+. Hosts sekmesinden host ekle
+. Commands sekmesinde Allow all commands seç
+. Gerekirse RunAs sekmesinde ALL tanımla
