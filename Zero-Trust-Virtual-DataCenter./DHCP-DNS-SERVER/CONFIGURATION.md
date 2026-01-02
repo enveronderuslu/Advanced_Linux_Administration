@@ -316,3 +316,5 @@ GUI daha iyi dersen ;
 . Hosts sekmesinden host ekle
 . Commands sekmesinde Allow all commands seç
 . Gerekirse RunAs sekmesinde ALL tanımla
+
+systemctl  --failed # shows  the failed services
