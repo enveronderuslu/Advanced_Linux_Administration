@@ -10,19 +10,27 @@ network:
     enp1s0:
       dhcp4: no
       addresses:
-        - 10.0.2.6/24
+        - 10.0.10.11/24
       routes:
         - to: default
-          via: 10.0.2.1
+          via: 10.0.10.1
       
       nameservers:
         addresses: 
           - 127.0.0.53
-          - 10.0.2.5
+          - 10.0.10.1
+          - 8.8.8.8
         search:
           - example.com 
 
 ```
+
+DNS      10.0.10.5    dns1         ubuntu
+IAM     10.0.10.6   root           fedora
+junp     10.0.10.7   alpine         alpine
+ansible 10.0.10.11 ansible-cntrl   ubuntu
+
+
 
 sonra `sudo netplan apply` ile uygula. 
 

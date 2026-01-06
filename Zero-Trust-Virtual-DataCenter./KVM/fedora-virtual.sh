@@ -14,4 +14,5 @@ sudo virt-sysprep -a $DEST --hostname $user.example.com --root-password password
 
 # sudo virt-customize -a $DEST  --ssh-inject fedora:file:/root/.ssh/id_rsa.pub
 
-sudo virt-install --name $user --ram 2048 --vcpus 2 --disk path=$DEST --import --os-variant fedora41 --network default --graphics vnc --noautoconsole
+sudo virt-install --name $user --ram 2048 --vcpus 2 --disk path=$DEST --import --os-variant ubuntu --network outof-fw --graphics vnc --noautoconsole
+
