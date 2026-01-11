@@ -37,13 +37,22 @@ sonra `sudo netplan apply` ile uygula.
 RHEL tabanli sistemlerde /etc/NetworkManager/system-connections icinde yapilir.
 
 ```vim
+[connection]
+id=enp1s0
+type=ethernet
+interface-name=enp1s0
+
 [ipv4]
-address1=10.0.2.6/24
-dns=10.0.2.5;
-dns-search=example.com;
-gateway=10.0.2.1
 method=manual
+addresses=172.17.17.22/24,172.17.17.1
+dns=127.0.0.53;172.17.17.1;8.8.8.8;
+dns-search=example.com
+
+[ipv6]
+method=ignore
+
 ```
+
 
 veya komutla 
 
@@ -217,7 +226,7 @@ sudo dnf update -y && sudo reboot
 sudo dnf install freeipa-server freeipa-server-dns -y
 sudo ipa-server-install
 
-fedora server kur. static ip ve dns konfig yap sobra;
+fedora server kur. static ip ve dns konfig yap sonra;
 
 
 /tmp icinde ki ipa.system.records.hmei6av6.db dosyasinin icerigini kopyala ve dns server da bind/zones icinde  db.example.com  dosyasiin götüne kopyala. 
