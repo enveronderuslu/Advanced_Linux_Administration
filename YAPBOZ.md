@@ -1,4 +1,5 @@
- 
+ Seyyidina Ebu Ümâme, Seyyidina Es'ad bin Zürâre, Seyyidina Avf bin Haris, Seyyidina Rafi bin Malik, Seyyidina Kutbe bin Amir, Seyyidina Ukbe bin Amir, Seyyidina Cabir bin Abdullah
+
 ssh-copy-id
 
 ansible fedora -m user -a "name=yeni_kullanici_adi state=present create_home=yes" --become -K
@@ -18,7 +19,7 @@ create_home=yes: Kullanıcı oluşturulurken bir ev dizini (/home/kullanici_adi)
 WHAT IS  ansible.cfg ?
 The ansible.cfg file centralizes environmental parameters to ensure consistent execution. Common uses:
 
-ini
+```ini
 [defaults]
 # --- Inventory & Connection ---
 # Points to your inventory file so you don't need to type -i
@@ -61,6 +62,7 @@ become_ask_pass = True
 [ssh_connection]
 # Optimize SSH by reusing connections (makes it much faster)
 pipelining = True
+```
 
 Mesela;
 ```ini
@@ -115,7 +117,7 @@ ansible-doc -s ansible.builtin.user  ,odülün  playbook icinde nasil kullabnil�
 
 En temel anlamda  PLAYBOOK yapisi.
 
----
+```yaml
 # 1. PLAY LEVEL
 - name: Title Describing the Purpose of the Playbook
   gather_facts: no
@@ -144,7 +146,7 @@ En temel anlamda  PLAYBOOK yapisi.
       ansible.builtin.service:
         name: nginx
         state: restarted
-...
+```
 
 FACT ve debugging
 
@@ -152,27 +154,27 @@ Fact
 Fact is the system information (IP address, operating system, RAM, disk status, etc.) that Ansible automatically collects when it connects to the target server. This process is called "gathering facts."
 Simple Example:
 A task that displays the operating system of the target machine:
-yaml
+```yaml
 - name: Show operating system
   ansible.builtin.debug:
     msg: "This server is running on {{ ansible_distribution }}."
-Use code with caution.
+```
 
 Debug
 Debug is a module used to print variable values, messages, or "fact" information to the terminal screen while the playbook is running. It is used for troubleshooting and verification purposes.
 Simple Example:
 Printing the content of a variable to the terminal:
-yaml
+```yaml
 - name: Check the variable
   ansible.builtin.debug:
     var: ansible_all_ipv4_addresses
-
-
-Ebu Ümâme Es'ad bin Zürâre, Avf bin Haris, Rafi bin Malik, Kutbe bin Amir, Ukbe bin Amir ve Cabir bin Abdullah
-
+```
 
 
 
+
+
+```yaml
 
 ---
 - name: ibstall and start hhtpd
@@ -187,9 +189,9 @@ Ebu Ümâme Es'ad bin Zürâre, Avf bin Haris, Rafi bin Malik, Kutbe bin Amir, U
       ansible.builtin.service:
         name: httpd
         enabled:yes
-       state:started
-...
+        state:started
 
+```
 ansible-doc -s ansible.builtin.service
 
 ansible-playbook dosya_adi.yml --check
@@ -209,7 +211,7 @@ REGISTER  mevzusu
 pöay esnasinda kullanilmak üzere bilgi  üretir. Somra veriable  gibi kullanir.
 
 
-yaml
+```yaml
 - name: Uptime komutunu çalıştır
   ansible.builtin.command: uptime
   register: uptime_sonucu  # Çıktıyı bu isme kaydet
@@ -217,7 +219,7 @@ yaml
 - name: Kaydedilen çıktıyı ekrana bas
   ansible.builtin.debug:
     msg: "Sunucu durumu şudur: {{ uptime_sonucu.stdout }}" # .stdout ile sadece metni al
-
+```
 
 
 direk "when  kullanamaz,iydi? "
@@ -226,15 +228,15 @@ direk "when  kullanamaz,iydi? "
 when komutu tek başına sadece Ansible'ın zaten bildiği "hazır" bilgileri (işletim sistemi, IP adresi gibi Facts verilerini) veya senin tanımladığın Variable'ları kontrol edebilir.
 
 1. Register OLMADAN (Hata Verir):
-yaml
+```yaml
 - name: Sadece klasör boşsa işlem yap
   ansible.builtin.file: path=/data/test.txt state=touch
   when: stdout == ""  # HATA! Ansible 'stdout' diye bir şeyi tanımaz.
                       # Hangi komutun çıktısı? Kimin stdout'u? Bilmiyor.
-Use code with caution.
+```
 
 2. Register İLE (Doğru Yöntem):
-yaml
+```yaml
 - name: Klasör içeriğini oku
   ansible.builtin.command: ls /data
   register: sonuc  # Çıktıyı "sonuc" kutusuna koyduk.
@@ -242,11 +244,11 @@ yaml
 - name: Şimdi o kutuyu aç ve kontrol et
   ansible.builtin.file: path=/data/test.txt state=touch
   when: sonuc.stdout == ""  # ŞİMDİ ÇALIŞIR. Çünkü 'sonuc' kutusuna bakacağını biliyor.
-
+```
 
 FAIL modülü
 
-yaml
+```yaml
 - name: Disk Kontrolü ve Kurulum Playbook'u
   hosts: servers
   tasks:
@@ -267,7 +269,7 @@ yaml
       ansible.builtin.yum:
         name: nginx
         state: present
-
+```
 
 Normalde bir hata olunca Ansible durur. Buradaki durum farkli. normalde  %90 dan sonranra doluluk sistem icin bi gata degil. Fakat sana kritik durum. Baska islerede yer lazim.
 
@@ -291,39 +293,42 @@ fail modülünde önce bir şart yazarsınız (when), o şart gerçekleşirse g�
         fail_msg: "Sunucu gereksinimleri karşılamıyor!"
         success_msg: "Donanım uygun, kuruluma geçiliyor." 
 ``` 
+
 1. ansible.builtin.copy
 Dosyayı Kontrol Düğümünden (Ansible Server) alır ve Uzak Sunucuya (Managed Node) gönderir.
 Kullanım: Küçük dosyalar (config, script vb.) için idealdir.
 Örnek:
-yaml
+
+```yaml
 - name: Config dosyasını gönder
   ansible.builtin.copy:
     src: /etc/local/nginx.conf
     dest: /etc/nginx/nginx.conf
-Use code with caution.
+```
 
 2. ansible.builtin.synchronize
 rsync aracını kullanır. Çok sayıda veya çok büyük dosyaları Kontrol Düğümünden Uzak Sunucuya (veya tam tersi) taşır.
 Kullanım: Büyük dizinler, yedekler veya uygulama paketleri için en hızlı yöntemdir.
 Örnek:
-yaml
+```yaml
 - name: Uygulama klasörünü senkronize et
   ansible.builtin.synchronize:
     src: /opt/app_data/
     dest: /opt/app_data/
-Use code with caution.
+
+```
 
 3. ansible.builtin.fetch
 Dosyayı Uzak Sunucudan alır ve Kontrol Düğümüne (Ansible Server) getirir. (copy modülünün tam tersi).
 Kullanım: Log dosyalarını veya sistem raporlarını merkeze toplamak için kullanılır.
 Örnek:
-yaml
+```yaml
 - name: Log dosyasını merkeze çek
   ansible.builtin.fetch:
     src: /var/log/syslog
     dest: /tmp/logs/{{ inventory_hostname }}.log
     flat: yes # Klasör hiyerarşisi oluşturmadan direkt dosyayı kaydeder.
-Use code with caution.
+```
 
 Kritik Farklar Tablosu
 Modül	Yön (Direction)	Alt Yapı	Temel Özellik
@@ -336,18 +341,18 @@ FING modül
 
 ROLES
 
-text
+```text
 roles/
   common/             # Rolün adı
     tasks/main.yml    # Yapılacak işler
     handlers/main.yml # Tetiklenecek handler'lar
     vars/main.yml     # Değişkenler
     templates/        # Jinja2 şablonları
-
-  Bir Role (Rol) oluşturduğunda, Ansible otomatik olarak şu dosyalara bakar:
+```
+ir Role (Rol) oluşturduğunda, Ansible otomatik olarak şu dosyalara bakar:
 1. Dosya: roles/web_server/tasks/main.yml
 Görevi: İşin mutfağıdır. Hangi komutların çalışacağını yazarız.
-yaml
+```yaml
 - name: Nginx paketini kur
   ansible.builtin.package:
     name: nginx
@@ -358,38 +363,38 @@ yaml
     src: nginx.conf.j2    # 'templates' klasöründeki dosyaya bakar
     dest: /etc/nginx/nginx.conf
   notify: Servisi Yeniden Baslat # 'handlers' klasöründeki görevi tetikler
-Use code with caution.
+```
 
 2. Dosya: roles/web_server/templates/nginx.conf.j2
 Görevi: Değişkenleri içine yerleştirdiğimiz taslak dosyadır.
-nginx
+```ini
 server {
     listen {{ web_port }}; # 'vars' klasöründeki değeri buraya çeker
 }
-Use code with caution.
+```
 
 3. Dosya: roles/web_server/vars/main.yml
 Görevi: Rol içinde sabit kullanacağımız verileri tutar.
-yaml
+```yaml
 web_port: 80
-Use code with caution.
+```
 
 4. Dosya: roles/web_server/handlers/main.yml
 Görevi: Sadece tetiklendiğinde (notify) çalışan görevleri tutar.
-yaml
+```yaml
 - name: Servisi Yeniden Baslat
   ansible.builtin.service:
     name: nginx
     state: restarted
-Use code with caution.
+```
 
 Peki Bunlar Nasıl Birleşiyor? (Main Playbook)
 Senin ana dosyan (örneğin site.yml) artık devasa bir kod yığını olmak yerine sadece şunu söyler:
-yaml
+```yaml
 - hosts: sunucularim
   roles:
     - web_server # Yukarıdaki 4 dosyayı tek bir isimle çağırdık
-Use code with caution.
+```
 
 
   COLLECTIONS
@@ -398,7 +403,7 @@ Use code with caution.
 Bu görevleri yapabilmek için önce şu komutla koleksiyonu indirirsin:
 ansible-galaxy collection install community.docker
 Ardından Playbook içinde şu şekilde kullanırsın:
-yaml
+```yaml
 - name: Nginx Collection Örneği
   hosts: sunucular
   tasks:
@@ -410,16 +415,18 @@ yaml
         state: started
         ports:
           - "80:80"
+```
 
-  KEYRING  konusu
+KEYRING  konusu
 
-  Linux'ta Keyring, verilerin (anahtar, şifre, sertifika) bellekte veya diskte tutulmasını sağlayan bir nesne grubudur. İki ana katmanda incelenir: Kernel Keyring ve User-space Keyring.
+Linux'ta Keyring, verilerin (anahtar, şifre, sertifika) bellekte veya diskte tutulmasını sağlayan bir nesne grubudur. İki ana katmanda incelenir: Kernel Keyring ve User-space Keyring.
+
 1. Kernel Keyring (Çekirdek Seviyesi)
 İşletim sisteminin çekirdek (RAM) üzerinde yönettiği bir veri yapısıdır. Bu bir "dosya" değildir; Kernel içinde bir Linked List (bağlı liste) yapısıdır.
-Veri Yapısı: Her anahtar; bir Type (tür), Description (açıklama), Payload (asıl veri/şifre) ve Access Control List (ACL) (erişim yetkisi) içerir.
-Depolama: Anahtarlar diskte değil, RAM'de (non-swappable kernel memory) tutulur. Sistem kapandığında bu veriler silinir.
+Anahtarlar diskte değil, RAM'de (non-swappable kernel memory) tutulur. Sistem kapandığında bu veriler silinir.
 Erişim: /proc/keys dosyası üzerinden kernel'daki mevcut anahtarları görebilirsiniz. keyctl komutu ile bu yapıya veri ekleyip çıkarabilirsiniz.
 Kullanım: Disk şifreleme anahtarları (dm-crypt) veya ağ kimlik doğrulamaları (Kerberos biletleri) burada tutulur.
+
 2. User-space Keyring (Disk Seviyesi)
 GPG anahtarları veya paket yöneticilerinin (apt/dnf) kullandığı "keyring"ler aslında ikili (binary) formatta dosyalardır.
 Format: Modern Linux sistemlerinde bu dosyalar genellikle GPG Keybox (.kbx) veya eski tip GPG Keyring (.gpg) formatındadır.
@@ -428,6 +435,7 @@ Konum:
 Sistem genelinde: /usr/share/keyrings/ veya /etc/apt/keyrings/
 Kullanıcı özelinde: ~/.gnupg/pubring.kbx
 Okuma: Bu dosyaları cat ile okuyamazsınız. İçeriğini görmek için gpg --no-default-keyring --keyring [dosya_yolu] --list-keys komutunu kullanmanız gerekir.
+
 3. Keyring Daemon (Servis Seviyesi)
 Masaüstü tarafında (GNOME/KDE) çalışan gnome-keyring-daemon gibi servisler, bu verileri diskte şifreli bir SQLite veritabanı veya özel bir binary formatta saklar.
 Erişim Protokolü: Uygulamalar bu verilere D-Bus üzerinden, Secret Service API protokolünü kullanarak erişir.
@@ -438,12 +446,122 @@ Kernel	RAM (Linked List)	keyctl
 GPG/APT	Binary Dosya (.kbx / .gpg)	gpg
 Masaüstü	Şifreli DB / Binary	libsecret / secret-tool
 
-Sisteminizdeki aktif anahtarları görmek için cat /proc/keys
+## SECURITY
+ssh icin  'sudo visudo' icinde asagidaki satirlar eklenir. 
+Defaults timestamp_timeout=30
+Defaults timestamp_type=global
 
-  
-  
-  
-    
-   
-        
-    
+## TAG kullanimi
+
+playbook un sadece belli bölümlerini kullanmak istediginide
+
+
+```yaml
+- name: Sunucu Kurulumu
+  hosts: servers
+  tasks:
+    - name: Apache Paketini Kur
+      apt:
+        name: apache2
+        state: present
+      tags: install  # Bu taska 'install' etiketi verildi
+
+    - name: Yapılandırma Dosyasını Güncelle
+      copy:
+        src: ./httpd.conf
+        dest: /etc/apache2/httpd.conf
+      tags: config   # Bu taska 'config' etiketi verildi
+```
+Nasi calisir?
+```bash
+ansible-playbook site.yml --tags "config"  # bir tag calistir
+ansible-playbook site.yml --tags "install,config" # birden fazla tag
+ansible-playbook site.yml --skip-tags "install" # bu haric hepsi calissin
+```
+
+## delegating isini anlamadim 
+```yaml
+name: Web Sunucularını Güncelle
+  hosts: webservers
+  tasks:
+    - name: Sunucuyu Yük Dengeleyiciden Çıkar
+      command: /usr/bin/remove_from_lb {{ inventory_hostname }}
+      delegate_to: load_balancer_sunucusu  # Bu komut web sunucusunda değil, LB'de çalışır.
+
+    - name: Uygulamayı Güncelle
+      apt:
+        name: my-app
+        state: latest  # Bu task normal şekilde web sunucusunda çalışır.
+```
+webservers ile ilgili islem yapilacak fakat is LB üzerinde yapilacak. 
+Soru: LB host olsa ve islem icin inventory dosyasindan  webservers cekilse olmazmi. Yani bi loop olusturulsa olmazmi?
+
+Cevap: Olur, ancak yönetimi zorlaştırır.
+Eğer ana hosts olarak Load Balancer'ı seçersen, Ansible o taskı web sunucuları sayısınca değil, sadece bir kez (LB için) çalıştırır. Web sunucularının isimlerini içeriye döngüyle (loop) sokman gerekir. delegate_to kullanmanın avantajı şudur: Ansible web sunucuları listesini baz alır; her bir web sunucusu için sırayla önce LB'ye gider, sonra web sunucusuna döner. Bu sayede karmaşık döngülerle uğraşmazsın. 
+
+```yaml
+- name: Hava Durumu Bilgisini Kaydet
+  hosts: sunucular
+  tasks:
+    - name: İnternetten bilgi çek
+      get_url:
+        url: "wttr.in"
+        dest: "./durum.txt"
+      delegate_to: localhost  # İnternete sunucu değil, senin bilgisayarın çıkar.
+
+    - name: Bilgiyi sunucuya kopyala
+      copy:
+        src: "./durum.txt"
+        dest: "/tmp/hava_durumu.txt" # Dosya hedef sunucuya yazılır.
+
+```
+
+## Parallelism
+
+Gomztoll hostun kaynak problemi olsun. Forks Ansible'ın aynı anda kaç "kol" (iş parçacığı) çıkaracağını belirler. 100 sunucun varsa ve forks değeri 5 ise, Ansible önce 5 sunucuyu bitirir, sonra diğer 5'e geçer. 
+```bash
+ansible-playbook test_playbook.yaml -f 10
+```
+
+Bu isi  playbook icinde yapacaksan buna serial deniliyor. 
+
+```yaml
+- name: Nginx Güncelleme
+  hosts: webservers
+  serial: 3  # Her seferinde sadece 3 sunucu güncellenir.
+  tasks:
+    - name: Nginx Yeniden Başlat
+      ansible.builtin.service:
+        name: nginx
+        state: restarted
+```
+ ## optimizing SSH 
+Which Ansible option allows multiple concurrent SSH connections with a remote host using one network connection?
+
+
+A ControlPersist
+B ControlMaster
+C Pipelining
+D SSH args
+
+
+
+ ## optimizing Ansible
+ 
+```bash
+time ansible-playbook test_plybk.yaml # isin ne kadar sürecegini anlatiyor
+time ansible-playbook -vvv test_plybk.yaml # detay verecek
+```
+
+## Timer ve callback plugins 
+
+Aşağıdaki satırları ansible.cfg dosyasına yapıştır:
+```ini
+[defaults]
+# Çıktı formatını daha okunur (YAML) yapar
+stdout_callback = yaml
+callbacks_enabled = ansible.posix.timer, ansible.posix.profile_tasks
+```
+
+## file lookup plugin
+## AWX WEBGUI

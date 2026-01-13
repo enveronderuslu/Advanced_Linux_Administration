@@ -997,6 +997,14 @@ ssh-copy-id -i ~/.ssh/id_rsa.pub remote@192.remote_IP
 sudo dpkg-reconfigure console-setup  #ubuntu serverda font VGA 16:32 yap cicek 
 
 ```
+### setup vim  color
+ open or create   ~/.vimrc
+```vim
+# vim ~/.vimrc 
+syntax on
+colorscheme industry
+```
+
 
 ```bash
 Local to Remote:
