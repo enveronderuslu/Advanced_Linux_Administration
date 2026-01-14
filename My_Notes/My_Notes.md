@@ -512,92 +512,10 @@ eski usül;
 log in as bob and then run `crontab -e` and write `0 5 * * * /usr/bin/logger "good morning"`. Veya `sudo nano /etc/crontab` icinde degistir
 
 # Networking
-## netstat -tunp
-
-|         Alan     |               Açıklama                  |
-| ---------------- | ----------------------------------------|
-| Proto            | Protokol türü: TCP, UDP, RAW gibi.      |
-| Recv-Q / Send-Q  | Alınan ve gönderilen veri kuyrukları.   |
-| Foreign Address  | Bağlı olan uzak IP ve port.             |
-| PID/Program name | Bağlantıyı kullanan işlem adı ve PID    |
-
-
-| Durum               | Ne Anlama Gelir?             |
-| ------------------- | ---------------------------- |
-| LISTEN              | Port dinlemede. |
-| ESTABLISHED         | Aktif bir bağlantı var |
-| CLOSE\_WAIT         | Karşı taraf kapattı ama sizin taraf hala kapatmadı |
-| TIME\_WAIT          | Bağlantı kapatıldı ama bir süre daha beklemede |
-| SYN\_SENT SYN\_RECV | TCP bağlantısı kurulmaya çalışılıyor.  |
-## NETWORK ADVANVECD 
-ip link # shows network interfaces
-sudo lshw -class network # deeper information
-man nmcli-examples # yapabileceklerinle ilgili örnekler. Z.b.
-nmcli device wifi list
-/etc/hosts   # hier stehen die Hostnamen
-
-`/etc/nsswitch.conf`, isim çözümleme ve kimlik doğrulama işlemlerinde hangi kaynağın hangi sırayla kullanılacağını belirleyen yapılandırma dosyasıdır.
-örnegin passwd: files ldap  Kimlik bilgileri önce yerel dosyalardan, sonra LDAP’tan alınır.
 
 
 
-*** CASE STUDY ***
-ip_A 192.168.1.A
-ip_C 192.168.2.C 
-ip_B 192.168.1.B 192.168.2.B 
-A 192.168.1.B  aginda C 192.168.2.B aginda ve B her iki agdan ipye sahip. A ile C nasil konusacak. 
- - A dan C ye ulasmak icin A nin terminalde
-```bash
-ip route add 192.168.2.B.0/24 via 192.168.1.B
-```
- - C den A ya ulasmak icin C nin terminale
- ```bash
- ip route add 192.168.1.B/24 via 192.168.2.B
- ```
 
-dig @4.2.2.2 google.com -> google.com alan adının IP adresini, 4.2.2.2 DNS sunucusunu kullanarak sorgular.
-/etc/resolv.conf 
-
-/etc/nsswitch.conf sistemi, kullanıcı, grup, hostname ve benzeri sorguların hangi kaynaktan ve hangi sırayla yapılacağını belirler. Örneğin:
-passwd satırı → Kullanıcı bilgileri aranacak kaynakların sırası.
-group satırı → Grup bilgileri aranacak kaynakların sırası.
-hosts satırı → Hostname/IP çözümleme sırası.
-
-/etc/nsswitch.conf dosyasındaki örnek içerik:
-passwd:     files sss
-group:      files sss
-hosts:      files dns
-Anlamı:
-passwd: files sss → Önce /etc/passwd, sonra SSSD (örn. LDAP) kullanılacak.
-hosts: files dns → IP/hostname çözümlemesinde önce /etc/hosts, sonra DNS kullanılacak.
-
-nmcli; temiz network device adress bilgisi veriyor
-nmcli device show
-nmcli connection show ens23 ens23 ün detaylarini gösterir 
-nmcli connection delete ens23 bu adaptörü siler
-nmcli connection modify ens224 connection.interface-name "wired connection 3"
-cnnection.interface-name kismini show ens23 komutunda görüyorsun ve tab ile geliyor
-`nmtui` nm-connection-editor (GUI) 
-
-What is the loopback device? localhost
-NIC bonding: Combining multiple NICs together
-
-ss COMMAND
-It is a faster and more modern replacement for netstat.
-```bash
-ss -tuln         # Show listening TCP/UDP ports with numeric addresses
-ss -s            # Display summary statistics
-ss -plnt         # Show listening TCP sockets with process info
-```
-Copy a file from a server to another; `scp *.txt  kali@192.168.X.X:/kali/Desktop` 
-timedatectl set-timezone Europe/Berlin
-`traceroute www.google.com` . Bunun dinamik olani real time olani mtr dir.  `mtr www.google.com`. 
-## DNS Setup
-`/etc/resolve.conf ` Dns gibi calisir
-## Firewall Configuration with `firewalld`
-fedore ve RHEL de firewall dan port acma 
-sudo firewall-cmd --permanent --add-port=8080/tcp
-sudo firewall-cmd --reload
 # Storage and Disk Management
 ## 
 fdisk -l gives the list of disks 
