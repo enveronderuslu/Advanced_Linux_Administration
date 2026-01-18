@@ -934,8 +934,7 @@ scp -r username@remote_host:/path/to/remote_folder /path/to/local_destination
 
 
 ```bash
-alias sysupdate='sudo zypper dup'
-alias z='zypper'
+alias sysupdate='sudo dnf update -y'
 alias c='clear'
 alias l='ls -laFtr  --color=auto'
 alias ping='ping -c 5'
@@ -978,3 +977,26 @@ sonra  asagidaki Scripti yaz
 echo $VAR   # boş, değişken görünmez
 `./script.sh` dersen mevcut shell den bagimsiz calisir ve cikti vermerz. 
 `source script.sh` yaparsan 1, değişkeni mevcut shell’de görünüyor
+
+
+```yaml
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    enp1s0:
+      dhcp4: no
+  vlans:
+    eth0.60:                  
+      id: 60                 
+      link: enp1s0            
+      addresses:
+        - 10.0.60.13/24    
+      routes:
+        - to: default
+          via: 10.0.60.1
+      nameservers:
+	addresses:
+    - 10.0.60.1
+    - 8.8.8.8
+```

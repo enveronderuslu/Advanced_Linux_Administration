@@ -10,25 +10,22 @@ network:
     enp1s0:
       dhcp4: no
       addresses:
-        - 10.0.10.11/24
+        - 192.168.122.200/24
       routes:
         - to: default
-          via: 10.0.10.1
+          via: 192.168.122.1
       
       nameservers:
         addresses: 
           - 127.0.0.53
-          - 10.0.10.1
+          - 192.168.122.1
           - 8.8.8.8
         search:
-          - example.com 
+          - example.local 
 
 ```
 
-DNS      10.0.10.5    dns1         ubuntu
-IAM     10.0.10.6   root           fedora
-junp     10.0.10.7   alpine         alpine
-ansible 10.0.10.11 ansible-cntrl   ubuntu
+
 
 
 
@@ -44,9 +41,9 @@ interface-name=enp1s0
 
 [ipv4]
 method=manual
-addresses=172.17.17.22/24,172.17.17.1
-dns=127.0.0.53;172.17.17.1;8.8.8.8;
-dns-search=example.com
+addresses=192.168.122.183/24,192.168.122.1
+dns=192.168.122.1,8.8.8.8;
+dns-search=example.local
 
 [ipv6]
 method=ignore
