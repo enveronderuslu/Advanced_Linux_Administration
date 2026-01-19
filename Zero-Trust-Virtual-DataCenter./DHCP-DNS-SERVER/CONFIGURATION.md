@@ -161,7 +161,7 @@ calismiyo hic ugrasma amk
 
 # DNS server 
 bilgi: test.example.com Burada test-->hostname example.com-->domain name
-resolvectl status # mevcut kullanikan DNS server adresini verir
+resolvectl status # mevcut kullanilan DNS server adresini verir
 
 serverlarda hostname  leri düzenle. Örnegin dns1  serverda ` hostnamextl set-hostname dns1.example.com` yap. Tüm serverlarda asagidakinin benzeri ayarlama yap. 
 Bu server icinde
@@ -182,40 +182,97 @@ OPTIONS="-u bind -4"  # satirini düzenle. sadece IPv4 kullan dedik
 Simdi  /etc/bind/named.conf.options dosyasini  düzenle. önce yedekle (cp file file.bak). Sonra asagidaki parcayi ekle
 
 ```vim
-        listen-on  {127.0.0.1; 10.0.2.5; };
-        allow-query { localhost; 10.0.2.0/24; };
-        allow-transfer { none; };
+acl "trusted" {
+        127.0.0.0/8;
+        10.0.10.0/24;  # MGMT 
+        10.0.20.0/24;  # CORP-LAN 
+        10.0.40.0/24;  # APP-LOGIC 
+        10.0.50.0/24;  # DB
+        10.0.60.0/24;  # SEC
+};
 
-        forwarders { 10.0.2.1; };
-        recursion yes;
+options {
+    directory "/var/cache/bind";
+
+    
+    listen-on { 127.0.0.1; 10.0.10.5; }; 
+
+    
+    allow-query { trusted; }; 
+
+    allow-transfer { none; };
+
+    forwarders { 10.0.10.1; };
+    recursion yes;
+};
 ```
 
 simdi /etc/bind/named.conf.local modifiye edilecek.  
 
 ```vim
-zone "example.com" 
+zone "example.local" 
 	{
 	type master;
-	file "/etc/bind/zones/db.example.com"; 
+	file "/etc/bind/zones/db.example.local"; 
 	};
 
-zone "2.0.10.in-addr.arpa"
+zone "10.0.10.in-addr.arpa"
 	{
 	type master;
-	file "/etc/bind/zones/db.2.0.10";
+	file "/etc/bind/zones/db.10.0.10";
 	};
 ```
 
-birinci kisim 'forward lookup' isimden ip ye 
-ikinci kisim 'reverse lookup' ip den isme. benim network 10.0.2.0/24 oldugundan  network adresi 10.0.2. Reverse yazilacagindan buraya 2-0-10 yazildi 
-Simdi /etc/bindicinde /zones klasörünü olustur. icine db.example.com ve db.2.0.10 dosyalarini ekle. dosyalar üst kalsörde
+
+Simdi /etc/bind icinde /zones klasörünü olustur. icine db.example.com ve db.2.0.10 dosyalarini ekle. dosyalar üst kalsörde
 Asagidaki komutlarla konfigurasyonu dogrulat
-named-checkzone 
-named-checkzone example.com /etc/bind/zones/db.example.com
-named-checkzone 2.0.10.in-addr.arpa /etc/bind/zones/db.2.0.10
+sudo named-checkconf -z
+sudo systemctl restart named
 reboot yap. cicek...
 
 resolvectl ile serverin dns ayarlarina bakarsin. 
+firewall ayarlari;
+1. Adım: Alias Oluştur (Ağ Grubu)
+Firewall > Aliases > IP sekmesine git.
+
+Add butonuna bas.
+
+Name: DNS_Allowed_Networks (veya benzeri bir isim).
+
+Type: Network(s).
+
+Networks: Aşağıdaki tüm ağlarını buraya ekle:
+
+10.0.20.0/24 (CORP)
+
+10.0.40.0/24 (APP)
+
+10.0.50.0/24 (DB)
+
+10.0.60.0/24 (SEC)
+
+Kaydet ve Apply Changes yap.
+
+2. Adım: Tek Bir Firewall Kuralı Yaz
+Normalde her arayüzün (interface) kendi sekmesinde kural yazılır. Ancak tüm bu ağlar üzerinde tek bir kural işletmek istiyorsan Floating Rules sekmesini kullanabilirsin:
+
+Firewall > Rules > Floating sekmesine git.
+
+Action: Pass.
+
+Quick: İşaretle (Kuralın hemen işlenmesi için).
+
+Interface: CORP-LAN, APP-LOGIC, DB, SEC (Hepsini seç - Ctrl/Cmd ile).
+
+Direction: in.
+
+Protocol: TCP/UDP.
+
+Source: Single host or alias -> DNS_Allowed_Networks (Az önce oluşturduğun alias).
+
+Destination: Single host or alias -> 10.0.10.5 (DNS Sunucun).
+
+Destination Port Range: 53 (DNS).
 
 # DIRECTORY SERVICES-SERVER
 

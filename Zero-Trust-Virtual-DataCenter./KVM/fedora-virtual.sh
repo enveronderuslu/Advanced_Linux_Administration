@@ -9,7 +9,7 @@ DEST="/var/lib/libvirt/images/$user.qcow2"
 sudo cp -p "$SOURCE" "$DEST"
 
 # temizlik ve root sifre 
-sudo virt-sysprep -a $DEST --hostname $user.example.com --root-password password:asd --enable customize,dhcp-client-state,net-hostname,net-hwaddr,machine-id
+sudo virt-sysprep -a $DEST --hostname $user.example.local --root-password password:asd --enable customize,dhcp-client-state,net-hostname,net-hwaddr,machine-id
 
 
 # sudo virt-customize -a $DEST  --ssh-inject fedora:file:/root/.ssh/id_rsa.pub
