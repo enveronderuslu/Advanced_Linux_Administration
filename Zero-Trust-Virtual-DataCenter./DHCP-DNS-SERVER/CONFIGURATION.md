@@ -181,47 +181,10 @@ OPTIONS="-u bind -4"  # satirini düzenle. sadece IPv4 kullan dedik
 
 Simdi  /etc/bind/named.conf.options dosyasini  düzenle. önce yedekle (cp file file.bak). Sonra asagidaki parcayi ekle
 
-```vim
-acl "trusted" {
-        127.0.0.0/8;
-        10.0.10.0/24;  # MGMT 
-        10.0.20.0/24;  # CORP-LAN 
-        10.0.40.0/24;  # APP-LOGIC 
-        10.0.50.0/24;  # DB
-        10.0.60.0/24;  # SEC
-};
-
-options {
-    directory "/var/cache/bind";
-
-    
-    listen-on { 127.0.0.1; 10.0.10.5; }; 
-
-    
-    allow-query { trusted; }; 
-
-    allow-transfer { none; };
-
-    forwarders { 10.0.10.1; };
-    recursion yes;
-};
-```
 
 simdi /etc/bind/named.conf.local modifiye edilecek.  
 
-```vim
-zone "example.local" 
-	{
-	type master;
-	file "/etc/bind/zones/db.example.local"; 
-	};
 
-zone "10.0.10.in-addr.arpa"
-	{
-	type master;
-	file "/etc/bind/zones/db.10.0.10";
-	};
-```
 
 
 Simdi /etc/bind icinde /zones klasörünü olustur. icine db.example.com ve db.2.0.10 dosyalarini ekle. dosyalar üst kalsörde
@@ -232,6 +195,8 @@ reboot yap. cicek...
 
 resolvectl ile serverin dns ayarlarina bakarsin. 
 firewall ayarlari;
+allow dns  server access to  1.1.1.1
+
 1. Adım: Alias Oluştur (Ağ Grubu)
 Firewall > Aliases > IP sekmesine git.
 
