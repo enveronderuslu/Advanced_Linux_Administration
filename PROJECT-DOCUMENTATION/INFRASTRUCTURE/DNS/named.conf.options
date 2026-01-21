@@ -1,8 +1,10 @@
+# /etc/bind/named.conf.options
+
 acl "trusted" {
         127.0.0.0/8;
-        10.0.10.0/24;  # MGMT 
-        10.0.20.0/24;  # CORP-LAN 
-        10.0.40.0/24;  # APP-LOGIC 
+        10.0.10.0/24;  # MGMT
+        10.0.20.0/24;  # CORP-LAN
+        10.0.40.0/24;  # APP-LOGIC
         10.0.50.0/24;  # DB
         10.0.60.0/24;  # SEC
 };
@@ -10,16 +12,13 @@ acl "trusted" {
 options {
     directory "/var/cache/bind";
 
-    
-    listen-on { 127.0.0.1; 10.0.10.5; }; 
+    listen-on { 127.0.0.1; 10.0.10.5; };   # DNS sadece lokal ve MGMT IP'den dinler
 
-    
-    allow-query { trusted; }; 
+    allow-query { trusted; };             # Sadece tanımlı ağlar sorgu atabilir
+    allow-transfer { none; };             # Zone transfer kapalı
 
-    allow-transfer { none; };
+    forwarders { 10.0.10.1; };             # pfSense LAN IP (1.1.1.1 yerine)
+    forward only;                         # Root DNS'e çıkmaz, sadece pfSense'e sorar
 
-    forwarders { 1.1.1.1; };
-    recursion yes;
-    
-    dnssec-validation auto;
+    recursion yes;                        # İç ağ için recursive açık
 };

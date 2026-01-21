@@ -239,7 +239,7 @@ Destination: Single host or alias -> 10.0.10.5 (DNS Sunucun).
 
 Destination Port Range: 53 (DNS).
 
-# DIRECTORY SERVICES-SERVER
+# DIRECTORY SERVICES-SERVER 
 
 sudo dnf update -y && sudo reboot
 sudo dnf install freeipa-server freeipa-server-dns -y

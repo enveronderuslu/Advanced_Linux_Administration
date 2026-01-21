@@ -2,13 +2,25 @@ whitelist_mgmt.txt
 ```vim
 vim /etc/squid/whitelists/whitelist_mgmt.txt
 .ubuntu.com
-.fedoraproject.org
-.freeipa.org
+.archive.ubuntu.com
+.security.ubuntu.com
+download.rockylinux.org
+dl.rockylinux.org
+vault.rockylinux.org
+dl.fedoraproject.org
+download.fedoraproject.org/pub/epel
+mirrors.fedoraproject.org
+*.rockylinux.org
+*.fedoraproject.org
 .kernel.org
 .isc.org
 .ansible.com
- pypi.org # Python paketleri için. 
- pythonhosted.org # Python kütüphane dosyaları için.
+.pypi.org
+.pythonhosted.org
+.launchpadcontent.net
+.canonical.com
+.cloudflare.com
+
 ```
 
 whitelist_corp.txt

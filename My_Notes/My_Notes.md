@@ -930,11 +930,15 @@ scp -r /path/to/local_folder username@remote_host:/path/to/destination
 Remote to Local:
 scp -r username@remote_host:/path/to/remote_folder /path/to/local_destination
 ```
+alias dns='ssh dns@10.0.10.5'
+alias iam='ssh iam@10.0.10.6'
+alias bastion='ssh bastion@10.0.10.6'
+alias ans='ssh ans@10.0.10.8'
 
 
 
 ```bash
-alias sysupdate='sudo dnf update -y'
+alias sysupdate='sudo apt update && sudo apt upgrade -y'
 alias c='clear'
 alias l='ls -laFtr  --color=auto'
 alias ping='ping -c 5'
@@ -997,6 +1001,5 @@ network:
           via: 10.0.60.1
       nameservers:
 	addresses:
-    - 10.0.60.1
-    - 8.8.8.8
+    - 10.0.10.5
 ```
