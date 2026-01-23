@@ -255,9 +255,22 @@ Sonra id1 serverda firewall kurallariyla port lari ac;
 firewall-cmd --list-ports 
 firewall-cmd --add-port={123,88,464}/udp --permanent
 firewall-cmd --add-port={80,442,689,636,88,464}/tcp --permanent
-firewall-cmd --reload
+sudo firewall-cmd --add-service={freeipa-ldap,freeipa-ldaps,kerberos,dns} --permanent
+sudo firewall-cmd --reload
 firewall-cmd --list-ports # kontrol icin 
 ```
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 freeipa kurduktan sonra ca-agent.p12, cacert.p12(en önemlisi bu) ve .dogtag gibi dosyalar olusur. Bunlari `ipa-backup` ile yedeklemek lazim. 
@@ -354,3 +367,4 @@ GUI daha iyi dersen ;
 . Gerekirse RunAs sekmesinde ALL tanımla
 
 systemctl  --failed # shows  the failed services
+

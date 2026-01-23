@@ -10,8 +10,8 @@ vault.rockylinux.org
 dl.fedoraproject.org
 download.fedoraproject.org/pub/epel
 mirrors.fedoraproject.org
-*.rockylinux.org
-*.fedoraproject.org
+.rockylinux.org
+.fedoraproject.org
 .kernel.org
 .isc.org
 .ansible.com
