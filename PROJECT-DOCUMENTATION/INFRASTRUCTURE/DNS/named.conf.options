@@ -17,8 +17,8 @@ options {
     allow-query { trusted; };             # Sadece tanımlı ağlar sorgu atabilir
     allow-transfer { none; };             # Zone transfer kapalı
 
-    forwarders { 10.0.10.1; };             # pfSense LAN IP (1.1.1.1 yerine)
-    forward only;                         # Root DNS'e çıkmaz, sadece pfSense'e sorar
+    forwarders { 192.168.1.1; };             # pfSense LAN IP (1.1.1.1 yerine)
+    forward first;                         # Root DNS'e çıkmaz, sadece pfSense'e sorar
 
     recursion yes;                        # İç ağ için recursive açık
 };

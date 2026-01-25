@@ -239,6 +239,230 @@ Destination: Single host or alias -> 10.0.10.5 (DNS Sunucun).
 
 Destination Port Range: 53 (DNS).
 
+# SQUID Proxy Server Configuration
+
+Objective: To implement a lightweight, secure gateway for internal zones (MGMT, APP, DB) to access the internet for updates while maintaining strict "Zero Trust" control with minimal resource consumption.
+Installation
+The proxy service is hosted on an Ubuntu VM within the SEC Zone (10.0.60.0/24).
+sudo apt update && sudo apt install squid -y
+Configuration & Access Control
+Refer to the Official Ubuntu Documentation for base settings. Custom configurations and segment-specific whitelists are located in Infrastructure/Squid folder.
+Backup and Validation
+sudo cp /etc/squid/squid.conf /etc/squid/squid.conf.bak
+sudo squid -k parse
+sudo systemctl restart squid
+sudo systemctl enable squid
+
+Permissions Management
+sudo chown -R proxy:proxy /etc/squid/whitelists
+sudo chmod -R 644 /etc/squid/whitelists/*.txt
+sudo chown -R proxy:proxy /var/log/squid
+sudo chown -R proxy:proxy /var/spool/squid
+
+Firewall Implementation
+Allow internal segments to reach Squid Proxy
+Alias Definition
+- Path: Firewall > Aliases > IP
+- Name: SQUID_CONNECTED_NETWORKS
+
+Floating Rule Configuration
+- Path: Firewall > Rules > Floating
+- Quick: Checked (Apply immediately)
+- Interface: [MGMT, APP, DB]
+- Direction: In
+- Protocol: TCP
+- Destination Port: 3128
+- Description: "Allow internal segments to reach Squid Proxy"
+
+Client Integration
+vim /etc/environment
+http_proxy="http://10.0.60.13:3128/"
+https_proxy="http://10.0.60.13:3128/"
+no_proxy="localhost,127.0.0.1"
+HTTP_PROXY="http://10.0.60.13:3128/"
+HTTPS_PROXY="http://10.0.60.13:3128/"
+NO_PROXY="localhost,127.0.0.1"
+
+source /etc/environment # Apply changes
+Package Manager Proxy Configuration
+Ubuntu Server (APT)
+File: /etc/apt/apt.conf.d/99proxy
+Acquire::http::Proxy "http://10.0.60.13:3128/";
+Acquire::https::Proxy "http://10.0.60.13:3128/";
+
+Fedora Server (DNF)
+File: /etc/dnf/dnf.conf
+proxy=http://10.0.60.13:3128
+
+## REQUired Documents
+/etc/squid.conf
+```vim
+# --- NETWORK PARAMETERS ---
+http_port 3128
+visible_hostname squid.example.local
+
+# --- NETWORK SEGMENTATION (ACLs) ---
+acl MGMT src 10.0.10.0/24
+acl CORP_LAN src 10.0.20.0/24
+acl DMZ src 10.0.30.0/24
+acl APP src 10.0.40.0/24
+acl DB src 10.0.50.0/24
+acl SEC_OPS src 10.0.60.0/24
+acl GUEST src 10.0.70.0/24
+acl localhost src 127.0.0.1/32
+
+# --- TARGETS (Whitelists) ---
+acl acl_mgmt_dst dstdomain "/etc/squid/whitelists/whitelist_mgmt.txt"
+acl acl_corp_dst dstdomain "/etc/squid/whitelists/whitelist_corp.txt"
+acl acl_dmz_dst dstdomain "/etc/squid/whitelists/whitelist_dmz.txt"
+acl acl_app_dst dstdomain "/etc/squid/whitelists/whitelist_app.txt"
+acl acl_db_dst dstdomain "/etc/squid/whitelists/whitelist_db.txt"
+acl acl_sec_dst dstdomain "/etc/squid/whitelists/whitelist_sec.txt"
+
+# --- PORTS ---
+acl SSL_ports port 443
+acl Safe_ports port 80
+acl Safe_ports port 443
+acl CONNECT method CONNECT
+
+# --- ACCESS RULES ---
+http_access deny !Safe_ports
+http_access deny CONNECT !SSL_ports
+
+http_access allow localhost
+http_access allow MGMT acl_mgmt_dst
+http_access allow CORP_LAN acl_corp_dst
+http_access allow DMZ acl_dmz_dst
+http_access allow APP acl_app_dst
+http_access allow DB acl_db_dst
+http_access allow SEC_OPS acl_sec_dst
+
+http_access deny all
+
+# --- CACHE & LOG SETTINGS ---
+cache_mem 128 MB
+maximum_object_size_in_memory 2 MB
+cache_dir ufs /var/spool/squid 1000 16 256
+maximum_object_size 10 MB
+access_log /var/log/squid/access.log squid
+cache_log /var/log/squid/cache.log
+
+# --- UBUNTU SPECIFIC ---
+error_directory /usr/share/squid/errors/en
+coredump_dir /var/spool/squid
+
+refresh_pattern ^ftp:           1440    20%     10080
+refresh_pattern ^gopher:        1440    0%      1440
+refresh_pattern -i (/cgi-bin/|\?) 0     0%      0
+refresh_pattern .               0       20%     4320
+
+```
+
+
+whitelist_mgmt.txt
+
+```vim
+vim /etc/squid/whitelists/whitelist_mgmt.txt
+.ubuntu.com
+.archive.ubuntu.com
+.security.ubuntu.com
+download.rockylinux.org
+dl.rockylinux.org
+vault.rockylinux.org
+dl.fedoraproject.org
+download.fedoraproject.org/pub/epel
+mirrors.fedoraproject.org
+.rockylinux.org
+.fedoraproject.org
+.kernel.org
+.isc.org
+.ansible.com
+.pypi.org
+.pythonhosted.org
+.launchpadcontent.net
+.canonical.com
+.cloudflare.com
+```
+
+
+whitelist_corp.txt 
+
+```vim
+vim /etc/squid/whitelists/whitelist_corp.txt
+.ubuntu.com
+.archive.ubuntu.com
+.security.ubuntu.com
+.fedoraproject.org
+```
+
+whitelist_dmz.txt 
+
+```vim
+vim /etc/squid/whitelists/whitelist_dmz.txt
+.ubuntu.com
+.archive.ubuntu.com
+.security.ubuntu.com
+.fedoraproject.org
+.nginx.org
+.haproxy.org
+```
+
+whitelist_app.txt 
+
+```vim
+vim /etc/squid/whitelists/whitelist_app.txt
+.ubuntu.com
+.archive.ubuntu.com
+.security.ubuntu.com
+.fedoraproject.org
+.kubernetes.io
+.docker.com
+.io.containerd
+```
+
+whitelist_db.txt 
+
+```vim
+vim /etc/squid/whitelists/whitelist_db.txt
+.ubuntu.com
+.archive.ubuntu.com
+.security.ubuntu.com
+.fedoraproject.org
+.mariadb.org
+.postgresql.org
+```
+
+whitelist_sec.txt 
+
+```vim
+vim /etc/squid/whitelists/whitelist_sec.txt
+.ubuntu.com
+.archive.ubuntu.com
+.security.ubuntu.com
+.fedoraproject.org
+.suricata-ids.org
+.elastic.co
+.prometheus.io
+.grafana.com
+```
+
+create  these files wita script
+
+```sh
+#!/bin/bash
+cat <<'EOF' > /etc/squid/whitelists/deneme1.txt
+.ubuntu.com
+.archive.ubuntu.com
+EOF
+cat <<'EOF' > /etc/squid/whitelists/deneme2.txt
+.ubuntu.com
+.archive.ubuntu.com
+EOF
+```
+
+
+
+
 # DIRECTORY SERVICES-SERVER 
 
 sudo dnf update -y && sudo reboot
