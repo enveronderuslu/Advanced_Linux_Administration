@@ -248,17 +248,21 @@ sudo apt update && sudo apt install squid -y
 Configuration & Access Control
 Refer to the Official Ubuntu Documentation for base settings. Custom configurations and segment-specific whitelists are located in Infrastructure/Squid folder.
 Backup and Validation
+
+```bash
 sudo cp /etc/squid/squid.conf /etc/squid/squid.conf.bak
 sudo squid -k parse
 sudo systemctl restart squid
 sudo systemctl enable squid
+```
 
-Permissions Management
+Permissions Management 
+```bash
 sudo chown -R proxy:proxy /etc/squid/whitelists
 sudo chmod -R 644 /etc/squid/whitelists/*.txt
 sudo chown -R proxy:proxy /var/log/squid
 sudo chown -R proxy:proxy /var/spool/squid
-
+```
 Firewall Implementation
 Allow internal segments to reach Squid Proxy
 Alias Definition
@@ -275,6 +279,7 @@ Floating Rule Configuration
 - Description: "Allow internal segments to reach Squid Proxy"
 
 Client Integration
+```vim
 vim /etc/environment
 http_proxy="http://10.0.60.13:3128/"
 https_proxy="http://10.0.60.13:3128/"
@@ -282,7 +287,9 @@ no_proxy="localhost,127.0.0.1"
 HTTP_PROXY="http://10.0.60.13:3128/"
 HTTPS_PROXY="http://10.0.60.13:3128/"
 NO_PROXY="localhost,127.0.0.1"
+```
 
+```vim
 source /etc/environment # Apply changes
 Package Manager Proxy Configuration
 Ubuntu Server (APT)
@@ -293,6 +300,7 @@ Acquire::https::Proxy "http://10.0.60.13:3128/";
 Fedora Server (DNF)
 File: /etc/dnf/dnf.conf
 proxy=http://10.0.60.13:3128
+```
 
 ## REQUired Documents
 /etc/squid.conf
@@ -358,7 +366,6 @@ refresh_pattern .               0       20%     4320
 
 ```
 
-
 whitelist_mgmt.txt
 
 ```vim
@@ -383,7 +390,6 @@ mirrors.fedoraproject.org
 .canonical.com
 .cloudflare.com
 ```
-
 
 whitelist_corp.txt 
 
