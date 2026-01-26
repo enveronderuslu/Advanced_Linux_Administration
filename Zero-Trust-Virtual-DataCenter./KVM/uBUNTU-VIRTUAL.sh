@@ -2,7 +2,7 @@
 echo "Yeni ubuntu sanal makine ismi"
 read user
 
-SOURCE="/var/lib/libvirt/images/SEC-ELK.qcow2"
+SOURCE="/var/lib/libvirt/images/SEC-IPS.qcow2"
 DEST="/var/lib/libvirt/images/$user.qcow2"
 
 sudo cp -p "$SOURCE" "$DEST"

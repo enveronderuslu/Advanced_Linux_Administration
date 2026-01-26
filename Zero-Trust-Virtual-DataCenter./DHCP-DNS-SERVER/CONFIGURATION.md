@@ -490,19 +490,6 @@ sudo firewall-cmd --reload
 firewall-cmd --list-ports # kontrol icin 
 ```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 freeipa kurduktan sonra ca-agent.p12, cacert.p12(en önemlisi bu) ve .dogtag gibi dosyalar olusur. Bunlari `ipa-backup` ile yedeklemek lazim. 
 
 LDAP dizin verileri (kullanıcılar, gruplar, politikalar), CA (Sertifika Otoritesi) dosyaları, DNS kayıtları ve Kerberos anahtarları yedeklenir ve varsayılan olarak /var/lib/ipa/backup/ dizini saklanır.
@@ -598,3 +585,76 @@ GUI daha iyi dersen ;
 
 systemctl  --failed # shows  the failed services
 
+
+
+suricata kuracagiz. ortamda freeipa , freeipa-dns-server var. önde pfsense firewall var. Nexus proxy sunucudan paketler cekiliyor. simdi SEC sanal aginda 10.0.60.11 statik ip li rocky linux sunucuya suricata kuracagiz. ortandaki tüm makinalarin üzerindeki  isletim sistemi Rocky  linux 10.1.
+
+Ne yapilacaksa adim adim yapilacak. her adimda ikiden fazla adim olmayacak . benden onay almadan diger adima gecmeyeceksin.  Ön ce ne anladigini anlat. Yanlis anlama olmasin. baska ihtiyac duydugun bilgi varsa omlarida söyle.
+
+
+# COMPREHENSIVE SURICATA IDS INSTALLATION AND CONFIGURATION GUIDE
+
+## . SYSTEM PREPARATION AND PERMISSIONS
+Suricata requires specific ownership and directory permissions to operate correctly under the 'suricata' user.
+
+# Set ownership for logging, state, and runtime directories
+sudo chown -R suricata:suricata /var/log/suricata /var/lib/suricata /run/suricata
+
+# Set appropriate directory permissions
+sudo chmod -R 750 /var/log/suricata
+sudo chmod -R 770 /var/lib/suricata
+sudo chmod -R 770 /run/suricata
+
+## 2. CONFIGURING SURICATA YAML
+The main configuration file must be pointed to the correct rule files.
+Edit /etc/suricata/suricata.yaml and ensure the following section is updated:
+
+rule-files:
+  - suricata.rules
+
+## 3. CREATING TEST SIGNATURES
+Create a manual rule to verify that the engine is triggering alerts upon detecting ICMP traffic.
+File: /var/lib/suricata/rules/suricata.rules
+Content:
+alert icmp any any -> any any (msg:"TEST: Ping Detected"; sid:1000001; rev:1;)
+
+## 4. ENABLING KERNEL CAPABILITIES
+To allow the Suricata process to capture packets on the network interface without running as the root user:
+
+# Set binary capabilities:
+sudo setcap cap_net_raw,cap_net_admin,cap_ipc_lock+ep /usr/sbin/suricata
+
+# Configure Systemd Override:
+# Run 'sudo systemctl edit suricata' and add:
+[Service]
+CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_RAW CAP_IPC_LOCK
+AmbientCapabilities=CAP_NET_ADMIN CAP_NET_RAW CAP_IPC_LOCK
+
+## 5. VALIDATING CONFIGURATION
+Always test the configuration for syntax errors before starting the service.
+sudo suricata -T -c /etc/suricata/suricata.yaml -v
+
+## 6. SERVICE MANAGEMENT AND LIVE TESTING
+Start the service and verify it is actively capturing packets.
+
+# Reload and Start Service:
+sudo systemctl daemon-reload
+sudo systemctl enable suricata
+sudo systemctl start suricata
+
+# Manual Live Capture (Diagnostic Mode):
+sudo suricata -c /etc/suricata/suricata.yaml -i enp1s0.60
+
+## 7. MONITORING OUTPUTS
+Verify that alerts are being written to the log files.
+
+# Check if logs are being generated:
+ls -lh /var/log/suricata/fast.log
+
+# Monitor logs in real-time:
+tail -f /var/log/suricata/fast.log
+
+## 8. TROUBLESHOOTING CHECKLIST
+- SELinux: Check status with 'getenforce'. If 'Enforcing', it may block log writing.
+- Statistics: Run 'grep "capture.kernel_packets" /var/log/suricata/stats.log' to verify packet flow.
+- Interface: Ensure the monitoring interface is UP and receiving traffic.
