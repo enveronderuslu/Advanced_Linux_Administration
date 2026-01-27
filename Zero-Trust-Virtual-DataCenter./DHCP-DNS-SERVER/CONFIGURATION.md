@@ -592,69 +592,133 @@ suricata kuracagiz. ortamda freeipa , freeipa-dns-server var. önde pfsense fire
 Ne yapilacaksa adim adim yapilacak. her adimda ikiden fazla adim olmayacak . benden onay almadan diger adima gecmeyeceksin.  Ön ce ne anladigini anlat. Yanlis anlama olmasin. baska ihtiyac duydugun bilgi varsa omlarida söyle.
 
 
-# COMPREHENSIVE SURICATA IDS INSTALLATION AND CONFIGURATION GUIDE
+# SURICATA IDS INSTALLATION AND CONFIGURATION
 
-## . SYSTEM PREPARATION AND PERMISSIONS
-Suricata requires specific ownership and directory permissions to operate correctly under the 'suricata' user.
+System Preparation and Permissions
 
-# Set ownership for logging, state, and runtime directories
 sudo chown -R suricata:suricata /var/log/suricata /var/lib/suricata /run/suricata
-
-# Set appropriate directory permissions
 sudo chmod -R 750 /var/log/suricata
 sudo chmod -R 770 /var/lib/suricata
 sudo chmod -R 770 /run/suricata
 
-## 2. CONFIGURING SURICATA YAML
-The main configuration file must be pointed to the correct rule files.
-Edit /etc/suricata/suricata.yaml and ensure the following section is updated:
 
-rule-files:
-  - suricata.rules
-
-## 3. CREATING TEST SIGNATURES
-Create a manual rule to verify that the engine is triggering alerts upon detecting ICMP traffic.
+Creating Test Signatures: Create a manual rule 
 File: /var/lib/suricata/rules/suricata.rules
 Content:
 alert icmp any any -> any any (msg:"TEST: Ping Detected"; sid:1000001; rev:1;)
 
-## 4. ENABLING KERNEL CAPABILITIES
-To allow the Suricata process to capture packets on the network interface without running as the root user:
 
-# Set binary capabilities:
+Set binary capabilities:
 sudo setcap cap_net_raw,cap_net_admin,cap_ipc_lock+ep /usr/sbin/suricata
 
-# Configure Systemd Override:
-# Run 'sudo systemctl edit suricata' and add:
-[Service]
-CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_RAW CAP_IPC_LOCK
-AmbientCapabilities=CAP_NET_ADMIN CAP_NET_RAW CAP_IPC_LOCK
 
-## 5. VALIDATING CONFIGURATION
-Always test the configuration for syntax errors before starting the service.
+Test the Configuration for syntax errors before starting the service.
 sudo suricata -T -c /etc/suricata/suricata.yaml -v
+send ping packets from an  other  client  to suricata server
 
-## 6. SERVICE MANAGEMENT AND LIVE TESTING
-Start the service and verify it is actively capturing packets.
-
-# Reload and Start Service:
+Reload and Start Service:
 sudo systemctl daemon-reload
 sudo systemctl enable suricata
 sudo systemctl start suricata
 
-# Manual Live Capture (Diagnostic Mode):
-sudo suricata -c /etc/suricata/suricata.yaml -i enp1s0.60
 
-## 7. MONITORING OUTPUTS
-Verify that alerts are being written to the log files.
-
-# Check if logs are being generated:
+Check if logs are being generated:
 ls -lh /var/log/suricata/fast.log
 
-# Monitor logs in real-time:
+Monitor logs in real-time:
 tail -f /var/log/suricata/fast.log
 
-## 8. TROUBLESHOOTING CHECKLIST
-- SELinux: Check status with 'getenforce'. If 'Enforcing', it may block log writing.
-- Statistics: Run 'grep "capture.kernel_packets" /var/log/suricata/stats.log' to verify packet flow.
-- Interface: Ensure the monitoring interface is UP and receiving traffic.
+
+
+The Ansible vocabulary¶
+The management machine: the machine on which Ansible is installed. Since Ansible is agentless, no software is deployed on the managed servers.
+The managed nodes: the target devices that Ansible manages are also referred to as "hosts." These can be servers, network appliances, or any other computer.
+The inventory: a file containing information about the managed servers.
+The tasks: a task is a block defining a procedure to be executed (e.g., create a user or a group, install a software package, etc.).
+A module: a module abstracts a task. There are many modules provided by Ansible.
+The playbooks: a simple file in yaml format defining the target servers and the tasks to be performed.
+A role: a role allows you to organize the playbooks and all the other necessary files (templates, scripts, etc.) to facilitate the sharing and reuse of code.
+A collection: a collection includes a logical set of playbooks, roles, modules, and plugins.
+The facts: these are global variables containing information about the system (machine name, system version, network interface and configuration, etc.).
+The handlers: these are used to cause a service to be stopped or restarted in the event of a change.
+
+
+
+
+suricata
+
+```bash
+mkdir -p /opt/suricata-central/rules # Create directory for central rule storage
+
+echo 'alert icmp any any -> any any (msg:"CENTRAL: ICMP Test Detected"; sid:1000001; rev:1;)' > /opt/suricata-central/rules/local.rules # Create a sample rule file with English message for testing
+```
+
+/opt/suricata-central/docker-compose.yml
+```yaml
+version: '3.8'
+services:
+  rules-server:
+    image: nginx:1.26-alpine
+    container_name: suricata-rules-server
+    ports:
+      - "44380:80"
+    volumes:
+      - /opt/suricata-central/rules/suricata.rules:/usr/share/nginx/html:ro
+    restart: always
+
+  suricata-update:
+    image: jasonish/suricata:latest
+    container_name: suricata-update
+    volumes:
+      - /opt/suricata-central/rules:/var/lib/suricata/rules
+    command: >
+      suricata-update
+      --output /var/lib/suricata/rules/suricata.rules
+
+```
+docker compose up -d
+docker compose run --rm suricata-update
+
+
+```bash 
+docker run --rm -v /opt/suricata-central/rules:/var/lib/suricata/rules jasonish/suricata:latest suricata-update --local /var/lib/suricata/rules/local.rules
+```
+
+verifixation 
+
+ls -F /opt/suricata-central/rules/ # Dosyaların varlığını gör
+
+
+curl -I http://localhost:44380/suricata.rules  # HTTP servisinin kuralı servis ettiğini gör 
+
+
+curl -s http://localhost:44380/suricata.rules | grep "CENTRAL"  # Kendi kuralının dosya içinde olduğunu gör
+
+
+central  server  ist schon installiert. 
+
+## Sensür side installation and configuration. 
+
+
+mkdir -p /opt/suricata-sensor/config /opt/suricata-sensor/logs
+
+touch /opt/suricata-sensor/config/suricata.yaml
+```yaml
+
+```
+
+docker compose file 
+services:
+  suricata:
+    image: jasonish/suricata:latest
+    container_name: suricata-sensor
+    network_mode: host
+    cap_add:
+      - NET_ADMIN    # Allows managing network interfaces and setting promiscuous mode.
+      - NET_RAW      # Enables capturing raw packets directly from the network interface.
+      - SYS_NICE     # Allows setting process priority to prevent packet drops under load.
+    volumes:
+      - /opt/suricata-sensor/config/suricata.yaml:/etc/suricata/suricata.yaml
+      - /opt/suricata-sensor/logs:/var/log/suricata
+      - /opt/suricata-sensor/rules:/var/lib/suricata/rules
+    restart: always
