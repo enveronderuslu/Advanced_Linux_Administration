@@ -244,7 +244,9 @@ Destination Port Range: 53 (DNS).
 Objective: To implement a lightweight, secure gateway for internal zones (MGMT, APP, DB) to access the internet for updates while maintaining strict "Zero Trust" control with minimal resource consumption.
 Installation
 The proxy service is hosted on an Ubuntu VM within the SEC Zone (10.0.60.0/24).
+```bash
 sudo apt update && sudo apt install squid -y
+```
 Configuration & Access Control
 Refer to the Official Ubuntu Documentation for base settings. Custom configurations and segment-specific whitelists are located in Infrastructure/Squid folder.
 Backup and Validation
@@ -258,11 +260,16 @@ sudo systemctl enable squid
 
 Permissions Management 
 ```bash
-sudo chown -R proxy:proxy /etc/squid/whitelists
+sudo chown -R squid:squid /etc/squid/whitelists
 sudo chmod -R 644 /etc/squid/whitelists/*.txt
-sudo chown -R proxy:proxy /var/log/squid
-sudo chown -R proxy:proxy /var/spool/squid
+sudo chown -R squid:squid /var/log/squid
+sudo chown -R squid:squid /var/spool/squid
 ```
+squid.conf  olusturulduktan sonra 
+```bash
+sudo squid -z
+```
+
 Firewall Implementation
 Allow internal segments to reach Squid Proxy
 Alias Definition
@@ -442,9 +449,20 @@ whitelist_sec.txt
 
 ```vim
 vim /etc/squid/whitelists/whitelist_sec.txt
+.mirrors.cicku.me
+.mirror.vhosting-it.com
+.ctrliq.cloud
+.rockylinux.org
+.fedoraproject.org
+.kernel.org
+.isc.org
+.ansible.com
+.pypi.org
+.pythonhosted.org
+.launchpadcontent.net
+.canonical.com
+.cloudflare.com
 .ubuntu.com
-.archive.ubuntu.com
-.security.ubuntu.com
 .fedoraproject.org
 .suricata-ids.org
 .elastic.co
@@ -468,6 +486,50 @@ EOF
 
 
 
+# NEXUS
+Server Side: Deploying Nexus via Docker
+```bash
+# Create a persistent directory for data and set permissions
+mkdir -p /opt/nexus-data && chown -R 200:200 /opt/nexus-data
+# Run the Nexus container
+docker run -d -p 8081:8081 –restart always --name nexus -v /opt/nexus-data:/nexus-data sonatype/nexus3
+```
+### Nexus Web Interface Configuration (Post-Install)
+Log in and navigate Repositories -> Create repository (yum Proxy)
+
+```vim
+Remote Storages:
+BaseOS : https://dl.rockylinux.org/pub/rocky/10/BaseOS/x86_64/os/
+AppStream : https://dl.rockylinux.org/pub/rocky/10/AppStream/x86_64/os/ 
+EPEL 10: https://dl.fedoraproject.org/pub/epel/10/Everything/x86_64/
+CRB (Rocky 10): https://dl.rockylinux.org/pub/rocky/10/CRB/x86_64/os/
+docker:  https://download.docker.com/linux/rhel/docker-ce.repo
+```
+
+```vim
+Create Group Repo (Unified Entry Point):
+Recipe: yum (group)
+Name: rocky-group
+Members: Add 'rocky-proxy' and 'rocky-appstream' to the members list
+```
+### Client Side Configuration
+```vim
+create /etc/yum.repos.d/nexus.repo
+[nexus-rocky]
+name=Nexus Rocky Group
+baseurl=http://10.0.60.13:8081/repository/rocky-group/
+enabled=1
+gpgcheck=1
+gpgkey=https://dl.rockylinux.org/pub/rocky/RPM-GPG-KEY-Rocky-10
+proxy=_none_
+```
+
+## Verification and Testing
+```vim
+dnf clean all # Clear dnf cache 
+dnf makecache –enablerepo="nexus-rocky" # Build new metadata from Nexus 
+dnf install -y wget –enablerepo="nexus-rocky" # Test installation of a package (e.g., wget)
+```
 
 # DIRECTORY SERVICES-SERVER 
 
@@ -592,6 +654,12 @@ suricata kuracagiz. ortamda freeipa , freeipa-dns-server var. önde pfsense fire
 Ne yapilacaksa adim adim yapilacak. her adimda ikiden fazla adim olmayacak . benden onay almadan diger adima gecmeyeceksin.  Ön ce ne anladigini anlat. Yanlis anlama olmasin. baska ihtiyac duydugun bilgi varsa omlarida söyle.
 
 
+
+
+
+
+
+
 # SURICATA IDS INSTALLATION AND CONFIGURATION
 
 System Preparation and Permissions
@@ -703,22 +771,40 @@ central  server  ist schon installiert.
 mkdir -p /opt/suricata-sensor/config /opt/suricata-sensor/logs
 
 touch /opt/suricata-sensor/config/suricata.yaml
-```yaml
 
-```
-
-docker compose file 
+```yaml 
 services:
   suricata:
     image: jasonish/suricata:latest
     container_name: suricata-sensor
     network_mode: host
     cap_add:
-      - NET_ADMIN    # Allows managing network interfaces and setting promiscuous mode.
-      - NET_RAW      # Enables capturing raw packets directly from the network interface.
-      - SYS_NICE     # Allows setting process priority to prevent packet drops under load.
+      - NET_ADMIN
+      - NET_RAW
+      - SYS_NICE
+    command: -i enp1s0  # PAY ATTENTION 111
     volumes:
       - /opt/suricata-sensor/config/suricata.yaml:/etc/suricata/suricata.yaml
       - /opt/suricata-sensor/logs:/var/log/suricata
       - /opt/suricata-sensor/rules:/var/lib/suricata/rules
     restart: always
+```
+docker compose -f suricata.yaml up -d
+
+
+.api.segment.io
+.cdn.segment.com
+.notify.bugsnag.com
+.sessions.bugsnag.com
+.auth.docker.io
+.cdn.auth0.com
+.login.docker.com
+.auth.docker.com
+.desktop.docker.com
+.hub.docker.com
+.registry-1.docker.io
+.production.cloudflare.docker.com
+.docker-images-prod.6aa30f8b08e16409b46e0173d6de2f56.r2.cloudflarestorage.com
+.docker-pinata-support.s3.amazonaws.com
+.api.dso.docker.com
+.api.docker.com
