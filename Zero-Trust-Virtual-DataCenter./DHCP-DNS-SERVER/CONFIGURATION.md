@@ -789,7 +789,7 @@ services:
       - /opt/suricata-sensor/rules:/var/lib/suricata/rules
     restart: always
 ```
-
+Configuration file
 ```vim
  vim /opt/suricata-sensor/config/suricata.yaml
 
@@ -839,8 +839,6 @@ logging:
 ```
 
 
-
-
 docker compose -f /opt/suricata-sensor/docker-compose.yaml up -d # suan calismaz. daemon düzeyinde docker  icin proxy ayari gerekir. 
 
 ```bash 
@@ -872,11 +870,6 @@ curl -v http://10.0.60.13:44380/suricata.rules \
 docker restart suricata-sensor
 
 
-```vim
-vim /opt/suricata-sensor/update-rules.sh
-
-```
-
 ## ansible  playbook to update rules
 
 ```yaml
@@ -900,6 +893,7 @@ vim /opt/suricata-sensor/update-rules.sh
       command: "docker kill -s USR2 {{ container_name }}"
       when: rule_result.changed
 ```
+
 
 
 
