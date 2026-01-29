@@ -731,7 +731,7 @@ services:
     ports:
       - "44380:80"
     volumes:
-      - /opt/suricata-central/rules/suricata.rules:/usr/share/nginx/html:ro
+  - /opt/suricata-central/rules:/usr/share/nginx/html:ro
     restart: always
 
   suricata-update:
@@ -749,7 +749,7 @@ docker compose run --rm suricata-update
 
 
 ```bash 
-docker run --rm -v /opt/suricata-central/rules:/var/lib/suricata/rules jasonish/suricata:latest suricata-update --local /var/lib/suricata/rules/local.rules
+docker run --rm -v /opt/suricata-central/rules:/var/lib/suricata/rules jasonish/suricata:latest suricata-update 
 ```
 
 verifixation 
@@ -765,12 +765,12 @@ curl -s http://localhost:44380/suricata.rules | grep "CENTRAL"  # Kendi kuralın
 
 central  server  ist schon installiert. 
 
-## Sensür side installation and configuration. 
+## Suricata sensor installation and configuration. 
 
 
-mkdir -p /opt/suricata-sensor/config /opt/suricata-sensor/logs
+mkdir -p /opt/suricata-sensor/config /opt/suricata-sensor/logs /opt/suricata-sensor/rules
 
-touch /opt/suricata-sensor/config/suricata.yaml
+touch /opt/suricata-sensor/docker-compose.yaml
 
 ```yaml 
 services:
@@ -789,22 +789,117 @@ services:
       - /opt/suricata-sensor/rules:/var/lib/suricata/rules
     restart: always
 ```
-docker compose -f suricata.yaml up -d
+
+```vim
+ vim /opt/suricata-sensor/config/suricata.yaml
+
+%YAML 1.1
+
+vars:
+  address-groups:
+    HOME_NET: "[10.0.60.11/32]"
+    EXTERNAL_NET: "!$HOME_NET"
+    HTTP_SERVERS: "$HOME_NET"
+    SMTP_SERVERS: "$HOME_NET"
+    SQL_SERVERS: "$HOME_NET"
+    DNS_SERVERS: "$HOME_NET"
+    TELNET_SERVERS: "$HOME_NET"
+    SNMP_SERVERS: "$HOME_NET"
+
+  port-groups:
+    HTTP_PORTS: "80,443,8080,44380"
+    SHELLCODE_PORTS: "!80"
+    ORACLE_PORTS: "1521"
+    SSH_PORTS: "22"
+
+af-packet:
+  - interface: enp1s0
+    threads: auto
+    cluster-id: 99
+    cluster-type: cluster_flow
+    defrag: yes
+
+default-rule-path: /var/lib/suricata/rules
+rule-files:
+  - local.rules
+
+outputs:
+  - eve-log:
+      enabled: yes
+      filetype: regular
+      filename: /var/log/suricata/eve.json
+      community-id: yes
+  - fast:
+      enabled: yes
+      filename: /var/log/suricata/fast.log
+
+logging:
+  default-log-level: info
+
+```
 
 
-.api.segment.io
-.cdn.segment.com
-.notify.bugsnag.com
-.sessions.bugsnag.com
-.auth.docker.io
-.cdn.auth0.com
-.login.docker.com
-.auth.docker.com
-.desktop.docker.com
-.hub.docker.com
-.registry-1.docker.io
-.production.cloudflare.docker.com
-.docker-images-prod.6aa30f8b08e16409b46e0173d6de2f56.r2.cloudflarestorage.com
-.docker-pinata-support.s3.amazonaws.com
-.api.dso.docker.com
-.api.docker.com
+
+
+docker compose -f /opt/suricata-sensor/docker-compose.yaml up -d # suan calismaz. daemon düzeyinde docker  icin proxy ayari gerekir. 
+
+```bash 
+ek ayar
+proxy  configurations
+
+mkdir -p /etc/systemd/system/docker.service.d
+
+vim /etc/systemd/system/docker.service.d/http-proxy.conf
+[Service]
+Environment="HTTP_PROXY=http://10.0.60.13:3128"
+Environment="HTTPS_PROXY=http://10.0.60.13:3128"
+Environment="NO_PROXY=localhost,127.0.0.1"
+
+
+systemctl daemon-reexec
+systemctl daemon-reload
+systemctl restart docker
+systemctl show docker --property=Environment . test the configs
+```
+
+docker compose -f /opt/suricata-sensor/docker-compose.yaml up -d # now it will work
+
+ls -ld /opt/suricata-sensor/rules
+
+curl -v http://10.0.60.13:44380/suricata.rules \
+-o /opt/suricata-sensor/rules/local.rules # bunun calismasi icin  sensor  client da no-proxy ayari yapilmali. no_proxy="localhost,127.0.0.1,10.0.60.13"
+
+docker restart suricata-sensor
+
+
+```vim
+vim /opt/suricata-sensor/update-rules.sh
+
+```
+
+## ansible  playbook to update rules
+
+```yaml
+- name: Suricata Rule Update Management
+  hosts: suricata_sensors
+  become: yes
+  vars:
+    rule_url: "http://10.0.60.13:44380/suricata.rules"
+    rule_path: "/opt/suricata-sensor/rules/local.rules"
+    container_name: "suricata-sensor"
+
+  tasks:
+    - name: Download updated rules from HTTP server
+      get_url:
+        url: "{{ rule_url }}"
+        dest: "{{ rule_path }}"
+        mode: '0644'
+      register: rule_result
+
+    - name: Trigger Suricata rule reload on change
+      command: "docker kill -s USR2 {{ container_name }}"
+      when: rule_result.changed
+```
+
+
+
