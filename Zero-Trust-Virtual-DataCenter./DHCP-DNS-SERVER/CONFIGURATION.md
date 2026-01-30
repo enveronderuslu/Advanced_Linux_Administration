@@ -760,9 +760,6 @@ ls -F /opt/suricata-central/rules/ # Dosyaların varlığını gör
 curl -I http://localhost:44380/suricata.rules  # HTTP servisinin kuralı servis ettiğini gör 
 
 
-curl -s http://localhost:44380/suricata.rules | grep "CENTRAL"  # Kendi kuralının dosya içinde olduğunu gör
-
-
 central  server  ist schon installiert. 
 
 ## Suricata sensor installation and configuration. 
@@ -894,6 +891,13 @@ docker restart suricata-sensor
       when: rule_result.changed
 ```
 
+create  a user  "ansible". Allow  ehis user  to connect  hosts  with ssh.  We will use this  user for ansible  automation. We create ssh keypair and  upload  public key to freeipa  server. 
 
+sudo -i -u ansible
 
+ssh-keygen -C ansible@example.local
+
+ ipa user-mod ansible  --sshpubkey="$(cat /home/ansible/.ssh/id_ed25519.pub)"
+
+ ssh -o GSSAPIAuthentication=no sec-ips.example.local
 
