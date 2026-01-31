@@ -1,5 +1,5 @@
 ## herstellung von ssh-key-pairs
-kontrol edilecek tüm serverlarda ansible isimli user olusturuldu. Hata olmasi durumunda daha rahat takib edilebilir. 
+kontrol edilecek tüm serverlarda ansible isimli user olusturuldu. Hata olmasi durumunda daha rahat takib edilebilir.
 
 git config --global user.email "enveronderuslu@gmail.com" && git config --global user.name "Enver Onder Uslu"
  
