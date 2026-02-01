@@ -545,8 +545,8 @@ Sonra id1 serverda firewall kurallariyla port lari ac;
 
 ```bash
 firewall-cmd --list-ports 
-firewall-cmd --add-port={123,88,464}/udp --permanent
-firewall-cmd --add-port={80,442,689,636,88,464}/tcp --permanent
+firewall-cmd --add-port={123,88,464,53}/udp --permanent
+firewall-cmd --add-port={80,443,389,636,88,464,53}/tcp --permanent
 sudo firewall-cmd --add-service={freeipa-ldap,freeipa-ldaps,kerberos,dns} --permanent
 sudo firewall-cmd --reload
 firewall-cmd --list-ports # kontrol icin 
@@ -901,3 +901,10 @@ ssh-keygen -C ansible@example.local
 
  ssh -o GSSAPIAuthentication=no sec-ips.example.local
 
+
+
+hostname
+hosts
+ip configuration
+proxy
+suricat
