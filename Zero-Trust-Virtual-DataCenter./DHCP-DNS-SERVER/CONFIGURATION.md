@@ -717,8 +717,6 @@ suricata
 
 ```bash
 mkdir -p /opt/suricata-central/rules # Create directory for central rule storage
-
-echo 'alert icmp any any -> any any (msg:"CENTRAL: ICMP Test Detected"; sid:1000001; rev:1;)' > /opt/suricata-central/rules/local.rules # Create a sample rule file with English message for testing
 ```
 
 /opt/suricata-central/docker-compose.yml
@@ -738,7 +736,7 @@ services:
     image: jasonish/suricata:latest
     container_name: suricata-update
     volumes:
-      - /opt/suricata-central/rules:/var/lib/suricata/rules
+      - /opt/suricata-central/rules/:/var/lib/suricata/rules
     command: >
       suricata-update
       --output /var/lib/suricata/rules/suricata.rules
