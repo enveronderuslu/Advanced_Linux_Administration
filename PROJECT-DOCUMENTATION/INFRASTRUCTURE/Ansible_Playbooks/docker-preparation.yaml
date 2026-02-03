@@ -1,0 +1,16 @@
+---
+- name: Docker Preparation
+  hosts: all
+  become: yes
+  tasks:
+    - name: Add aliasses
+      ansible.builtin.blockinfile:
+        path: /etc/bashrc
+        marker: "# {mark} ANSIBLE MANAGED ALIASES"
+        block: |
+          alias c='clear'
+          alias l='ls -laF'
+          alias ping='ping -c 5'
+          alias ports='ss -tulanp'
+          alias shut='sudo shutdown now'
+        state: present
