@@ -784,61 +784,10 @@ services:
       - /opt/suricata-sensor/rules:/var/lib/suricata/rules
     restart: always
 ```
-Configuration file
-```vim
- vim /opt/suricata-sensor/config/suricata.yaml
-
-%YAML 1.1
-
-vars:
-  address-groups:
-    HOME_NET: "[10.0.60.11/32]"
-    EXTERNAL_NET: "!$HOME_NET"
-    HTTP_SERVERS: "$HOME_NET"
-    SMTP_SERVERS: "$HOME_NET"
-    SQL_SERVERS: "$HOME_NET"
-    DNS_SERVERS: "$HOME_NET"
-    TELNET_SERVERS: "$HOME_NET"
-    SNMP_SERVERS: "$HOME_NET"
-
-  port-groups:
-    HTTP_PORTS: "80,443,8080,44380"
-    SHELLCODE_PORTS: "!80"
-    ORACLE_PORTS: "1521"
-    SSH_PORTS: "22"
-
-af-packet:
-  - interface: enp1s0
-    threads: auto
-    cluster-id: 99
-    cluster-type: cluster_flow
-    defrag: yes
-
-default-rule-path: /var/lib/suricata/rules
-rule-files:
-  - local.rules
-
-outputs:
-  - eve-log:
-      enabled: yes
-      filetype: regular
-      filename: /var/log/suricata/eve.json
-      community-id: yes
-  - fast:
-      enabled: yes
-      filename: /var/log/suricata/fast.log
-
-logging:
-  default-log-level: info
-
-```
-
-
-docker compose -f /opt/suricata-sensor/docker-compose.yaml up -d # suan calismaz. daemon düzeyinde docker  icin proxy ayari gerekir. 
 
 ```bash 
 ek ayar
-proxy  configurations
+docker proxy  configurations
 
 mkdir -p /etc/systemd/system/docker.service.d
 
@@ -849,45 +798,18 @@ Environment="HTTPS_PROXY=http://10.0.60.13:3128"
 Environment="NO_PROXY=localhost,127.0.0.1"
 
 
-systemctl daemon-reexec
+
 systemctl daemon-reload
 systemctl restart docker
 systemctl show docker --property=Environment . test the configs
 ```
 
-docker compose -f /opt/suricata-sensor/docker-compose.yaml up -d # now it will work
 
-ls -ld /opt/suricata-sensor/rules
 
-curl -v http://10.0.60.13:44380/suricata.rules \
--o /opt/suricata-sensor/rules/local.rules # bunun calismasi icin  sensor  client da no-proxy ayari yapilmali. no_proxy="localhost,127.0.0.1,10.0.60.13"
-
-docker restart suricata-sensor
 
 
 ## ansible  playbook to update rules
 
-```yaml
-- name: Suricata Rule Update Management
-  hosts: suricata_sensors
-  become: yes
-  vars:
-    rule_url: "http://10.0.60.13:44380/suricata.rules"
-    rule_path: "/opt/suricata-sensor/rules/local.rules"
-    container_name: "suricata-sensor"
-
-  tasks:
-    - name: Download updated rules from HTTP server
-      get_url:
-        url: "{{ rule_url }}"
-        dest: "{{ rule_path }}"
-        mode: '0644'
-      register: rule_result
-
-    - name: Trigger Suricata rule reload on change
-      command: "docker kill -s USR2 {{ container_name }}"
-      when: rule_result.changed
-```
 
 create  a user  "ansible". Allow  ehis user  to connect  hosts  with ssh.  We will use this  user for ansible  automation. We create ssh keypair and  upload  public key to freeipa  server. 
 
@@ -900,9 +822,12 @@ ssh-keygen -C ansible@example.local
  ssh -o GSSAPIAuthentication=no sec-ips.example.local
 
 
+# LOKI, GRAFANA , PROmetheus
+open the  related ports  on the erver, 
+firewall-cmd --permanent --add-port=3100/tcp (Loki) 
+firewall-cmd --permanent --add-port=9090/tcp (Prometheus) 
+firewall-cmd --permanent --add-port=3000/tcp (Grafana)
 
-hostname
-hosts
-ip configuration
-proxy
-suricat
+firewall-cmd --reload (runtime  almak icin. aksi haldi sadece  diskte kalir)
+firewall-cmd --list-ports (simdi degisiklikler  görünür)
+

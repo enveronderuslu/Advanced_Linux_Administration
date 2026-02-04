@@ -1,0 +1,9 @@
+---
+- name: Install Podman on Rocky Linux
+  hosts: localhost
+  become: true
+  tasks:
+    - name: Install podman package
+      dnf:
+        name: podman
+        state: present
