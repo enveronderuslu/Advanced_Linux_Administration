@@ -7,5 +7,10 @@
 # Set zones and records
 # User for  Amsible auzomatiobs allowed ssh access to internal system with ssh-keygen 
 # Connecting Client to Directory Server
-# Squid server  installation. Client  side configurations
-# Install Suricat-Central-Rule server. Docker application  
+# Squid on pfsense Firewall. Insert the whitelist and subnets  in ACLs part. Bypass Proxy for internal Traffic in General settings. Firewall rule: Allow subnets to access port 3128  of LAN
+# Install Suricata on pfsense
+# Preparation for LOKI-Grafan-Prometheus. Port settings  on local server and  Loki  installation and configuration.  
+
+
+
+

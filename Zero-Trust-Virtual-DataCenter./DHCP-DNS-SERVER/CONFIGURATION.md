@@ -831,3 +831,130 @@ firewall-cmd --permanent --add-port=3000/tcp (Grafana)
 firewall-cmd --reload (runtime  almak icin. aksi haldi sadece  diskte kalir)
 firewall-cmd --list-ports (simdi degisiklikler  görünür)
 
+On pfsense allow subnets to  access  port 3100 and  9090 of  Grafava  server. 
+
+On grafana server 
+```bash
+mkdir -p /mnt/loki-data
+```
+Container silinse bile  veriler silinmesin diye. Why mnt ? Kök dizini veya kullanici dizinleriyle karismasin diye.  
+
+```bash
+chown -R 10001:10001 /mnt/loki-data  # 1001 is the UID of  LOki service
+chcon -Rt svirt_sandbox_file_t /mnt/loki-data
+```
+chcon: Dosya güvenlik etiketini değiştirir.
+
+-Rt: Tüm alt klasörlere uygular (R) ve tipini (t) belirler.
+
+svirt_sandbox_file_t: Podman konteynerine "bu klasör senin sandbox alanına dahil, buraya yazabilirsin" izni verir.
+
+
+vim /mnt/loki-data/loki-config.yaml
+
+```vim
+auth_enabled: false                # Çoklu kullanıcı desteğini (auth) devre dışı bırakır (tek lab ortamı için).
+
+server:
+  http_listen_port: 3100           # Loki'nin API ve Grafana ile haberleşeceği HTTP portu.
+  grpc_listen_port: 9095           # Dahili servis iletişimi için kullanılan gRPC portu.
+
+common:
+  instance_addr: 127.0.0.1         # Servisin çalışacağı yerel adres.
+  path_prefix: /loki               # Verilerin ve geçici dosyaların ana dizin ön eki.
+  storage:
+    filesystem:
+      chunks_directory: /loki/chunks # Log parçalarının (chunk) saklanacağı fiziksel dizin.
+      rules_directory: /loki/rules   # Alarm kurallarının saklanacağı dizin.
+  replication_factor: 1            # Veri kopyalama sayısı (Tek sunucu olduğu için 1).
+  ring:
+    kvstore:
+      store: inmemory              # Kümeleme bilgilerini RAM üzerinde tutar.
+
+schema_config:
+  configs:
+    - from: "2020-10-24"           # Bu yapılandırmanın geçerli olduğu başlangıç tarihi.
+      store: tsdb                  # Yeni nesil depolama motoru (v3 için zorunlu).
+      object_store: filesystem     # Verilerin yerel dosya sistemine yazılacağını belirtir.
+      schema: v13                  # En güncel şema versiyonu (v3 özellikleri için şart).
+      index:
+        prefix: index_             # İndeks dosyalarının isimlendirme ön eki.
+        period: 24h                # Her 24 saatte bir yeni bir indeks dosyası oluşturulur.
+
+limits_config:
+  allow_structured_metadata: true  # Yeni nesil metadata (OTLP vb.) desteğini açar.
+  reject_old_samples: true         # Belirlenen süreden daha eski logların kabulünü reddeder.
+  reject_old_samples_max_age: 168h # 168 saatten (7 gün) eski loglar sisteme alınmaz.
+```
+
+Run the  podman 
+```bash
+podman run -d --name loki -p 3100:3100 -v /mnt/loki-data:/loki -v /mnt/loki-data/loki-config.yaml:/etc/loki/local-config.yaml docker.io/grafana/loki:latest -config.file=/etc/loki/local-config.yaml
+```
+Komutun Parametreleri:
+-d: Konteyneri arka planda (detached) çalıştırır.
+-p 3100:3100: sec-grafana üzerindeki 3100 portunu konteynerin 3100 portuna bağlar.
+-v /mnt/loki-data:/loki: Log verilerinin yazılacağı disk alanını bağlar.
+-v ...:/etc/loki/local-config.yaml: Hazırladığın yapılandırma dosyasını konteynerin içine aktarır.
+-config.file=...: Loki'ye hangi ayar dosyasını kullanacağını söyler.
+
+# Loki config: Client side 
+
+mkdir -p /etc/promtail
+
+vim  /etc/promtail/config.yaml
+```vim
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://10.0.60.11:3100/loki/api/v1/push
+
+scrape_configs:
+  - job_name: system
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: varlogs
+          host: $(hostname)
+          __path__: /var/log/*.log
+```
+
+
+podman;
+```bash
+podman run -d \
+  --name promtail \
+  --replace \
+  -e http_proxy=http://10.0.60.13 \
+  -e https_proxy=http://10.0.60.13 \
+  -e no_proxy=10.0.10.11 \
+  -v /etc/promtail:/etc/promtail:Z \
+  -v /var/log:/var/log:ro \
+  --security-opt label=disable \
+  docker.io/grafana/promtail:latest \
+  -config.file=/etc/promtail/config.yaml
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
