@@ -1,5 +1,23 @@
  Seyyidina Ebu Ümâme, Seyyidina Es'ad bin Zürâre, Seyyidina Avf bin Haris, Seyyidina Rafi bin Malik, Seyyidina Kutbe bin Amir, Seyyidina Ukbe bin Amir, Seyyidina Cabir bin Abdullah
 
+
+The Ansible vocabulary¶
+
+```txt
+The management machine: the machine on which Ansible is installed. Since Ansible is agentless, no software is deployed on the managed servers.
+The managed nodes: the target devices that Ansible manages are also referred to as "hosts." These can be servers, network appliances, or any other computer.
+The inventory: a file containing information about the managed servers.
+The tasks: a task is a block defining a procedure to be executed (e.g., create a user or a group, install a software package, etc.).
+A module: a module abstracts a task. There are many modules provided by Ansible.
+The playbooks: a simple file in yaml format defining the target servers and the tasks to be performed.
+A role: a role allows you to organize the playbooks and all the other necessary files (templates, scripts, etc.) to facilitate the sharing and reuse of code.
+A collection: a collection includes a logical set of playbooks, roles, modules, and plugins.
+The facts: these are global variables containing information about the system (machine name, system version, network interface and configuration, etc.).
+The handlers: these are used to cause a service to be stopped or restarted in the event of a change.
+
+```
+
+
 ssh-copy-id
 
 ansible fedora -m user -a "name=yeni_kullanici_adi state=present create_home=yes" --become -K
@@ -222,7 +240,7 @@ pöay esnasinda kullanilmak üzere bilgi  üretir. Somra veriable  gibi kullanir
 ```
 
 
-direk "when  kullanamaz,iydi? "
+direk "when  kullanamazmiydi? "
 
 
 when komutu tek başına sadece Ansible'ın zaten bildiği "hazır" bilgileri (işletim sistemi, IP adresi gibi Facts verilerini) veya senin tanımladığın Variable'ları kontrol edebilir.

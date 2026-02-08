@@ -377,98 +377,37 @@ whitelist_mgmt.txt
 
 ```vim
 vim /etc/squid/whitelists/whitelist_mgmt.txt
-.ubuntu.com
-.archive.ubuntu.com
-.security.ubuntu.com
-download.rockylinux.org
-dl.rockylinux.org
-vault.rockylinux.org
-dl.fedoraproject.org
-download.fedoraproject.org/pub/epel
-mirrors.fedoraproject.org
+.ntvspor.net
 .rockylinux.org
-.fedoraproject.org
-.kernel.org
-.isc.org
-.ansible.com
-.pypi.org
-.pythonhosted.org
-.launchpadcontent.net
-.canonical.com
-.cloudflare.com
-```
-
-whitelist_corp.txt 
-
-```vim
-vim /etc/squid/whitelists/whitelist_corp.txt
-.ubuntu.com
-.archive.ubuntu.com
-.security.ubuntu.com
-.fedoraproject.org
-```
-
-whitelist_dmz.txt 
-
-```vim
-vim /etc/squid/whitelists/whitelist_dmz.txt
-.ubuntu.com
-.archive.ubuntu.com
-.security.ubuntu.com
-.fedoraproject.org
-.nginx.org
-.haproxy.org
-```
-
-whitelist_app.txt 
-
-```vim
-vim /etc/squid/whitelists/whitelist_app.txt
-.ubuntu.com
-.archive.ubuntu.com
-.security.ubuntu.com
-.fedoraproject.org
-.kubernetes.io
-.docker.com
-.io.containerd
-```
-
-whitelist_db.txt 
-
-```vim
-vim /etc/squid/whitelists/whitelist_db.txt
-.ubuntu.com
-.archive.ubuntu.com
-.security.ubuntu.com
-.fedoraproject.org
-.mariadb.org
-.postgresql.org
-```
-
-whitelist_sec.txt 
-
-```vim
-vim /etc/squid/whitelists/whitelist_sec.txt
+.mirrors.rockylinux.org
 .mirrors.cicku.me
 .mirror.vhosting-it.com
 .ctrliq.cloud
-.rockylinux.org
 .fedoraproject.org
 .kernel.org
-.isc.org
+.docker.com
+.docker.io
+.auth.docker.io
+.registry-1.docker.io
+.production.cloudflare.docker.com
+.quay.io
+.gcr.io
+.grafana.com
+.prometheus.io
+.elastic.co
 .ansible.com
 .pypi.org
 .pythonhosted.org
+.files.pythonhosted.org
 .launchpadcontent.net
 .canonical.com
-.cloudflare.com
 .ubuntu.com
-.fedoraproject.org
 .suricata-ids.org
-.elastic.co
-.prometheus.io
-.grafana.com
+.cloudflare.com
+.isc.org
+.pool.ntp.org
 ```
+
 
 create  these files wita script
 
@@ -624,7 +563,7 @@ sudo dnf install freeipa-client
 sudo ipa-client-install --mkhomedir
 reboot
 ```
-
+http://localhost:5000
 Ne iskime yarayacak bunlar ?
 . client ta 'kinit admin' yap. Freeipa da olusturulan users sorgula  'id c.ademov' 
 
@@ -662,12 +601,16 @@ Ne yapilacaksa adim adim yapilacak. her adimda ikiden fazla adim olmayacak . ben
 
 # SURICATA IDS INSTALLATION AND CONFIGURATION
 
-System Preparation and Permissions
+IDS/IPS (Suricata) implementation for threat detection.
+    • Objektive: To monitor all traffic (both incoming and outgoing) on pfSense using Suricata. 
+    • Installation: On the Firewall navigate to System > Package Manager > Available Packages. Then install Suricata on pfSene 
+    • Global Settings & Rule Updates:  Download the threat signatures: Go to Services > Suricata > Global Settings and  
+    • Check the boxes for:  Emerging Threats Open Rules (Free and excellent). Go to the Updates tab and click Update.
+    • Configuring Interfaces (WAN and LAN): For each interface (WAN, LAN, etc.):  Interfaces > Suricata Add.
+    • Logging Settings: Check Send Alerts to System Log amd Check EVE Log.
+    • Categories: Go to the Categories tab for that interface, select the rules you want (e.g., malware-cnc, exploit, scan), and click Save.
 
-sudo chown -R suricata:suricata /var/log/suricata /var/lib/suricata /run/suricata
-sudo chmod -R 750 /var/log/suricata
-sudo chmod -R 770 /var/lib/suricata
-sudo chmod -R 770 /run/suricata
+
 
 
 Creating Test Signatures: Create a manual rule 
@@ -676,133 +619,6 @@ Content:
 alert icmp any any -> any any (msg:"TEST: Ping Detected"; sid:1000001; rev:1;)
 
 
-Set binary capabilities:
-sudo setcap cap_net_raw,cap_net_admin,cap_ipc_lock+ep /usr/sbin/suricata
-
-
-Test the Configuration for syntax errors before starting the service.
-sudo suricata -T -c /etc/suricata/suricata.yaml -v
-send ping packets from an  other  client  to suricata server
-
-Reload and Start Service:
-sudo systemctl daemon-reload
-sudo systemctl enable suricata
-sudo systemctl start suricata
-
-
-Check if logs are being generated:
-ls -lh /var/log/suricata/fast.log
-
-Monitor logs in real-time:
-tail -f /var/log/suricata/fast.log
-
-
-
-The Ansible vocabulary¶
-The management machine: the machine on which Ansible is installed. Since Ansible is agentless, no software is deployed on the managed servers.
-The managed nodes: the target devices that Ansible manages are also referred to as "hosts." These can be servers, network appliances, or any other computer.
-The inventory: a file containing information about the managed servers.
-The tasks: a task is a block defining a procedure to be executed (e.g., create a user or a group, install a software package, etc.).
-A module: a module abstracts a task. There are many modules provided by Ansible.
-The playbooks: a simple file in yaml format defining the target servers and the tasks to be performed.
-A role: a role allows you to organize the playbooks and all the other necessary files (templates, scripts, etc.) to facilitate the sharing and reuse of code.
-A collection: a collection includes a logical set of playbooks, roles, modules, and plugins.
-The facts: these are global variables containing information about the system (machine name, system version, network interface and configuration, etc.).
-The handlers: these are used to cause a service to be stopped or restarted in the event of a change.
-
-
-
-
-suricata
-
-```bash
-mkdir -p /opt/suricata-central/rules # Create directory for central rule storage
-```
-
-/opt/suricata-central/docker-compose.yml
-```yaml
-version: '3.8'
-services:
-  rules-server:
-    image: nginx:1.26-alpine
-    container_name: suricata-rules-server
-    ports:
-      - "44380:80"
-    volumes:
-  - /opt/suricata-central/rules:/usr/share/nginx/html:ro
-    restart: always
-
-  suricata-update:
-    image: jasonish/suricata:latest
-    container_name: suricata-update
-    volumes:
-      - /opt/suricata-central/rules/:/var/lib/suricata/rules
-    command: >
-      suricata-update
-      --output /var/lib/suricata/rules/suricata.rules
-
-```
-docker compose up -d
-docker compose run --rm suricata-update
-
-
-```bash 
-docker run --rm -v /opt/suricata-central/rules:/var/lib/suricata/rules jasonish/suricata:latest suricata-update 
-```
-
-verifixation 
-
-ls -F /opt/suricata-central/rules/ # Dosyaların varlığını gör
-
-
-curl -I http://localhost:44380/suricata.rules  # HTTP servisinin kuralı servis ettiğini gör 
-
-
-central  server  ist schon installiert. 
-
-## Suricata sensor installation and configuration. 
-
-
-mkdir -p /opt/suricata-sensor/config /opt/suricata-sensor/logs /opt/suricata-sensor/rules
-
-touch /opt/suricata-sensor/docker-compose.yaml
-
-```yaml 
-services:
-  suricata:
-    image: jasonish/suricata:latest
-    container_name: suricata-sensor
-    network_mode: host
-    cap_add:
-      - NET_ADMIN
-      - NET_RAW
-      - SYS_NICE
-    command: -i enp1s0  # PAY ATTENTION 111
-    volumes:
-      - /opt/suricata-sensor/config/suricata.yaml:/etc/suricata/suricata.yaml
-      - /opt/suricata-sensor/logs:/var/log/suricata
-      - /opt/suricata-sensor/rules:/var/lib/suricata/rules
-    restart: always
-```
-
-```bash 
-ek ayar
-docker proxy  configurations
-
-mkdir -p /etc/systemd/system/docker.service.d
-
-vim /etc/systemd/system/docker.service.d/http-proxy.conf
-[Service]
-Environment="HTTP_PROXY=http://10.0.60.13:3128"
-Environment="HTTPS_PROXY=http://10.0.60.13:3128"
-Environment="NO_PROXY=localhost,127.0.0.1"
-
-
-
-systemctl daemon-reload
-systemctl restart docker
-systemctl show docker --property=Environment . test the configs
-```
 
 
 
@@ -831,7 +647,7 @@ firewall-cmd --permanent --add-port=3000/tcp (Grafana)
 firewall-cmd --reload (runtime  almak icin. aksi haldi sadece  diskte kalir)
 firewall-cmd --list-ports (simdi degisiklikler  görünür)
 
-On pfsense allow subnets to  access  port 3100 and  9090 of  Grafava  server. 
+On pfsense allow subnets to  access  port 3100 and  9090 of  Grafana  server. 
 
 On grafana server 
 ```bash
@@ -930,10 +746,6 @@ podman;
 ```bash
 podman run -d \
   --name promtail \
-  --replace \
-  -e http_proxy=http://10.0.60.13 \
-  -e https_proxy=http://10.0.60.13 \
-  -e no_proxy=10.0.10.11 \
   -v /etc/promtail:/etc/promtail:Z \
   -v /var/log:/var/log:ro \
   --security-opt label=disable \
