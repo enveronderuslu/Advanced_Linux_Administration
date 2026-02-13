@@ -1,0 +1,25 @@
+---
+- name: Create Promtail configuration directory
+  file:
+    path: /opt/promtail
+    state: directory
+    mode: '0755'
+
+- name: Deploy Promtail configuration from template
+  template:
+    src: promtail-config.yaml.j2
+    dest: /opt/promtail/promtail-config.yaml
+    mode: '0644'
+
+- name: Start Promtail container via Podman
+  containers.podman.podman_container:
+    name: promtail
+    image: docker.io/grafana/promtail:latest
+    state: started
+    recreate: yes
+    privileged: yes
+    network_mode: host
+    volumes:
+      - /opt/promtail/promtail-config.yaml:/etc/promtail/config.yml:ro
+      - /var/log:/var/log:ro
+    command: -config.file=/etc/promtail/config.yml

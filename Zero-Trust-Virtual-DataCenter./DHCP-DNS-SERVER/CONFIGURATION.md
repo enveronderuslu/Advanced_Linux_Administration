@@ -309,6 +309,7 @@ File: /etc/dnf/dnf.conf
 proxy=http://10.0.60.13:3128
 ```
 
+
 ## REQUired Documents
 /etc/squid.conf
 ```vim
@@ -317,13 +318,13 @@ http_port 3128
 visible_hostname squid.example.local
 
 # --- NETWORK SEGMENTATION (ACLs) ---
-acl MGMT src 10.0.10.0/24
+acl MGMT src     10.0.10.0/24
 acl CORP_LAN src 10.0.20.0/24
-acl DMZ src 10.0.30.0/24
-acl APP src 10.0.40.0/24
-acl DB src 10.0.50.0/24
-acl SEC_OPS src 10.0.60.0/24
-acl GUEST src 10.0.70.0/24
+acl DMZ src      10.0.30.0/24
+acl APP src      10.0.40.0/24
+acl DB src       10.0.50.0/24
+acl SEC_OPS src  10.0.60.0/24
+acl GUEST src    10.0.70.0/24
 acl localhost src 127.0.0.1/32
 
 # --- TARGETS (Whitelists) ---
@@ -491,6 +492,7 @@ sudo firewall-cmd --reload
 firewall-cmd --list-ports # kontrol icin 
 ```
 
+
 freeipa kurduktan sonra ca-agent.p12, cacert.p12(en önemlisi bu) ve .dogtag gibi dosyalar olusur. Bunlari `ipa-backup` ile yedeklemek lazim. 
 
 LDAP dizin verileri (kullanıcılar, gruplar, politikalar), CA (Sertifika Otoritesi) dosyaları, DNS kayıtları ve Kerberos anahtarları yedeklenir ve varsayılan olarak /var/lib/ipa/backup/ dizini saklanır.
@@ -567,6 +569,12 @@ http://localhost:5000
 Ne iskime yarayacak bunlar ?
 . client ta 'kinit admin' yap. Freeipa da olusturulan users sorgula  'id c.ademov' 
 
+
+
+
+
+
+
 . Simdi user lara sudo hakki verilecek. FreeIPA Server Terminalinde:
 ```bash
 ipa sudorule-add rule-name-SUDO1
@@ -585,18 +593,6 @@ GUI daha iyi dersen ;
 . Gerekirse RunAs sekmesinde ALL tanımla
 
 systemctl  --failed # shows  the failed services
-
-
-
-suricata kuracagiz. ortamda freeipa , freeipa-dns-server var. önde pfsense firewall var. Nexus proxy sunucudan paketler cekiliyor. simdi SEC sanal aginda 10.0.60.11 statik ip li rocky linux sunucuya suricata kuracagiz. ortandaki tüm makinalarin üzerindeki  isletim sistemi Rocky  linux 10.1.
-
-Ne yapilacaksa adim adim yapilacak. her adimda ikiden fazla adim olmayacak . benden onay almadan diger adima gecmeyeceksin.  Ön ce ne anladigini anlat. Yanlis anlama olmasin. baska ihtiyac duydugun bilgi varsa omlarida söyle.
-
-
-
-
-
-
 
 
 # SURICATA IDS INSTALLATION AND CONFIGURATION
@@ -635,91 +631,67 @@ ssh-keygen -C ansible@example.local
 
  ipa user-mod ansible  --sshpubkey="$(cat /home/ansible/.ssh/id_ed25519.pub)"
 
- ssh -o GSSAPIAuthentication=no sec-ips.example.local
+ ssh -o GSSAPIAuthentication=no mgmt-ipa.example.local
 
 
 # LOKI, GRAFANA , PROmetheus
-open the  related ports  on the erver, 
-firewall-cmd --permanent --add-port=3100/tcp (Loki) 
-firewall-cmd --permanent --add-port=9090/tcp (Prometheus) 
-firewall-cmd --permanent --add-port=3000/tcp (Grafana)
 
-firewall-cmd --reload (runtime  almak icin. aksi haldi sadece  diskte kalir)
-firewall-cmd --list-ports (simdi degisiklikler  görünür)
-
-On pfsense allow subnets to  access  port 3100 and  9090 of  Grafana  server. 
-
-On grafana server 
-```bash
-mkdir -p /mnt/loki-data
+```bash 
+mkdir -p /mnt/loki/config /mnt/loki/data
+chown -R 10001:10001 /mnt/loki/data
+semanage fcontext -a -t container_file_t "/mnt/loki(/.*)?"
+restorecon -Rv /mnt/loki
 ```
-Container silinse bile  veriler silinmesin diye. Why mnt ? Kök dizini veya kullanici dizinleriyle karismasin diye.  
 
-```bash
-chown -R 10001:10001 /mnt/loki-data  # 1001 is the UID of  LOki service
-chcon -Rt svirt_sandbox_file_t /mnt/loki-data
-```
-chcon: Dosya güvenlik etiketini değiştirir.
-
--Rt: Tüm alt klasörlere uygular (R) ve tipini (t) belirler.
-
-svirt_sandbox_file_t: Podman konteynerine "bu klasör senin sandbox alanına dahil, buraya yazabilirsin" izni verir.
-
-
-vim /mnt/loki-data/loki-config.yaml
-
-```vim
-auth_enabled: false                # Çoklu kullanıcı desteğini (auth) devre dışı bırakır (tek lab ortamı için).
+vim /mnt/loki/config/loki-config.yaml
+```yaml
+auth_enabled: false
 
 server:
-  http_listen_port: 3100           # Loki'nin API ve Grafana ile haberleşeceği HTTP portu.
-  grpc_listen_port: 9095           # Dahili servis iletişimi için kullanılan gRPC portu.
+  http_listen_port: 3100
 
 common:
-  instance_addr: 127.0.0.1         # Servisin çalışacağı yerel adres.
-  path_prefix: /loki               # Verilerin ve geçici dosyaların ana dizin ön eki.
+  instance_addr: 127.0.0.1
+  path_prefix: /tmp/loki
   storage:
     filesystem:
-      chunks_directory: /loki/chunks # Log parçalarının (chunk) saklanacağı fiziksel dizin.
-      rules_directory: /loki/rules   # Alarm kurallarının saklanacağı dizin.
-  replication_factor: 1            # Veri kopyalama sayısı (Tek sunucu olduğu için 1).
+      chunks_directory: /tmp/loki/chunks
+      rules_directory: /tmp/loki/rules
+  replication_factor: 1
   ring:
     kvstore:
-      store: inmemory              # Kümeleme bilgilerini RAM üzerinde tutar.
+      store: inmemory
+
+# Yeni eklenen bölüm: Eski şema uyumluluğu için gerekli
+limits_config:
+  allow_structured_metadata: false
 
 schema_config:
   configs:
-    - from: "2020-10-24"           # Bu yapılandırmanın geçerli olduğu başlangıç tarihi.
-      store: tsdb                  # Yeni nesil depolama motoru (v3 için zorunlu).
-      object_store: filesystem     # Verilerin yerel dosya sistemine yazılacağını belirtir.
-      schema: v13                  # En güncel şema versiyonu (v3 özellikleri için şart).
+    - from: 2020-10-24
+      store: boltdb-shipper
+      object_store: filesystem
+      schema: v11
       index:
-        prefix: index_             # İndeks dosyalarının isimlendirme ön eki.
-        period: 24h                # Her 24 saatte bir yeni bir indeks dosyası oluşturulur.
-
-limits_config:
-  allow_structured_metadata: true  # Yeni nesil metadata (OTLP vb.) desteğini açar.
-  reject_old_samples: true         # Belirlenen süreden daha eski logların kabulünü reddeder.
-  reject_old_samples_max_age: 168h # 168 saatten (7 gün) eski loglar sisteme alınmaz.
+        prefix: index_
+        period: 24h
 ```
+firewall-cmd --permanent --add-port=3100/tcp
+firewall-cmd --reload
 
-Run the  podman 
 ```bash
-podman run -d --name loki -p 3100:3100 -v /mnt/loki-data:/loki -v /mnt/loki-data/loki-config.yaml:/etc/loki/local-config.yaml docker.io/grafana/loki:latest -config.file=/etc/loki/local-config.yaml
+podman run -d --name loki --restart always -v /opt/loki:/mnt/config -p 3100:3100 grafana/loki:latest -config.file=/mnt/config/loki-config.yaml
 ```
-Komutun Parametreleri:
--d: Konteyneri arka planda (detached) çalıştırır.
--p 3100:3100: sec-grafana üzerindeki 3100 portunu konteynerin 3100 portuna bağlar.
--v /mnt/loki-data:/loki: Log verilerinin yazılacağı disk alanını bağlar.
--v ...:/etc/loki/local-config.yaml: Hazırladığın yapılandırma dosyasını konteynerin içine aktarır.
--config.file=...: Loki'ye hangi ayar dosyasını kullanacağını söyler.
 
-# Loki config: Client side 
+podman ps -f name=loki  # ist er angefangen
 
-mkdir -p /etc/promtail
+## Promtail installation
 
-vim  /etc/promtail/config.yaml
-```vim
+sudo mkdir -p /opt/promtail
+sudo vim /opt/promtail/promtail-config.yaml
+   
+
+```yaml
 server:
   http_listen_port: 9080
   grpc_listen_port: 0
@@ -728,31 +700,32 @@ positions:
   filename: /tmp/positions.yaml
 
 clients:
-  - url: http://10.0.60.11:3100/loki/api/v1/push
+  - url: http://10.0.60.13:3100/loki/api/v1/push
 
 scrape_configs:
-  - job_name: system
-    static_configs:
-      - targets:
-          - localhost
-        labels:
-          job: varlogs
-          host: $(hostname)
-          __path__: /var/log/*.log
+- job_name: system
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: varlogs
+      host: mgmt-bastion
+      __path__: /var/log/*.log
 ```
 
-
-podman;
-```bash
+```podman
 podman run -d \
   --name promtail \
-  -v /etc/promtail:/etc/promtail:Z \
+  --privileged \
+  -v /opt/promtail/promtail-config.yaml:/etc/promtail/config.yml:ro \
   -v /var/log:/var/log:ro \
-  --security-opt label=disable \
+  --net=host \
   docker.io/grafana/promtail:latest \
-  -config.file=/etc/promtail/config.yaml
+  -config.file=/etc/promtail/config.yml
 ```
 
+Verification: On Loki server; 
+curl -G "http://10.0.60.13:3100/loki/api/v1/labels"
 
 
 
@@ -764,6 +737,19 @@ podman run -d \
 
 
 
+
+
+
+
+## Grafana
+sudo dnf install -y grafana
+sudo systemctl enable --now grafana-server
+
+sudo firewall-cmd --permanent --add-port=3000/tcp
+sudo firewall-cmd --reload
+
+
+http://10.0.60.11:3000  admin/admin
 
 
 
