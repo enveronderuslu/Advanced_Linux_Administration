@@ -1,0 +1,51 @@
+---
+- name: Create Docker service configuration directory
+  file:
+    path: /etc/systemd/system/docker.service.d
+    state: directory
+    mode: '0755'
+
+- name: Deploy Docker service configuration from template
+  template:
+    src: docker_on_RHEL-config.yaml.j2
+    dest: /etc/systemd/system/docker.service.d/http-proxy.conf
+    mode: '0644'
+
+- name: Remove old Docker versions
+  dnf:
+    name:
+      - docker
+      - docker-client
+      - docker-client-latest
+      - docker-common
+      - docker-latest
+      - docker-latest-logrotate
+      - docker-logrotate
+      - docker-engine
+    state: absent
+
+- name: Install required packages
+  dnf:
+    name:
+      - dnf-plugins-core
+    state: present
+
+- name: Add Docker repository
+  command: dnf config-manager --add-repo https://download.docker.com/linux/rhel/docker-ce.repo
+  args:
+    creates: /etc/yum.repos.d/docker-ce.repo
+
+- name: Install Docker Engine
+  dnf:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+    state: latest
+
+- name: Reload systemd daemon
+  command: systemctl daemon-reexec
+
+- name: Reload system

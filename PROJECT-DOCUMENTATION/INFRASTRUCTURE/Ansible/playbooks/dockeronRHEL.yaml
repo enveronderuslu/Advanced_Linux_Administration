@@ -1,0 +1,5 @@
+- name: Deploy Promtail to All Servers
+  hosts: Servers
+  become: yes
+  roles:
+    - dockeronRGEL
