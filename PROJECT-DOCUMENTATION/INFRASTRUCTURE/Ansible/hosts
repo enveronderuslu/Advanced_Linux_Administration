@@ -1,6 +1,6 @@
 [mgmt_servers]
 mgmt-ipa      ansible_host=10.0.10.6
-mgmt-bastion  ansible_host=10.0.10.7
+
 
 [corplan_workstations]
 corp-ws1      ansible_host=10.0.20.11
@@ -14,13 +14,19 @@ db-srv1       ansible_host=10.0.50.11
 [app_servers]
 app-srv1      ansible_host=10.0.40.11
 
+[control_node]
+localhost ansible_connection=local
+
 [Servers:children]
 mgmt_servers
 corplan_workstations
 sec_servers
 db_servers
 app_servers
+control_node
+
 
 [all:vars]
 ansible_user=ansible
 ansible_ssh_private_key_file=/home/ansible/.ssh/id_ed25519
+

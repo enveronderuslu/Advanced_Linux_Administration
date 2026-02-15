@@ -680,56 +680,18 @@ firewall-cmd --permanent --add-port=3100/tcp
 firewall-cmd --reload
 
 ```bash
-podman run -d --name loki --restart always -v /opt/loki:/mnt/config -p 3100:3100 grafana/loki:latest -config.file=/mnt/config/loki-config.yaml
+docker run -d --name loki --restart always -v /opt/loki:/mnt/config -p 3100:3100 grafana/loki:latest -config.file=/mnt/config/loki-config.yaml
 ```
 
-podman ps -f name=loki  # ist er angefangen
+docker ps --filter name=loki  # ist er angefangen
+
+
 
 ## Promtail installation
-
-sudo mkdir -p /opt/promtail
-sudo vim /opt/promtail/promtail-config.yaml
-   
-
-```yaml
-server:
-  http_listen_port: 9080
-  grpc_listen_port: 0
-
-positions:
-  filename: /tmp/positions.yaml
-
-clients:
-  - url: http://10.0.60.13:3100/loki/api/v1/push
-
-scrape_configs:
-- job_name: system
-  static_configs:
-  - targets:
-      - localhost
-    labels:
-      job: varlogs
-      host: mgmt-bastion
-      __path__: /var/log/*.log
+finf  deployment files  in Ansible folder. install following on Controller. 
+```bash
+ansible-galaxy collection install community.docker
 ```
-
-```podman
-podman run -d \
-  --name promtail \
-  --privileged \
-  -v /opt/promtail/promtail-config.yaml:/etc/promtail/config.yml:ro \
-  -v /var/log:/var/log:ro \
-  --net=host \
-  docker.io/grafana/promtail:latest \
-  -config.file=/etc/promtail/config.yml
-```
-
-Verification: On Loki server; 
-curl -G "http://10.0.60.13:3100/loki/api/v1/labels"
-
-
-
-
 
 
 
