@@ -651,18 +651,17 @@ server:
   http_listen_port: 3100
 
 common:
-  instance_addr: 127.0.0.1
-  path_prefix: /tmp/loki
+  instance_addr: 0.0.0.0
+  path_prefix: /var/lib/loki
   storage:
     filesystem:
-      chunks_directory: /tmp/loki/chunks
-      rules_directory: /tmp/loki/rules
+      chunks_directory: /var/lib/loki/chunks
+      rules_directory: /var/lib/loki/rules
   replication_factor: 1
   ring:
     kvstore:
       store: inmemory
 
-# Yeni eklenen bölüm: Eski şema uyumluluğu için gerekli
 limits_config:
   allow_structured_metadata: false
 
@@ -675,12 +674,20 @@ schema_config:
       index:
         prefix: index_
         period: 24h
+
 ```
 firewall-cmd --permanent --add-port=3100/tcp
 firewall-cmd --reload
 
 ```bash
-docker run -d --name loki --restart always -v /opt/loki:/mnt/config -p 3100:3100 grafana/loki:latest -config.file=/mnt/config/loki-config.yaml
+docker run -d \
+  --name loki \
+  --restart always \
+  -v /mnt/loki/config:/mnt/config \
+  -v /mnt/loki/data:/var/lib/loki \
+  -p 3100:3100 \
+  grafana/loki:latest \
+  -config.file=/mnt/config/loki-config.yaml
 ```
 
 docker ps --filter name=loki  # ist er angefangen
@@ -694,15 +701,6 @@ ansible-galaxy collection install community.docker
 ```
 
 
-
-
-
-
-
-
-
-
-
 ## Grafana
 sudo dnf install -y grafana
 sudo systemctl enable --now grafana-server
@@ -711,7 +709,7 @@ sudo firewall-cmd --permanent --add-port=3000/tcp
 sudo firewall-cmd --reload
 
 
-http://10.0.60.11:3000  admin/admin
+http://10.0.60.13:3000  admin/admin
 
 
 

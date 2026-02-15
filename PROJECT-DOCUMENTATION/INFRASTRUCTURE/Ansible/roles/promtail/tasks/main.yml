@@ -22,4 +22,5 @@
     volumes:
       - /opt/promtail/promtail-config.yaml:/etc/promtail/config.yml:ro
       - /var/log:/var/log:ro
+      - /opt/promtail/positions:/var/lib/promtail
     command: -config.file=/etc/promtail/config.yml
