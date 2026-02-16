@@ -1,0 +1,6 @@
+---
+- name: Install node-exporter container
+  hosts: Servers
+  become: true
+  roles:
+    - node-exporter

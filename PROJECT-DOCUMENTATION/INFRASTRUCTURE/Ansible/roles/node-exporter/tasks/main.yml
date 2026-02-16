@@ -1,0 +1,24 @@
+- name: Allow Prometheus IP to access Node Exporter port (9100)
+  ansible.posix.firewalld:
+    rich_rule: 'rule family="ipv4" source address="{{ sec-loki }}" port protocol="tcp" port="9100" accept'
+    permanent: yes
+    state: enabled
+    immediate: yes
+
+- name: Start Node Exporter container
+  community.docker.docker_container:
+    name: node-exporter
+    image: prom/node-exporter:latest
+    state: started
+    restart_policy: always
+    network_mode: host
+    privileged: yes
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--path.rootfs=/rootfs'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'

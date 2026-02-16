@@ -1,0 +1,16 @@
+---
+- name: Deploy Prometheus Container
+  hosts: sec-loki
+  become: true
+  tasks:
+    - name: Run Prometheus container
+      community.docker.docker_container:
+        name: prometheus
+        image: prom/prometheus
+        state: started
+        restart_policy: always
+        published_ports:
+          - "19090:9090"
+        volumes:
+          - /opt/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+          - /opt/prometheus/data:/prometheus
