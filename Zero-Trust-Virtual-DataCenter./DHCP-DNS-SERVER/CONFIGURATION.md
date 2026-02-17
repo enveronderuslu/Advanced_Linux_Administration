@@ -763,3 +763,6 @@ verify  deployment  on Prometheus  server
 
 curl -s http://localhost:19090/api/v1/targets | jq '.data.activeTargets[] | {node: .discoveredLabels.__address__, health: .health}'
 
+
+# DMZ 
+nginx reverse  proxy  kurulacak .
