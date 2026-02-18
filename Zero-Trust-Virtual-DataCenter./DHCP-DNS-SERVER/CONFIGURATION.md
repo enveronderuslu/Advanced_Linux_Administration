@@ -765,4 +765,14 @@ curl -s http://localhost:19090/api/v1/targets | jq '.data.activeTargets[] | {nod
 
 
 # DMZ 
-nginx reverse  proxy  kurulacak .
+nginx reverse  proxy  kurulacak. 
+
+dnf install epel-release -y
+dnf install nginx -y
+systemctl enable --now nginx
+
+firewall-cmd --permanent --add-service=http
+firewall-cmd --permanent --add-service=https
+firewall-cmd --reload
+
+setsebool -P httpd_can_network_connect 1
