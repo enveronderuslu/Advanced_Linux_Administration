@@ -1,0 +1,7 @@
+---
+- name: Deploy Docker service configuration from template
+  template:
+    src: alias.yaml.j2
+    dest: /etc/profile.d/custom_aliases.sh
+    mode: '0644'
+
