@@ -1,0 +1,33 @@
+---
+
+  - hosts: ubuntu_Servers
+    become: true
+    tasks:
+  
+
+    - name: uninstall Apeche2 and PHP
+      apt:
+        name:
+         - apache2
+         - libapache2-mod-php
+        state: absent
+      when: ansible_distribution == "Ubuntu" 
+      
+
+  - hosts: rhel_Servers
+    become: true
+    tasks:
+  
+
+
+
+    - name: uninstall httpd and PHP
+      apt:
+        name:
+         - httpd
+         - php
+        state: absent
+      when: ansible_distribution == "Rocky" 
+      
+       
+

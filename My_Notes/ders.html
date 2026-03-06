@@ -1,0 +1,968 @@
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ssh-keygen</span> <span class="at">-t</span> rsa <span class="at">-b</span> 4096</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">ssh-copy-id</span> <span class="at">-i</span> ~/.ssh/id_rsa.pub ansible@192.168.178.115</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> <span class="kw">;</span> <span class="fu">date</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">Sample_file</span>  myapp         </span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">Fri</span> Aug 15 09:01:39 PM CEST 2025</span></code></pre></div>
+<p>&amp;&amp; baglacida ; gibi kullanilabilir fakat komut1 &amp;&amp;
+komut2 farkli anlama gelir. birinci calisr isi biterse ikinci calisir. ;
+de birbirinden bagimsiz calisir. benzer sekilde komut1 || komut2 var. Bu
+defa sol taraf hata dönerde sag taraf calisir- sol taraf calisirsa sag
+calismaz. XOR gibi</p>
+<p>yine command &amp; ie komut arka planda calisir # Red Hat Linux Notes
+# Linux System Basics – Quick Notes sudo derdinden kurtulmak istiyorum:
+Hedef makinada şu komutla sudoers dosyasına özel bir kural ekle:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> visudo</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="bu">test</span> ALL=<span class="er">(</span><span class="ex">ALL</span><span class="kw">)</span> <span class="ex">NOPASSWD:</span> ALL</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Eğer sadece reboot komutu için yetki vermek istersen:</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="bu">test</span> ALL=<span class="er">(</span><span class="ex">ALL</span><span class="kw">)</span> <span class="ex">NOPASSWD:</span> /sbin/reboot</span></code></pre></div>
+<h2 id="system-and-hardware-info">System and Hardware Info</h2>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">hostnamectl</span>  <span class="co"># Shows full system metadata </span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">lscpu</span>  <span class="co"># Displays CPU architecture and info  </span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ex">lsblk</span>  <span class="co"># Lists block devices (disks, partitions, etc.) </span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">free</span> <span class="at">-m</span>  <span class="co"># Shows memory (RAM) usage in MB </span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="fu">df</span> <span class="at">-kh</span> <span class="co"># Displays all mounted partitions and their usage in human-readable format</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="fu">date</span>  <span class="co"># Displays current date, time, and timezone (localization info)</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="fu">whoami</span>  <span class="co"># Shows current logged-in user </span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="fu">who</span>  <span class="co"># Users currently connected to the system</span></span></code></pre></div>
+<h2 id="monitoring-tools">Monitoring Tools</h2>
+<ul>
+<li><code>htop</code> # A better, interactive version of
+<code>top</code> with a cleaner UI</li>
+<li><code>top</code> → press <code>Enter</code>, then
+<code>Shift + M</code><br />
+Sorts processes by memory usage</li>
+<li><code>vmstat</code> # Reports current memory and system
+activity</li>
+<li><code>iotop</code> # Displays real-time disk read/write by
+processes</li>
+<li><code>nmon</code> # Powerful monitoring tool for all system
+statistics</li>
+</ul>
+<h2 id="aliases-bash-customization">Aliases &amp; Bash
+Customization</h2>
+<p>Each user has their own <code>.bashrc</code> file. To apply changes,
+run:<br />
+<code>source ~/.bashrc</code> Sample aliases :</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="bu">alias</span> sysupdate=<span class="st">&#39;dnf -y update&#39;</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="bu">alias</span> c=<span class="st">&#39;clear&#39;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="bu">alias</span> l=<span class="st">&#39;ls -laFtr  --color=no&#39;</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="bu">alias</span> ping=<span class="st">&#39;ping -c 5&#39;</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="bu">alias</span> ports=<span class="st">&#39;netstat -tulanp&#39;</span></span></code></pre></div>
+<p>Changing the System Hostname: Edit the file directly
+<code>sudo vim /etc/hostname + reboot</code> or
+<code>sudo hostnamectl set-hostname newname</code> Script Logging: Save
+terminal output <code>script deneme.txt # Type exit to stop</code></p>
+<h1 id="system-architecture-and-boot-process">System Architecture and
+Boot Process</h1>
+<h2 id="boot-process">Boot Process</h2>
+<ul>
+<li>BIOS/UEFI initializes hardware and loads the bootloader.</li>
+<li>GRUB (GRand Unified Bootloader) presents boot options and loads the
+kernel.</li>
+<li>Kernel Initialization.</li>
+<li>init/Systemd launch essential services and bring the system to a
+usable state.</li>
+</ul>
+<h2 id="systemd-overview">systemd Overview</h2>
+<p>systemd, modern Linux sistemlerinin temelini oluşturan bir sistem ve
+servis yöneticisidir. Eskiden kullanılan init sisteminin yerini
+almıştır. Temel olarak şunları yapar: - Sistemi Başlatma (Boot):
+Cekirdekten sonra ilk çalışan süreçtir (PID 1). Sistemi kullanıma hazır
+hale getirmek için gerekli servisleri ve süreçleri başlatır. Bunu
+paralel olarak yaparak sistem açılış süresini önemli ölçüde kısaltır. -
+Servis Yönetimi: Sistemdeki tüm servisleri (web sunucuları, veritabanı
+sunucuları, ağ servisleri usw). - Bağımlılık Yönetimi: Servisler
+arasındaki bağımlılıkları takip eder ve servislerin doğru sırada
+başlatılmasını sağlar. Bir servis çalışabilmek için başka bir servisin
+çalışıyor olmasına ihtiyaç duyabilir. - Kaynak Yönetimi: Sistem
+kaynaklarını (CPU, bellek …) yönetitr izler kontrol eder. - Günlükleme
+(Journaling): Sistem olaylarını ve servislerin çıktılarını merkezi bir
+yerde (journald) toplar. <code>journalctl</code> komutu ile bu
+günlüklere erişilebilir. - Diğer Özellikler: Zamanlanmış görevler
+(systemd.timer ile cron yerine), ağ yapılandırması (systemd-networkd),
+kullanıcı oturum yönetimi (systemd-logind) gibi birçok ek özelliği de
+bünyesinde barındırır.</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">systemd-analyze</span> + blame <span class="co"># makinenin baslamasi icin süre + detaylat </span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">/lib/systemd/system</span> <span class="co"># services are here</span></span></code></pre></div>
+<h3 id="target-.service-dosyalari">.target .service dosyalari</h3>
+<p>.target uzantılı dosyalar, SysVinit’teki runlevel kavramının modern
+karşılığıdır. .service dosyaları bireysel servisleri tanımlar. .target
+dosyaları ise bu servisleri bir araya getirip topluca yönetir.
+<code>/lib/systemd/system/</code> veya <code>/etc/systemd/system/</code>
+icinde bulunurlar. <code>.service</code> dosyası bir servisin kendisini
+tanımlar. İçinde hangi binary’nin çalıştırılacağı, hangi kullanıcıyla
+çalışacağı, ne zaman yeniden başlatılacağı gibi bilgiler olur. Örneğin:
+<code>myhttp.service</code> dosyasini olusturalim.</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode ini"><code class="sourceCode ini"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">[Unit]</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Description</span><span class="ot">=</span><span class="st"> Python HTTP Server</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="kw">[Service]</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="dt">ExecStart</span><span class="ot">=</span><span class="st">/usr/bin/python3 -m http.server 8080</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="dt">Restart</span><span class="ot">=</span><span class="st">always</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="dt">User</span><span class="ot">=</span><span class="st">nobody</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="kw">[Install]</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="dt">WantedBy</span><span class="ot">=</span><span class="st">multi-user.target</span></span></code></pre></div>
+<p>Bu dosya kaydedilip <code>systemctl enable myhttp.service</code>
+denildiğinde servis açılışta otomatik başlar.</p>
+<p>.target dosyası ise doğrudan bir servis tanımlamaz; sadece bir grup
+mantıksal hedef sunar. Örneğin:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode ini"><code class="sourceCode ini"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">[Unit]</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Description</span><span class="ot">=</span><span class="st">Custom Services Target</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="dt">Requires</span><span class="ot">=</span><span class="st">myhttp.service</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="dt">Requires</span><span class="ot">=</span><span class="st">nginx.service</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="dt">After</span><span class="ot">=</span><span class="st">network.target</span></span></code></pre></div>
+<p>Bu custom.target çağrıldığında myhttp.service ve nginx.service
+beraber yüklenir. default .target dosyalari: — multi-user.target (ağ
+servisleri, çoklu kullanıcı, SSH, cron gibi servisleri çalıştırır.
+systemctl status multi-user.target</p>
+<p>— graphical.target GUI içeren sistemler için kullanılır.</p>
+<h1 id="package-management-with-yum-and-dnf">Package Management with YUM
+and DNF</h1>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">dnf</span> install package-name <span class="co">#Installing packages:</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="ex">dnf</span> update <span class="co"># Updating packages: </span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="ex">dnf</span> remove package-name <span class="co"># Removing packages: </span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="ex">rpm</span> <span class="at">-qi</span> package-name <span class="co"># Querying package info: </span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="ex">custom</span> .repo files in /etc/yum.repos.d/ <span class="co"># Managing repositories: </span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="ex">dnf</span> clean all <span class="co"># it deletes Metadata cache (depo bilgileri), Paket önbelleği (indirilen .rpm dosyaları), Geçici  dosyalar ve depo verileri</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="ex">rpm</span> <span class="at">-qa</span> <span class="kw">|</span> <span class="fu">grep</span> <span class="at">-i</span> libre<span class="pp">*</span> <span class="kw">;</span> <span class="ex">dpkg</span> <span class="at">-l</span>  <span class="co"># shows the installed packages</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="ex">dnf</span> <span class="at">-y</span> remove libreoffice<span class="pp">*</span></span></code></pre></div>
+<h3 id="orphan-packages">ORPHAN PACKAGES</h3>
+<p>A paketi B paketine bagli . B yi kaldirdin. A atil kaldi. iste A ya
+Orphan package denir. How to remove?</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">dnf</span> repoquery <span class="at">--unneeded</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ex">dnf</span> remove <span class="va">$(</span><span class="ex">dnf</span> repoquery <span class="at">--unneeded</span> <span class="at">-q</span><span class="va">)</span></span></code></pre></div>
+<p>Snap, Canonical (Ubuntu’nun geliştiricisi) tarafından geliştirilen,
+dağıtımdan bağımsız çalışan bir paket sistemidir. Uygulamalar kendi
+bağımlılıklarıyla birlikte paketlenir.
+<code>sudo snap install App1</code></p>
+<h3 id="case-study">Case Study</h3>
+<p>sudo apt install google-chrome-stable_current_amd64.deb E: Unable to
+locate package google-chrome-stable_current_amd64.deb apt, bu komuttaki
+“google-chrome-stable_current_amd64.deb” ifadesini, bir paket
+deposundaki paket ismi sanıyor. <code>sudo apt install Firefox</code>
+komutunda Dogru calisir. Ama sen aslında elindeki yerel bir dosyayı
+kurmaya çalışıyorsun. Bu yüzden sistem, Benim depolarımda
+<code>google-chrome-stable_current_amd64.deb</code> diye bir paket yok
+diyor. Ve hata veriyor. apt, .deb dosyalarını paket deposu (package
+repository) adı gibi algılar. Bu yüzden “Unable to locate package”
+hatası verir. .deb dosyası ile çalışmak için uygun değil.
+<code>sudo dpkg -i  google-chrome-stable_current_amd64.deb</code> -&gt;
+Doğru kullanım</p>
+<p><code>sudo apt install firefox</code> dediğinde, apt markete gider,
+raftan firefox paketini bulur ve kurar. 3. apt = Market görevlisiakip
+eder. 4. deb dosyası = Poşet içindeki ürün
+<code>sudo dpkg -i ürün.deb</code> 5. baska yol: dosyayi indirdigin
+yerde terminali ac. <code>apt install ./sample.deb</code> yazsan direk
+calisacakti Aklini s*keyim</p>
+<h1 id="filesystem-management">Filesystem Management</h1>
+<p>SPECIAL PERMISSIONS | Bit | Kullanım Yeri | Etkisi | İlgili Komut |
+<code>ls -l</code> Göstergesi | | ——– | ————- | ———————————————————————–
+| —————— | —————— | | <code>setuid</code> | <strong>Dosya</strong> |
+Dosya, <strong>sahibinin yetkileriyle çalışır</strong> |
+<code>chmod u+s dosya</code> | <code>rws</code> (x yerine s) | |
+<code>setgid</code> | <strong>Dosya</strong> | Dosya, <strong>grup
+sahibinin yetkisiyle çalışır</strong> | <code>chmod g+s dosya</code> |
+<code>rwxr-s</code> | | <code>setgid</code> | <strong>Klasör</strong> |
+Klasöre eklenen dosyalar <strong>aynı grup</strong> ile oluşturulur |
+<code>chmod g+s klasör</code> | <code>rwxr-s</code> | |
+<code>sticky</code> | <strong>Klasör</strong> | Klasördeki dosyalar,
+<strong>sadece sahibi veya root tarafından silinebilir</strong> |
+<code>chmod +t klasör</code> | <code>rwxrwxrwt</code> |</p>
+<h1 id="user-and-group-management">User and Group Management</h1>
+<p>useradd, groupadd userdel <user> home directory silinmez userdel -r
+<user> home directory silinir usermod -G <DROUP> <USER> (diger
+gruplardan cikarir. kendi ismindeki grup korumur) usermod -aG <GROUP>
+<USER> (diger gruplarda kalmaya devam eder) visudo /etc/sudoers
+dosyasini acar- who veya users makineyi o an kullanan kullanicilari
+verir</p>
+<p><code>etc/passwd</code> user accountlarla ilgili bilgiler
+<code>etc/shadow</code> encrypted password ler burada.</p>
+<h2 id="group-administration">Group Administration</h2>
+<p>/etc/login.defs - Configuration control definitions for the login
+package. user login islemlerinin ddetaylari</p>
+<p>sudo chage-l user1 Komutuyla detaylari görürsün. password yönetimine
+dair bazi kurallar mesela max usage day gibi, nasil degisir. Yine man
+dan bak belli degisiklikleri yap.</p>
+<p>her kullanici icin ayri ayri yapmak yerine sudo nano
+/etc/logindefs<br />
+dosyasinda bu sayilari düzelt. Loginretries ile arkaarkaya kac kez
+yanlis girince kilitlebecegini kac Saniye sonra kilidin kalkacagini yine
+belirle</p>
+<p>FAILED LOGINLER ICIN DETAYLI ISLEM BELIRLEME
+/etc/security/faillock.conf DOSYASINDDA</p>
+<p>/etc/pam.d icinde config dosyasindada belli ayarlamalar
+yapilabiliyor</p>
+<p>sudo groupadd groupname nerede bu gruplar less /etc/group Wie wird
+der Gruppenname geändert sudo groupmod -n der_neue_Gruppenname gurup1
+Hinzufügen eines Namens zu einer Gruppe sudo usermod -aG IT
+maldegnegi</p>
+<h2 id="password-policies">Password Policies</h2>
+<p>PASSWORD AGING chage -m mindays -M maxdays -d lastday /etc/login.defs
+icinde ayarlamalari yapar (password aging controls kisminda)</p>
+<p>RECOVER ROOT PASSWORD edit grub detayi cok fazla sifreni unutma
+aq</p>
+<h2 id="using-sudo-for-privilege-delegation">Using <code>sudo</code> for
+Privilege Delegation</h2>
+<p>/etc/sudoers icinde düzenleme yap</p>
+<h1 id="system-services-and-process-management">System Services and
+Process Management</h1>
+<h2 id="managing-services-with-systemctl">Managing Services with
+<code>systemctl</code></h2>
+<p>systemctl enable <service> her boot edildiginde sistemi baslatir ###
+Using <code>ps</code></p>
+<p>ps aux | grep ssh bununla tüm ssh processlerini ve PID lerini
+görürsün</p>
+<p>ctrl + z ekrandaki islmei arkaya atar jobs ile bu islemleri görürsün
+%1 sana arkada calisan 1 numarali processi getirir fg veya bg foreground
+background ta calistirir systemctl background da calisan tüm programlari
+verir Yine “ps -eo pid,ni,pri,cmd –sort=ni” komutuylada görürsün</p>
+<h3 id="system-monitoring">SYSTEM MONITORING</h3>
+<p>Using <code>top</code> and <code>htop</code></p>
+<p>top -u user1 user1 ne kullaniyor sadece bunu gösterir top</p>
+<table>
+<colgroup>
+<col style="width: 11%" />
+<col style="width: 25%" />
+<col style="width: 63%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Kolon</th>
+<th>Açılım (İngilizce)</th>
+<th>Açıklama (Türkçe)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>PID</code></td>
+<td>Process ID</td>
+<td>İşlem kimliği</td>
+</tr>
+<tr class="even">
+<td><code>USER</code></td>
+<td>User</td>
+<td>İşlemi başlatan kullanıcı</td>
+</tr>
+<tr class="odd">
+<td><code>PR</code></td>
+<td>Priority</td>
+<td>İşlem önceliği</td>
+</tr>
+<tr class="even">
+<td><code>NI</code></td>
+<td>Nice value</td>
+<td>Nice değeri – işlem önceliğini belirleyen değer</td>
+</tr>
+<tr class="odd">
+<td><code>VIRT</code></td>
+<td>Virtual Memory</td>
+<td>Sanal bellek kullanımı (MB/KB)</td>
+</tr>
+<tr class="even">
+<td><code>RES</code></td>
+<td>Resident Memory</td>
+<td>Fiziksel RAM kullanımı</td>
+</tr>
+<tr class="odd">
+<td><code>SHR</code></td>
+<td>Shared Memory</td>
+<td>Paylaşılan bellek miktarı</td>
+</tr>
+<tr class="even">
+<td><code>S</code></td>
+<td>State</td>
+<td>İşlem durumu (S: uyku, R: çalışıyor, Z: zombie vs.)</td>
+</tr>
+<tr class="odd">
+<td><code>%CPU</code></td>
+<td>CPU Usage Percent</td>
+<td>İşlemin CPU kullanım yüzdesi</td>
+</tr>
+<tr class="even">
+<td><code>%MEM</code></td>
+<td>Memory Usage Percent</td>
+<td>İşlemin RAM kullanım yüzdesi</td>
+</tr>
+<tr class="odd">
+<td><code>TIME+</code></td>
+<td>CPU Time (total)</td>
+<td>İşlemin toplam CPU süresi (saniye+salise)</td>
+</tr>
+</tbody>
+</table>
+<p>dmesg hardware ile ilgili hersey burada | Section | Description | |
+———————- | ————————————————————————- | | <strong>Boot</strong> |
+Messages related to system initialization (BIOS, ACPI, EFI). | |
+<strong>CPU and Memory</strong> | Information about processors, cores,
+and memory mapping. | | <strong>Disks and I/O</strong> | Detection and
+status of storage devices (e.g., <code>sda</code>, <code>nvme</code>,
+<code>usb</code>). | | <strong>Network Interfaces</strong> |
+Initialization of network devices (e.g., <code>eth0</code>,
+<code>wlan0</code>, <code>enpXsY</code>). | | <strong>USB
+Devices</strong> | Connection/disconnection messages for USB
+peripherals. | | <strong>Driver Errors</strong> | Kernel messages
+indicating driver or hardware failures (<code>error</code>,
+<code>fail</code>). | | <strong>Kernel Warnings</strong> | Serious
+issues or crashes (<code>WARNING</code>, <code>BUG</code>,
+<code>panic</code>, <code>call trace</code>). | | <strong>Module
+Loading</strong> | Messages about kernel modules being loaded
+(<code>modprobe</code>, <code>insmod</code>). | |
+<strong>Timestamps</strong> | Elapsed time since boot, shown as
+<code>[ XX.XXXXXX ]</code> in each line. |</p>
+<p>pratik filtreleme</p>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dmesg</span> <span class="kw">|</span> <span class="fu">grep</span> <span class="at">-i</span> error       <span class="co"># Hata mesajlarını bulur</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">dmesg</span> <span class="kw">|</span> <span class="fu">grep</span> usb            <span class="co"># USB ile ilgili mesajları listeler</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="fu">dmesg</span> <span class="kw">|</span> <span class="fu">grep</span> <span class="at">-i</span> fail        <span class="co"># Başarısızlıklarla ilgili satırlar</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="fu">dmesg</span> <span class="kw">|</span> <span class="fu">grep</span> eth            <span class="co"># Ethernet veya ağ arayüzü sorunları</span></span></code></pre></div>
+<h2 id="managing-processes">Managing Processes</h2>
+<h3 id="kill-killall"><code>kill</code>, <code>killall</code></h3>
+<p>w shows all current sesions</p>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pgrep</span> <span class="at">-l</span> <span class="at">-u</span> bob <span class="co"># bob isimli user la ilgili processes</span></span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pkill</span> <span class="at">-SIGKILL</span> <span class="at">-u</span> newuser <span class="co"># user ile ilgili tüm prosesleri kill yapar</span></span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pstree</span> <span class="at">-p</span> newuser <span class="co"># proses agaci</span></span></code></pre></div>
+<h3 id="nice-renice"><code>nice</code>, <code>renice</code></h3>
+<p>nice : run a program with modified scheduling priority.High priority
+icin negatif degerler verilir. -20 = en yüksek öncelik. negatif degeri
+sadece adminler verebilir 19 = en düşük öncelik (sisteme en az yük olur)
+Neden Kullanılır? Arka planda çalışan ama acelesi olmayan işler için
+(örn: büyük dosya dönüştürme, yedekleme) Sistem performansını
+etkilemeden yoğun işler yapmak için. top komutunda öncelikleri
+görebilirsin.</p>
+<p>renice komutuyla siralamayi degistirirsin</p>
+<h2 id="scheduled-tasks">Scheduled Tasks</h2>
+<h3 id="cron"><code>cron</code></h3>
+<p>Application=Service Script list of instructions Process when you
+start a service(app) it starts a Process and process id Daemon etwas
+continuously runs in background doesnt stops. it is also a process
+Threads Service–&gt;Process–&gt;Thread1, thread2, … Job (workorder) Run
+a service or process at a schedule time</p>
+<p>kill [OPTION] PID manages the processes crontab - e = Edit the
+crontab table crontab -l list the crontab entries -r remove /etc/cron*
+kisminda saatlik aylik yillik seklinde ayri dosyalara var nice process
+priority mesela nice -n 5 en öncelikli 5 process (degerler -20 ile 19
+arasindadir )bg sleep 100 (normalde 100 saniye beklersin) ###
+<code>at</code></p>
+<h1 id="networking">Networking</h1>
+<h2 id="network-configuration">Network Configuration</h2>
+<p>netstat -tunp</p>
+<table>
+<colgroup>
+<col style="width: 18%" />
+<col style="width: 81%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Alan</th>
+<th>Açıklama</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Proto</strong></td>
+<td>Protokol türü: TCP, UDP, RAW gibi.</td>
+</tr>
+<tr class="even">
+<td><strong>Recv-Q / Send-Q</strong></td>
+<td>Alınan ve gönderilen veri kuyrukları. Genelde sıfır olur, değilse
+tıkanıklık olabilir.</td>
+</tr>
+<tr class="odd">
+<td><strong>Local Address</strong></td>
+<td>Yerel IP adresi ve portu. Hangi portun hangi IP’de dinlendiğini
+gösterir.</td>
+</tr>
+<tr class="even">
+<td><strong>Foreign Address</strong></td>
+<td>Bağlı olan uzak IP ve port. Hangi istemcinin bağlı olduğunu
+gösterir.</td>
+</tr>
+<tr class="odd">
+<td><strong>State</strong></td>
+<td>Bağlantı durumu: <code>LISTEN</code>, <code>ESTABLISHED</code>,
+<code>TIME_WAIT</code>, <code>CLOSE_WAIT</code>, vs.</td>
+</tr>
+<tr class="even">
+<td><strong>PID/Program name</strong></td>
+<td>(Bazı sürümlerde) Bağlantıyı kullanan işlem adı ve PID.</td>
+</tr>
+</tbody>
+</table>
+<p>******************DIKKAT****************** | Durum | Ne Anlama Gelir?
+| | ————————- | ——————————————————————– | | <strong>LISTEN</strong> |
+Port dinlemede, gelen bağlantıları kabul etmeye hazır. | |
+<strong>ESTABLISHED</strong> | Aktif bir bağlantı var. | |
+<strong>CLOSE_WAIT</strong> | Karşı taraf kapattı ama sizin taraf hala
+kapatmadı — sorun olabilir. | | <strong>TIME_WAIT</strong> | Bağlantı
+kapatıldı ama bir süre daha beklemede kalıyor (normaldir). | |
+<strong>SYN_SENT / SYN_RECV</strong> | TCP bağlantısı kurulmaya
+çalışılıyor. Aşırıysa ağ sorunu olabilir. |</p>
+<p>*** CASE STUDY *** ip_A 192.168.1.A ip_C 192.168.2.C ip_B 192.168.1.B
+192.168.2.B A 192.168.1.B aginda C 192.168.2.B aginda ve B her iki agdan
+ipye sahip. A ile C nasil konusacak. - A dan C ye ulasmak icin A nin
+terminalde</p>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ip</span> route add 192.168.2.B.0/24 via 192.168.1.B</span></code></pre></div>
+<ul>
+<li>C den A ya ulasmak icin C nin terminale</li>
+</ul>
+<div class="sourceCode" id="cb16"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ip</span> route add 192.168.1.B/24 via 192.168.2.B</span></code></pre></div>
+<p>/etc/resolv.conf ta search yahoo.com yazdiginda artik subdomain leri
+uzunuzun yazmana gerek kalmaz. artik curl news yazdiinda direk curl
+news.yahoo.com anlasilir NETWORKING; SERVICES AND SYSTEM UPDATES dig
+<span class="citation" data-cites="4.2.2.2">@4.2.2.2</span> google.com
+-&gt; google.com alan adının IP adresini, 4.2.2.2 DNS sunucusunu
+kullanarak sorgular. /etc/resolv.conf ns switch.conf Görevi: Sistem
+hangi kaynaktan (örneğin: dosya, DNS, LDAP) kullanıcı, grup, host,
+şifre, network vb. bilgilerini alacağını ve hangi sırayla deneyeceğini
+belirtir.</p>
+<p>Örnek içerik: passwd: files sss group: files sss hosts: files dns
+Anlamı: passwd: files sss → Önce /etc/passwd, sonra SSSD (örn. LDAP)
+kullanılacak. hosts: files dns → IP/hostname çözümlemesinde önce
+/etc/hosts, sonra DNS kullanılacak. Bu dosya, kimlik doğrulama veya ağ
+gibi temel sistem fonksiyonlarının nasıl davranacağını kontrol eder.
+*********************************************************
+/etc/NetworkManager/system-connections/ens… burada ip adresini manuelmi
+yoksa DHCP denmi alacaksin onu belirlersin nmcli temiz network device
+adress bilgisi veriyor nmcli connection show buda devices gösteriyor</p>
+<p>nmcli connectin show network adapterlari gösterrir nmcli connectin
+show ens23 ens23 ün detaylarini gösterir nmcli connectin delete ens23 bu
+adaptörü siler nmcli connection modify ens224 connection.interface-name
+“wired connection 3” cnnection.interface-name kismini show ens23
+komutunda görüyorsun ve tab ile geliyor</p>
+<p>BASKA VARMI <code>nmtui</code> nm-connection-editor (GUI)
+************************************************************ What is the
+loopback device?</p>
+<p>The loopback device is a virtual network interface used by a computer
+to communicate with itself. Details: Interface name: lo IP address:
+127.0.0.1 (IPv4), ::1 (IPv6) Hostname: localhost Uses: Local testing of
+services and applications Internal communication between processes No
+traffic is sent to physical network hardware
+**************************************************** NIC bonding
+combining multiple NICs together
+************************************************** ss COMMAND What is
+the ss command? The ss (socket statistics) command is used in Linux to
+display detailed information about network sockets. It is considered a
+faster and more modern replacement for netstat.</p>
+<p>Basic Usage Examples ss # Show all connections ss -tuln # Show
+listening TCP/UDP ports with numeric addresses ss -s # Display summary
+statistics ss -plnt # Show listening TCP sockets with process info</p>
+<p>Protocol: Set of rules that computers use to communicate how to copy
+a file from a server to another? scp test.txt
+kali@192.168.178.114:/home/kali/Desktop timedatectl timedatectl
+list-timezones timedatectl set-timezone Europe/Berlin</p>
+<p>traceroute: traceroute is used to display the path that network
+packets take from your computer to a destination (IP or domain). It
+helps identify where delays or connection problems occur in the route.
+traceroute www.google.com Bunun dinamik olani real time olani mtr dir.
+mtr www.google.com</p>
+<h3 id="using-nmcli">Using <code>nmcli</code></h3>
+<p>ip addrb ifconfig ten fazlasi</p>
+<p>nmcli network detaylarini verir. device name ve connettion name match
+olmayabilir parametrelerle ayarlamalar yapabörsin</p>
+<h3 id="using-nmtui">Using <code>nmtui</code></h3>
+<h2 id="dns-setup">DNS Setup</h2>
+<p>systemd icinde resolve.conf var Dns gibi calisir ss -natp listening
+portlari cikarir. rsync remote server sync Damit ist download oder
+upload möglich</p>
+<p>crontab -e ile scheduld tak lar ousturabilirsin</p>
+<p>PAM MATRIX DIYE BISEY VAR ONA BI BAK</p>
+<h2 id="firewall-configuration-with-firewalld">Firewall Configuration
+with <code>firewalld</code></h2>
+<h1 id="storage-and-disk-management">Storage and Disk Management</h1>
+<h2
+id="disk-partitioning-and-formatting-mount-points-and-auto-mounting">Disk
+Partitioning and Formatting Mount Points and Auto Mounting</h2>
+<p>fdisk -l gives the list of disks fdisk /dev/nvme0n2 bu bizim VMWare
+de sonradan ekledigimiz disk Bu komuttan sonra m yazip enterlayinca
+opsiyonlar karsina cikar n ebter: add a new partition df -h disk usage
+### MOUNT ETME ISLEME mkdir -p /home/enver/Desktop/disk2 yukaridaki
+komutta -p ; aradaki parent klasörler yoksa onlarida olusturur.
+mkfs.ext4 /dev/nvme0n2 # önce formatladim mkdir -p
+/home/enver/Desktop/disk2 # diski mount edecegim dosyayi olusturdum
+mount /dev/nvme0n2 /home/enver/Desktop/Disk2 # simdide mount ettim
+Gparted disk islemlerini komutsuz arayüz ile hallet</p>
+<h2 id="persistent-mounts-using-etcfstab">Persistent Mounts using
+<code>/etc/fstab</code></h2>
+<h1 id="security-and-selinux">Security and SELinux</h1>
+<h2 id="basic-security-practices">Basic Security Practices</h2>
+<p>LINUX OS HARDENING - User Account Naming conventions. Instead of
+admin use sadmin, hradmin, usw. Use user names that are not easily
+guessted. Useradd ile user olusturdugunda direk id olusturulur. Begin
+userid from 10000. also password policies. max min age expire day (one
+can use chage command) /etc/login.defs /etc/pam.d/system-auth</p>
+<ul>
+<li>Remove un-wanted Packages rpm -qa kurulu tüm paketleri verir (Debian
+da “dpkg -l”) bir paketi kaldirirken dependiec kismini dikkat et</li>
+<li>Stop un-used Services systemctl -a</li>
+<li>Check on Listening Ports netstat -tunlp tcp udp listening Ports
+fuser -k 80/tcp 80 nolu porttaki servisi durdurur ve portu kaoatir</li>
+<li>Secure SSH Configuration /etc/ssh/sshd_config change port enable
+PermitRootLogin no yap. kimse root olarak baglanamasin systemctl restart
+sshd yapmayi unutma</li>
+<li>Enable Firewall (firewalld) firewall-config bir GUI acar
+firewall-cmd –help</li>
+<li>Enable Selinux Securits Enhanced linux it is a projeckt of NSE Damit
+kann man permissions von Prozesse oder Serveces ändern sestatus ile
+kontrol edebilirsin. root@rocky sysconfig]# pwd /etc/sysconfig/selinux
+burada detaylar var</li>
+<li>Chande listening Services Port numbers mesela ssh portunu 22 den
+baska bisey yapabilirsin</li>
+<li>Keep your OS up to date</li>
+</ul>
+<h2 id="file-and-directory-permissions">File and Directory
+Permissions</h2>
+<p>head etwas.txt shows first 10 line of the file tail etwas.txt shows
+last 10 line of the file tail -n 20 etwas.txt sudo tail -f
+/var/log/syslog eklendikce yenileri görürsün</p>
+<p>icinde folder1 folder2 folder3 yazan bir folder.txt dosyasi hazirla.
+cat folder.txt | mkdir calistirdigin zaman bulundugun klasörde folder1
+folder2 folder3 dosyalari olussur . xargs, komut satırında bir komutun
+argümanlarını dışardan (genellikle stdin’den) alarak çalıştıran bir
+yardımcı programdır. Kısaca: Veriyi alır, komutlara argüman olarak
+dönüştürür.</p>
+<p>command 2&gt; /dev/null özellikle komut ciktisinda cok fazla eror
+olacaksa bu erorlar temizlenmis olur</p>
+<p>find / -name *.doc 2&gt; /dev/null sudo updatedb sonra locate
+deneme.txt daha hizli bulur grep -c -i Ali isimleer txt dosyada ali
+isminin kac kere gectigini -c , büyük Kücük harf hassasiyetrinden
+kurtulmayi -i sagllar.</p>
+<p>grep -r search in subdirectories grep -r -i ebenin* recursively tüm
+dosya isimleri ve iceriklerinde ebenin kelimesiyle baslayan kelemeleri
+bulur -r -i yerine -ri yazabilrsin</p>
+<p>egrep “abc|xyz” abc veya xyz bulacak egrep “^1[0-2]” ^ satir basinda
+10, 11, 12 ile baslayanlar sha356sum abc.txt</p>
+<p>locate tüm file Lari bir database icinde arar ve süper hizlidir.
+Fakat sudo updatedb yapmalisin</p>
+<p>whereis tüm hardawre da aramaz path de arar which in farki direk
+command in nerede calistigini verir find / -name *.pdf 2&gt; /dev/null
+find / -size +100M 2&gt; /dev/null find / -perm /g=w,o=w 2&gt; /dev/null
+w Hakki olan gruplar ve other people bulunur</p>
+<p>chown change owner sudo chown cemsit deneme.txt dosyanin owner ini
+cemsit yapar sudo chown -R cemsit klasor hem klasorun Hemde altinda ne
+varsa hepinin sahabini degistirdi sudo chown -R cemsit:cemsit klasor/
+hem kullanici hem grup degisti</p>
+<p>-s (setuid veya setgid) argümanı, bir dosya çalıştırıldığında: setuid
+(user): Komut, dosya sahibinin yetkileriyle çalışır. setgid (group):
+Komut, dosya grubunun yetkileriyle çalışır. Genellikle chmod u+s veya
+chmod g+s şeklinde kullanılır.</p>
+<p>chmod u+s /usr/bin/example</p>
+<p>Bu komut, example dosyasına setuid verir. Artık bu dosyayı çalıştıran
+herkes, onu sahibi gibi (root olabilir) çalıştırır.</p>
+<p>chmod g+s /usr/bin/example Bu komut, example dosyasına setgid verir.
+Artık dosyadan oluşturulan alt dosyalar, dosyanın grubuna ait olur.</p>
+<p>Bir dizine setgid verildiğinde, o dizin içinde oluşturulan tüm dosya
+ve klasörler, otomatik olarak dizinin grubuna ait olur.</p>
+<p>Normalde ne olurdu? Varsayılan olarak, bir kullanıcı bir dizine dosya
+eklediğinde, o dosya kullanıcının aktif grubuna ait olur.</p>
+<p>mkdir paylasim chown :gelistirici paylasim chmod g+s paylasim Bu
+durumda:</p>
+<p>mkdir paylasim chown :gelistirici paylasim chmod g+s paylasim</p>
+<p>paylasim klasörüne kim dosya eklerse eklesin, Eklenen dosyalar
+gelistirici grubuna ait olur. Bu yöntem, ortak çalışma dizinlerinde grup
+sahipliğini sabit tutmak için kullanılır.</p>
+<p>umax file olusturulunca otomatik verilecek yetkileri belirler</p>
+<p>cat /etc/fstab file system table</p>
+<p>setfacl -m u:cemsit:rw deneme.txt enver kullanicisinin üzerinde Hakki
+olan deneme.txt dosyasina bir user daha atadim (gruba hak taniyacaksan u
+yerine g yaz) gertfacl deneme.txt ile detaylari görürsün.</p>
+<p>directory icinde setfacl uygulanir fakat inherited olmasi icin :</p>
+<p>sudo setfacl -m u:user1:rw reports/ bununla reports
+dosyasininicindekilere inherit edemezsin.</p>
+<p>sudo setfacl -d -R -m u:user1:rw reports/ yaparsan asagi Dogru
+gider</p>
+<p>ldd library daemon dependecy ldd /bash/vim vm applicationu hangi
+kütüphaneleri kullaniyor /home/enver de -local dosyasi var bunun icinde
+shred dosyalari saklamak daha dogru.</p>
+<p>sudo ldconfig -n /home/enver/.local/lib</p>
+<p>ldconfig: Paylaşımlı kütüphaneleri (.so dosyaları) tarar ve sistemin
+kullanması için yeni/özel kütüphane yollarını günceller.</p>
+<p>-n: Sadece belirtilen dizini (/home/enver/.local/lib) işler. (Yani
+/etc/ld.so.conf dosyasını veya diğer yolları dikkate almaz.)</p>
+<p>/home/enver/.local/lib: Taratılacak özel kütüphane klasörüdür.</p>
+<p>Ne işe yarar? Bu komut, /home/enver/.local/lib dizininde bulunan
+kütüphaneleri sistemin tanımasını sağlar, böylece burada bulunan .so
+dosyaları çağrılabilir hale gelir. Kullanıcı kendi yerel kütüphanelerini
+derleyip kullanmak istediğinde bu komut sıkça kullanılır.</p>
+<p>ls .. what is in the parent dirctory</p>
+<p>ln mainfile.txt sonradanolusanfile.txt link yapma herhangibirinde
+yaptigin ddegisiklik digerinde de olusur</p>
+<p>find / -perm +rwx rwx hakkinna sahip file Lari arayacak find /usr
+-group sales find / size +2M find komutu cok masraflidir bunnun yerine
+locate daha iyi. (sudo updatedb) satabase i kullandigi icin daha Rahat
+is görür</p>
+<p>whoami ve arkasindan id command sonucta 100 l id root user olur</p>
+<p>file creation default icin umask degeri kullanilir. Mesela 022
+aslinda 755 tir. umask degeri 777 den cikarilir</p>
+<p>sudo du -h –max-depth=1 / 2&gt;/dev/null root tan itibren bir dosya
+aagiya Kadar ne vatsa onlaeri ve giskusage leri bulur</p>
+<p>ls -F hlasör dosa executabl durumlarini verir link olusturma ln -s
+testdir/file1.txt link1 useradd newuser passwd newuser rm -rf
+silliklanmadan herseyi siler tail -n 1 /etc/group veya /etc/passwd
+(eklenen son user/group görürsün)</p>
+<p>umask set the defaults of file/directory creation umask /etc/bashrc
+icinde bu degeri degistirebilirsun</p>
+<h3 id="getenforce-setenforce"><code>getenforce</code>,
+<code>setenforce</code></h3>
+<h3 id="semanage-restorecon-getsebool"><code>semanage</code>,
+<code>restorecon</code>, <code>getsebool</code></h3>
+<h1 id="system-monitoring-and-performance">System Monitoring and
+Performance</h1>
+<h3 id="top-iotop-vmstat-sar"><code>top</code>, <code>iotop</code>,
+<code>vmstat</code>, <code>sar</code></h3>
+<h2 id="reading-logs-with-journalctl">Reading Logs with
+<code>journalctl</code></h2>
+<h1 id="troubleshooting-and-recovery">Troubleshooting and Recovery</h1>
+<h2 id="troubleshooting-and-recovery-1">Troubleshooting and
+Recovery</h2>
+<h3 id="what-is-troubleshooting">What Is Troubleshooting?</h3>
+<p>Thi nk of your Linux system like a car. Sometimes it won’t start, or
+it makes weird noises. Troubleshooting is like being a mechanic — you
+observe the symptoms, identify the problem, and fix it.</p>
+<p>Troubleshooting in Linux means:</p>
+<ul>
+<li>Detecting what’s wrong</li>
+<li>Diagnosing the cause</li>
+<li>Applying a fix</li>
+<li>Testing if the fix worked</li>
+</ul>
+<p>Recovery is what you do <strong>after something breaks</strong> —
+like when your system doesn’t boot, or a service crashes. LOG MONITORING
+Log directory /var/log boot reboots issues chronyd=NTP cron maillog
+secure all login logout activities tail -f secure dinamik olarrak log
+penceresi acik kalir messages important to monitor system activities
+httpd apache application log —</p>
+<h3 id="common-troubleshooting-tools-and-techniques">Common
+Troubleshooting Tools and Techniques</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Tool/Command</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>journalctl</code></td>
+<td>View system logs</td>
+</tr>
+<tr class="even">
+<td><code>dmesg</code></td>
+<td>View kernel messages</td>
+</tr>
+<tr class="odd">
+<td><code>systemctl status</code></td>
+<td>Check status of systemd services</td>
+</tr>
+<tr class="even">
+<td><code>top</code>, <code>htop</code></td>
+<td>Monitor CPU and memory usage</td>
+</tr>
+<tr class="odd">
+<td><code>ps aux</code>, <code>pstree</code></td>
+<td>View running processes</td>
+</tr>
+<tr class="even">
+<td><code>strace</code></td>
+<td>Trace system calls of a process</td>
+</tr>
+<tr class="odd">
+<td><code>netstat</code>, <code>ss</code></td>
+<td>Monitor network connections</td>
+</tr>
+<tr class="even">
+<td><code>ping</code>, <code>traceroute</code></td>
+<td>Check connectivity</td>
+</tr>
+<tr class="odd">
+<td><code>lsblk</code>, <code>df</code>, <code>mount</code></td>
+<td>Diagnose storage and mount issues</td>
+</tr>
+</tbody>
+</table>
+<p>load avarage uptime veya cat /proc/loadavg ile bulunur. son 1, 5 ve
+15 dakikalik load avarage (cpu) kullanimini verir lscpu da degerleri
+verir —</p>
+<h3 id="example-a-service-isnt-starting">Example: A Service Isn’t
+Starting</h3>
+<p>Let’s say your Apache web server isn’t starting.</p>
+<p>Step-by-step:</p>
+<ol type="1">
+<li><p><strong>Check service status:</strong></p>
+<div class="sourceCode" id="cb17"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="ex">systemctl</span> status httpd</span></code></pre></div></li>
+<li><p><strong>View logs:</strong></p>
+<div class="sourceCode" id="cb18"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="ex">journalctl</span> <span class="at">-xeu</span> httpd</span></code></pre></div></li>
+<li><p><strong>Look for errors</strong> like:</p>
+<pre><code>Permission denied
+Port already in use
+SELinux denial</code></pre></li>
+<li><p><strong>Check configuration syntax:</strong></p>
+<div class="sourceCode" id="cb20"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="ex">apachectl</span> configtest</span></code></pre></div></li>
+<li><p><strong>Fix the issue and restart:</strong></p>
+<div class="sourceCode" id="cb21"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="ex">systemctl</span> restart httpd</span></code></pre></div></li>
+</ol>
+<hr />
+<h3 id="troubleshooting-boot-issues">Troubleshooting Boot Issues</h3>
+<p>Sometimes your system fails to boot. Here’s what to try:</p>
+<h3 id="boot-into-rescue-mode-or-emergency-mode">Boot into Rescue Mode
+or Emergency Mode</h3>
+<ol type="1">
+<li>Reboot the system.</li>
+<li>At the GRUB screen, edit the kernel line:
+<ul>
+<li>Add <code>systemd.unit=rescue.target</code> or
+<code>emergency.target</code>.</li>
+</ul></li>
+</ol>
+<p>This gives you a <strong>minimal shell</strong> for recovery.</p>
+<h3 id="common-boot-problems">Common Boot Problems</h3>
+<table>
+<colgroup>
+<col style="width: 51%" />
+<col style="width: 48%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Symptom</th>
+<th>Possible Cause</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Kernel panic</td>
+<td>Bad initramfs or hardware issues</td>
+</tr>
+<tr class="even">
+<td>Hanging after grub</td>
+<td>Missing root device</td>
+</tr>
+<tr class="odd">
+<td>“Cannot mount root”</td>
+<td>Filesystem issues or UUID mismatch</td>
+</tr>
+<tr class="even">
+<td>Black screen</td>
+<td>Graphics driver problem</td>
+</tr>
+</tbody>
+</table>
+<h3 id="fixing-with-dracut">Fixing with Dracut</h3>
+<p>If initramfs is broken:</p>
+<div class="sourceCode" id="cb22"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="ex">dracut</span> <span class="at">--force</span></span></code></pre></div>
+<p>Or regenerate for a specific kernel:</p>
+<div class="sourceCode" id="cb23"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="ex">dracut</span> <span class="at">-f</span> /boot/initramfs-<span class="va">$(</span><span class="fu">uname</span> <span class="at">-r</span><span class="va">)</span>.img <span class="va">$(</span><span class="fu">uname</span> <span class="at">-r</span><span class="va">)</span></span></code></pre></div>
+<hr />
+<h3 id="recovering-root-password">Recovering Root Password</h3>
+<p>If you forgot the root password:</p>
+<ol type="1">
+<li><p>Reboot into GRUB menu.</p></li>
+<li><p>Edit kernel line (<code>e</code>), append:</p>
+<pre><code>rw init=/bin/bash</code></pre></li>
+<li><p>After booting:</p>
+<div class="sourceCode" id="cb25"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">passwd</span></span></code></pre></div></li>
+<li><p>Then:</p>
+<div class="sourceCode" id="cb26"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="bu">exec</span> /sbin/init</span></code></pre></div></li>
+</ol>
+<hr />
+<h3 id="reinstalling-or-repairing-grub">Reinstalling or Repairing
+GRUB</h3>
+<p>If the system shows a <code>grub&gt;</code> prompt or cannot find the
+bootloader:</p>
+<p>Boot from a live CD/USB:</p>
+<div class="sourceCode" id="cb27"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> /dev/sdaX /mnt</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">--bind</span> /dev /mnt/dev</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">--bind</span> /proc /mnt/proc</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="fu">mount</span> <span class="at">--bind</span> /sys /mnt/sys</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="fu">chroot</span> /mnt</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a><span class="ex">grub2-install</span> /dev/sda</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="ex">grub2-mkconfig</span> <span class="at">-o</span> /boot/grub2/grub.cfg</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a><span class="bu">exit</span></span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a><span class="ex">reboot</span></span></code></pre></div>
+<h3 id="system-running-slow-heres-what-to-check">System Running Slow?
+Here’s What to Check</h3>
+<ol type="1">
+<li><p><strong>CPU Usage:</strong></p>
+<div class="sourceCode" id="cb28"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="ex">top</span></span></code></pre></div></li>
+<li><p><strong>Memory Usage:</strong></p></li>
+</ol>
+<div class="sourceCode" id="cb29"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">free</span> <span class="at">-m</span></span></code></pre></div>
+<ol start="3" type="1">
+<li><strong>Disk Space:</strong></li>
+</ol>
+<div class="sourceCode" id="cb30"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">df</span> <span class="at">-h</span></span></code></pre></div>
+<ol start="4" type="1">
+<li><strong>I/O Wait:</strong></li>
+</ol>
+<div class="sourceCode" id="cb31"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="ex">iostat</span></span></code></pre></div>
+<ol start="5" type="1">
+<li><strong>Zombie Processes:</strong></li>
+</ol>
+<div class="sourceCode" id="cb32"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ps</span> aux <span class="kw">|</span> <span class="fu">grep</span> <span class="st">&#39;Z&#39;</span></span></code></pre></div>
+<h3 id="application-crashes">Application Crashes</h3>
+<p>When an app crashes:</p>
+<ul>
+<li><p>Use <code>journalctl</code> to see logs</p></li>
+<li><p>Use <code>strace</code> to trace it:</p>
+<div class="sourceCode" id="cb33"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="ex">strace</span> ./appname</span></code></pre></div></li>
+<li><p>Look at core dumps:</p>
+<div class="sourceCode" id="cb34"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="ex">coredumpctl</span> list</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="ex">coredumpctl</span> info <span class="op">&lt;</span>PID<span class="op">&gt;</span></span></code></pre></div></li>
+</ul>
+<h3 id="network-troubleshooting">Network Troubleshooting</h3>
+<ol type="1">
+<li><strong>Check if the interface is up:</strong></li>
+</ol>
+<div class="sourceCode" id="cb35"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ip</span> a</span></code></pre></div>
+<ol start="2" type="1">
+<li><strong>Can you ping your gateway?</strong></li>
+</ol>
+<div class="sourceCode" id="cb36"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ping</span> 192.168.1.1</span></code></pre></div>
+<ol start="3" type="1">
+<li><strong>Can you resolve DNS?</strong></li>
+</ol>
+<div class="sourceCode" id="cb37"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="ex">nslookup</span> google.com</span></code></pre></div>
+<ol start="4" type="1">
+<li><strong>View all connections:</strong></li>
+</ol>
+<div class="sourceCode" id="cb38"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ss</span> <span class="at">-tunlp</span></span></code></pre></div>
+<ol start="5" type="1">
+<li><strong>Firewall issue?</strong></li>
+</ol>
+<div class="sourceCode" id="cb39"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="ex">firewall-cmd</span> <span class="at">--list-all</span></span></code></pre></div>
+<h3 id="summary">Summary</h3>
+<ul>
+<li>Troubleshooting is about identifying, diagnosing, fixing, and
+testing.</li>
+<li>Use tools like <code>journalctl</code>, <code>systemctl</code>,
+<code>ping</code>, and <code>top</code>.</li>
+<li>Boot problems often require GRUB and rescue mode techniques.</li>
+<li>Recovery includes repairing GRUB, fixing services, and resetting
+passwords.</li>
+<li>Learn to read logs — logs are your best friend in
+troubleshooting.</li>
+</ul>
+<p>Practice common scenarios in a virtual machine to build
+confidence!</p>
+<p>DNS problems: Server is not reaxhable cat /etc/hosts cat
+/etc/resolv.conf cat /etc/nsswitch.conf ping gateway check physical
+Connection WEBsite or Application is not erreichbar Question: Server or
+sservice on it down? ping with ip adress or hostname telnet
+192.168.178.x 80 port calisip calismadigini gösterir baglanamazsan
+demekki http service is not running Can not SSK as root as default root
+connection is disabled /etc/ssh/ssh_config ssh ile giderken yapilan
+ayarlar /etc/ssh/sshd_config gelen ssh baglantilaei icin ayarlar mesela
+root olarak birisi baglanabilsinmi /var/log/secure burayi tail -f ile
+izlersen canli tüm loginleri görürsün Can not write to a File parent
+directory permissions anotheruser works with the file getfacl filename
+ausführliche info über file Dusk problems cat /etc/fstab diskle ilgili
+bilgiler var</p>
+<p>TOP command PID USER PR NI VIRT RES SHR S %CPU %MEM TIME+ COMMAND
+PID: The Process ID — a unique number that identifies each running
+process. USER: The user who owns the process. PR: The process’s priority
+for scheduling. Lower numbers mean higher priority. ATAMAYI SYSTEM YAPAR
+NI: The “nice” value, which affects the priority. Ranges from -20
+(highest) to 19 (lowest). KULLANICI ATAMASI VIRT: The total virtual
+memory used by the process, including code, data, and shared libraries.
+RES: The resident memory — the actual physical RAM used by the process.
+SHR: The amount of memory shared with other processes (usually from
+shared libraries). S: The current status of the process: R = Running S =
+Sleeping D = Uninterruptible sleep Z = Zombie T = Stopped %CPU: The
+percentage of CPU the process is using. %MEM: The percentage of physical
+RAM the process is using. TIME+: The total amount of CPU time the
+process has used since it started, in minutes and seconds. COMMAND: The
+name of the command that started the process. MiB Swap, sisteminizdeki
+takas alanıdir (swap). RAM yetersiz kaldığında sistemin geçici olarak
+disk üzerinde kullandığı bellektir. WHAT IS SWAP MEMORY? Swap memory is
+a portion of the storage that used as extra virtual memory when the
+physical RAM is full. mevcut memory nin iki kati büyüklükte olmasi
+tavsiye edilir netstat -rnv gives the IP routing table</p>
+<p>pwconv, şifreleri güvenli bir şekilde saklamak için kullanılır.
+Şifreler /etc/passwd içindeyse, bu komut onları /etc/shadow’a taşır ve
+/etc/passwd içindeki şifre alanını x olarak değiştirir.</p>
+<p>LAST komutu sisteme login olanlari bulur</p>
+<p>Rollback Update Nedir? Rollback update, bir sistem veya yazılım
+güncellemesi yapıldıktan sonra, eski (önceki) sürüme geri dönme
+işlemidir.</p>
+<p>sos report komutu rhel ve rocky linux sistemlerde; Sistem hakkında
+ayrıntılı teşhis bilgileri toplar: Donanım bilgileri Ağ ayarları Servis
+durumları Log dosyaları Yüklü paketler Çekirdek bilgileri vs. </p>
+<h2 id="managing-vms-with-virt-manager">13.2 Managing VMs with
+<code>virt-manager</code></h2>
+<h1 id="useful-tools-and-tips">Useful Tools and Tips</h1>
+<h2 id="common-text-editors-vim-nano">Common Text Editors (vim,
+nano)</h2>
+<p>VIM Kullanimi yy stir yw kelime kopyalar p yapistirir dd / de satir /
+üzerinde oldugu kelimeyi siler /word yazarsan dosya icindeki ilk “word”
+kelimesini bulur. Sonra n harfine basarak sirasiyla digerlerini
+bulursun. asagidan yukari arama: shift + g ile dosyanin sonnuna git.
+Satir numaralarin inasil gösterirsin: escape modda:set number 3 shift g
+ile 3. satira gidersin kelime degistirme: kelimenin üstüne gel cw yaz
+sonra yeni kelimeyi yaz</p>
+<h2 id="file-compression-and-archiving">14.2 File Compression and
+Archiving</h2>
+<h3 id="tar-gzip-zip">14.2.1 <code>tar</code>, <code>gzip</code>,
+<code>zip</code></h3>
+<h2 id="searching-files">14.3 Searching Files</h2>
+<h3 id="grep-find-locate">14.3.1 <code>grep</code>, <code>find</code>,
+<code>locate</code></h3>
+<h2 id="system-info-commands">14.4 System Info Commands</h2>
+<h3 id="uname-hostnamectl-lsb_release">14.4.1 <code>uname</code>,
+<code>hostnamectl</code>, <code>lsb_release</code></h3>
+<h1 id="appendix">Appendix</h1>
+<h2 id="command-cheat-sheet">Command Cheat Sheet</h2>
+<p>SYSTEM UTILITY COMMANDS date uptime(1, 5, 15 dakikalarda cpu
+kullanimi)<br />
+hostname uname ehich<br />
+cal 11 1976 bc calculator <code>cp  -pr</code> klasörü icindekilerle
+kopyalaar <code>cat  -n</code> satirlari numaralandirarak cikti verir
+<code>cat isimler.txt| sort</code> satirlari bas harflerine göre siralar
+&amp;&amp; önce sol taraf sonra sol calisirsa sag taraf calisir echo -e
+icerdeki özel karakterleri algila yorum satirlari: # ile baslar Bash
+script te cift tirnak kullan tmux (Terminal Multplex Command) terminal
+ekranini birkac bölmeye ayirir bin &amp; sbin : executables for all
+&amp; executanles for root<br />
+Asagida birsey calistirilmaya calisildiginda nerelerde aranir
+PATH=/root/.local/bin:/root/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin
+mesela deneme.sh dosyasini bu dizinlerden birine tasi Sonra istedigin
+yerde direk calistir export PATH=$PATH:/home/rocky2/Skripten (Yeni path
+plusturacazMevcut path i $PATH ile ekledik )</p>
+<p>Thread (İş Parçacığı) Ne demek? Çekirdeklerin aynı anda birden fazla
+işi işleyebilmesini sağlayan mantıksal işlem yolları. Intel’de bu
+teknolojiye HyperThreading denir.</p>
+<p>Ne işe yarar? 1 çekirdek = 2 thread olursa, işlemci yoğun işlerde
+daha fazla işi aynı anda yapabilir. Yani işlemcinin verimliliği
+artar.</p>

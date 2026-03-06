@@ -1,0 +1,13 @@
+---
+
+  - hosts: all
+    become: true
+    tasks:
+  
+
+    - name: uninstall Apeche2 and PHP
+      apt:
+        name:
+         - nginx
+         - libapache2-mod-php
+        state: absent

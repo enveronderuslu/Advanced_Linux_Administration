@@ -1,0 +1,17 @@
+---
+ - name: install nginx
+   hosts: all
+   become: true
+   tasks:
+
+     - name: Install Nginx
+       ansible.builtin.apt:
+         name: nginx
+         state: latest
+
+     - name: Start and enable Nginx service
+       ansible.builtin.systemd: # service te yazilabilir
+         name: nginx
+         state: started
+         enabled: true
+         

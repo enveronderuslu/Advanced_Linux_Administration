@@ -1,0 +1,14 @@
+- name: Handlers. Degisiklik olursa sunu yap
+  hosts: all
+  become: true
+  tasks:
+    - name: Konfigürasyon dosyaini kopyala
+      copy:
+        src: test.txt
+        dest: /tmp/test.txt
+      register: config_copy
+
+    - name: Değişiklik varsa bilgi mesaji yazdir
+      debug:
+        msg: "nginx.conf dosyasi güncellendi."
+      when: config_copy.changed

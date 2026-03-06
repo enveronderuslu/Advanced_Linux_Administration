@@ -1,0 +1,18 @@
+$TTL    1d
+$ORIGIN 10.0.10.in-addr.arpa.
+@       IN      SOA     mgmt-dns.example.local. hostmaster.example.local. (
+                        4               ; Serial (Serial'ı bir artırdım)
+                        1d              ; Refresh
+                        2h              ; Retry
+                        4w              ; Expire
+                        1h )            ; Negative Cache TTL
+
+; Name Server Kayıtları
+@       IN      NS      mgmt-dns.example.local.
+
+; PTR Records (Sonuna nokta eklendi)
+5          IN      PTR      mgmt-dns.example.local.
+6          IN      PTR      mgmt-iam.example.local.
+7          IN      PTR      mgmt-bastion.example.local.
+8          IN      PTR      mgmt-ans.example.local.
+13.60      IN      PTR      sec-squid.example.local.

@@ -1,0 +1,30 @@
+---
+
+  - hosts: ubuntu_Servers
+    become: true
+    tasks:
+    
+    - name: updates apt packet index
+      apt:
+        name:
+         - apache2
+         - libapache2-mod-php      
+        update_cache: yes
+        state: latest 
+        
+  - hosts: rhel_Servers
+    become: true
+    tasks:
+    
+
+    - name: httpd for "Rocky"
+      dnf:
+        name:
+         - httpd
+         - php
+        update_cache: yes
+        state: latest
+
+      
+      
+      

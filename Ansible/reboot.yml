@@ -1,0 +1,14 @@
+- hosts: all
+  become: true
+  tasks:
+    - name: Unconditionally shut down the machine with all defaults
+      ansible.builtin.reboot:
+        reboot_timeout: 60
+
+# Sistemi yeniden başlat.
+# 60 saniye boyunca tekrar SSH bağlantısı kurulmasını bekle.
+# 60 saniye içinde sistem geri gelmezse görev başarısız olur (timeout).
+# Neden önemlidir?Çünkü reboot işlemi:
+# Donanıma göre uzun sürebilir.
+# VM’lerde veya fiziksel makinelerde farklı sürede tamamlanabilir.
+# Eğer reboot_timeout çok kısa ayarlanırsa, sistem henüz açılmadan Ansible hata verebilir.
