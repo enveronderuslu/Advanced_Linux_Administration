@@ -58,7 +58,7 @@ systemd-analyze + blame # makinenin baslamasi icin süre + detaylat
 /lib/systemd/system # services are here
 ```
 ## SYSTEMD (ADVANCED)
-kisaca servis yönetimi (fazlasi var aslinda)
+Shortly it is the service management
 
 ### Best Practices
 Konfigürasyon Yönetimi
@@ -80,8 +80,7 @@ Bağımlılık ve Sıra Yönetimi
 - Düzenli olarak servislerin override.conf yapılarını gözden getir.
 - Güvenlik açısından tüm unit dosyalarında izolasyon ayarlarını standartlaştır.
 
-Eğer yanlış bağımlılık kurarsan Sistem her boot sırasında o gereksiz servisi de bekler. Ve Boot süresi uzar. Servis zincirleme olarak gecikme yaratır.
-
+Eğer yanlış bağımlılık kurarsan Sistem her boot sırasında o gereksiz servisi de bekler. 
 Yanlis tasaraim: Bir log toplama servisi:
 Requires=mysql.service
 After=mysql.service
