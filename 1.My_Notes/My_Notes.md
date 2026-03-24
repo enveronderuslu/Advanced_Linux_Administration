@@ -82,26 +82,29 @@ Bağımlılık ve Sıra Yönetimi
 
 Eğer yanlış bağımlılık kurarsan Sistem her boot sırasında o gereksiz servisi de bekler. 
 Yanlis tasaraim: Bir log toplama servisi:
+```vim
 Requires=mysql.service
 After=mysql.service
+```
 Bu durumda Log servisi için MySQL’in önce açılması beklenir. MySQL geç açılırsa log servisi de bekler. Boot süresi gereksiz uzar. Doğrusu:
+```vim
 Wants=mysql.service
 After=mysql.service
+```
 Bu durumda Bağımlılık zorunlu değildir; sistem gerekirse MySQL’i başlatmadan da boot eder.
-
 Servis bağımlılıklarını düzenlerken “Requires” yerine mümkün olduğunca “Wants” tercih et.
 ## systemctl – Instruction Notes (Red Hat–based Systems)
 
 sudo systemctl edit unit.type # Z.b. sshd.service
-sudo systemctl edit # activate the changes 
 sudo systemctl show sshd.service # servisle ilgili tüm detaylari görürsün
 - socket: Socket unit (örnek: sshd.socket), bir servisin sadece ihtiyaç olduğunda çalışmasını sağlayan “tetikleme noktasıdır”. Bir servis direkt çalışmak yerine, sistem bir port veya dosya üzerinden istek alınca çalışır. 
 sshd.socket # 22 numaralı portu dinler
 sshd.service # Bir bağlantı olunca otomatik başlar
 
 **Örnek**
+```vim
 [Unit]
-Description=Basit Python HTTP Server
+Description=Basic Python HTTP Server
 
 [Service]
 ExecStart=/usr/bin/python3 -m http.server 8080
@@ -110,8 +113,10 @@ User=nobody
 
 [Install]
 WantedBy=multi-user.target
+```
 Bu dosya kaydedilip systemctl enable myhttp.service denildiğinde servis açılışta otomatik başlar.
 Bu custom.target çağrıldığında myhttp.service ve nginx.service beraber yüklenir. Yani .service tekil yapı taşıdır, .target bunları organize eden şemsiye gibidir.
+
 ### Core Concepts
 **Unit**: A configuration object managed by systemd (service, socket, mount, timer, target). Stored under `/usr/lib/systemd/system/` or `/etc/systemd/system/`.
 
