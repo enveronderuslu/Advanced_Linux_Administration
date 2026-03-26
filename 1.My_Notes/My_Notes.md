@@ -1082,8 +1082,6 @@ Remote to Local:
 scp -r username@remote_host:/path/to/remote_folder /path/to/local_destination
 ```
 
-alias iam='ssh iam@10.0.10.6'
-
 ```bash
 alias sysupdate='sudo apt update && sudo apt upgrade -y'
 alias c='clear'
@@ -1126,28 +1124,5 @@ sonra  asagidaki Scripti yaz
 
 #!/bin/bash
 echo $VAR   # boş, değişken görünmez
-`./script.sh` dersen mevcut shell den bagimsiz calisir ve cikti vermerz. 
+`./script.sh` dersen mevcut shell den bagimsiz calisir ve cikti vermez. 
 `source script.sh` yaparsan 1, değişkeni mevcut shell’de görünüyor
-
-
-```yaml
-network:
-  version: 2
-  renderer: networkd
-  ethernets:
-    enp1s0:
-      dhcp4: no
-  vlans:
-    eth0.60:                  
-      id: 60                 
-      link: enp1s0            
-      addresses:
-        - 10.0.60.13/24    
-      routes:
-        - to: default
-          via: 10.0.60.1
-      nameservers:
-	addresses:
-    - 10.0.10.5
-```
-
