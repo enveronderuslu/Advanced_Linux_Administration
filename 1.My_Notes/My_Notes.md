@@ -1073,7 +1073,7 @@ sudo dpkg-reconfigure console-setup  #ubuntu serverda font VGA 16:32 yap cicek
 syntax on
 colorscheme industry
 ```
-
+### copy with ssh
 
 ```bash
 Local to Remote:
