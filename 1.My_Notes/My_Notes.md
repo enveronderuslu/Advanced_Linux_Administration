@@ -666,7 +666,8 @@ sudo firewall-cmd --reload
 fdisk -l gives the list of disks 
 fdisk /dev/nvme0n2  bu bizim VMWare de sonradan ekledigimiz disk 
 df -h disk usage
-
+du recursively ne varsa döker ortaya
+ncdu bu komutla bulöundugun ditindeki dosya büyüklükleri
 ### MOUNT ETME ISLEME 
  mkdir -p /home/enver/Desktop/disk2 
  mkfs.ext4 /dev/nvme0n2   # önce formatladim
