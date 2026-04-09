@@ -1,108 +1,110 @@
-**Linux System Basics** 
+**Linux System Basics (Red Hat–based Systems)** 
 # System and Hardware Info
 
 ```bash
-hostnamectl  # Shows full system metadata 
-lscpu  # Displays CPU architecture and info  
-lsblk  # Lists block devices (disks, partitions, etc.) 
-free -m  # Shows memory (RAM) usage in MB 
-df -kh # Displays all mounted partitions and their usage in human-readable format
-date  # Displays current date, time, and timezone (localization info)
-whoami  # Shows current logged-in user 
-who  # Users currently connected to the system
+hostnamectl  # Displays full system metadata and kernel info
+lscpu        # Displays CPU architecture and hardware details
+lsblk        # Lists all block devices and partitions
+free -h      # Shows memory usage in human-readable format
+df -h        # Displays mounted partitions and disk usage
+date         # Displays current date, time, and timezone
+sudo hostnamectl set-hostname <NewName>`# Changing System Hostname
 ```
 
 # Aliases & Bash Customization
-Users have their own `.bashrc` file. To apply changes, `source ~/.bashrc`
-
-Sample alias:
-```bash
-alias c='clear' # en sonda  sIk kullanilanlara bak
+Users have their own `.bashrc` file. To apply changes: `source ~/.bashrc`
+The command `alias` shows all active aliases.
+```ini
+alias sysupdate='sudo dnf5 -y upgrade'
+alias c='clear'
+alias l='ls -laFtr --color=auto --group-directories-first'
+alias ping='ping -c 5'
+alias ports='ss -tulanp'
+alias shut='sudo shutdown now'
+PS1='$ ' 
 ```
-Changing the System Hostname: `sudo hostnamectl set-hostname <NewName>`
-Script Logging: `script deneme.txt # Type exit to stop`
 
-The command 'alias' shows all alasses
-```bash
-cut -d : -f 3 /etc/passwd # selects the  3hd column
-```
-### Usecae: Profil.d kulllanimi
-Make "vim" default around the system:
-```bash
-sudo vim /etc/profile.d/editor.sh
+### Use Case: profile.d usage
+To set "vim" as the system-wide default editor:
+`sudo vim /etc/profile.d/editor.sh`
 
+Add the following lines:
+```ini
 #!/bin/bash
 export EDITOR=$(which vim)
 export VISUAL=$(which vim)
-
-sudo chmod +x /etc/profile.d/editor.sh
 ```
+Make it executable: `sudo chmod +x /etc/profile.d/editor.sh`
 
 # System Architecture and Boot Process
-## Boot Process
- - BIOS/UEFI initializes hardware and loads the bootloader.
- - GRUB (GRand Unified Bootloader) presents boot options and loads the kernel.
- - Kernel Initialization.
- - init/Systemd launch essential services and bring the system to a usable state.
-## systemd Overview
 
-systemd, modern Linux sistemlerinin temelini oluşturan bir sistem ve servis yöneticisidir. Eskiden kullanılan init sisteminin yerini almıştır. Temel olarak şunları yapar:
- - Sistemi Başlatma (Boot): Cekirdekten sonra ilk çalışan süreçtir (PID 1). Sistemi kullanıma hazır hale getirmek için gerekli servisleri ve süreçleri başlatır. 
- - Servis Yönetimi: Sistemdeki tüm servisleri (web sunucuları, veritabanı sunucuları, ağ servisleri usw). 
- - Bağımlılık Yönetimi: Servisler arasındaki bağımlılıkları takip eder ve servislerin doğru sırada başlatılmasını sağlar.  
- - Kaynak Yönetimi: Sistem kaynaklarını (CPU, bellek ...) yönetitr. 
- - Günlükleme (Journaling): Sistem olaylarını ve servislerin çıktılarını merkezi bir yerde (journald) toplar. `journalctl`  komutu ile bu günlüklere erişilebilir.
- - Diğer Özellikler: Zamanlanmış görevler (systemd.timer ile cron yerine), ağ yapılandırması (systemd-networkd), kullanıcı oturum yönetimi (systemd-logind) gibi birçok ek özelliği de bünyesinde barındırır.
+## Boot Process
+- BIOS/UEFI initializes hardware and loads the bootloader.
+- GRUB2 (GRand Unified Bootloader) presents boot options, loads the kernel.
+- Kernel Initialization and hardware driver loading.
+- systemd launches essential services (PID 1) and brings the system to a usable state.
+
+## SYSTEMD 
+Shortly systemd is the service management. Systemd is the primary service manager for modern Linux distributions.
+- **System Boot:** First process (PID 1) that starts all system components.
+- **Service Management:** Handles daemons like web and database servers.
+- **Dependency Management:** Ensures services start in the correct sequence.
+- **Resource Management:** Controls system resources (CPU, RAM) using cgroups.
+- **Journaling:** Centralized logging via `journald`, accessible with `journalctl`.
+- **Additional Features:** Includes timers (cron alternative), networking, and session management.
+
 ```bash
-systemd-analyze + blame # makinenin baslamasi icin süre + detaylat 
-/lib/systemd/system # services are here
+systemd-analyze         # Shows total boot time
+systemd-analyze blame   # Shows time taken by each service to start
+/usr/lib/systemd/system # Default system unit files (installed by packages)
+/etc/systemd/system     # User-defined unit files and customizations
 ```
-## SYSTEMD (ADVANCED)
-Shortly it is the service management
 
 ### Best Practices
-Konfigürasyon Yönetimi
-- Vendor dosyalarını değiştirme; /etc altında override kullan.
-- Aynı serviste çok adım varsa ExecStart= yerine ayrı script kullan.
+Configuration Management
+- Do not modify vendor files; use overrides under /etc.
+- If there are many steps in the same service, use a separate script instead of ExecStart=.
 
-Bağımlılık ve Sıra Yönetimi
-- Requires= servis gerekliliği, After= başlama sırası
-- Gereksiz bağımlılıklardan kaçın, boot süresini kontrol et.
+Dependency and Order Management
+- Requires= service requirement, After= startup order
+- Avoid unnecessary dependencies, check the boot time.
 
-İzleme
-- sytemctl status, journalctl -u ile sürekli servis durumu takibi.
-- Timer tarafında Persistent= kullanarak kaçırılan zamanlamaları telafi et.
+Monitoring
+- Follow service status continuously with systemctl status, journalctl -u.
+- Use Persistent= on the Timer side to compensate for missed schedules.
 
-5) Güvenlik
-- Servis çalıştırma ortamını mümkün olduğunca izole et:
+Security
+- Isolate the service running environment as much as possible:
 - ProtectSystem=full, ProtectHome=yes, PrivateDevices=yes
-- CapabilityBoundingSet= kullan
-- Düzenli olarak servislerin override.conf yapılarını gözden getir.
-- Güvenlik açısından tüm unit dosyalarında izolasyon ayarlarını standartlaştır.
+- Use CapabilityBoundingSet=
+- Regularly review the override.conf structures of the services.
+- Standardize isolation settings in all unit files for security.
 
-Eğer yanlış bağımlılık kurarsan Sistem her boot sırasında o gereksiz servisi de bekler. 
-Yanlis tasaraim: Bir log toplama servisi:
-```vim
+If you establish a wrong dependency, the system waits for that unnecessary service during every boot.
+Wrong design: A log collection service:
+```ini
 Requires=mysql.service
 After=mysql.service
 ```
-Bu durumda Log servisi için MySQL’in önce açılması beklenir. MySQL geç açılırsa log servisi de bekler. Boot süresi gereksiz uzar. Doğrusu:
-```vim
+In this case, MySQL is expected to open first for the Log service. If MySQL opens late, the log service also waits. Boot time is unnecessarily extended. Correct:
+
+```ini 
 Wants=mysql.service
 After=mysql.service
 ```
-Bu durumda Bağımlılık zorunlu değildir; sistem gerekirse MySQL’i başlatmadan da boot eder.
-Servis bağımlılıklarını düzenlerken “Requires” yerine mümkün olduğunca “Wants” tercih et.
-## systemctl – Instruction Notes (Red Hat–based Systems)
+In this case, the dependency is not mandatory; the system boots without starting MySQL if necessary. When organizing service dependencies, choose "Wants" instead of "Requires" as much as possible.
 
-sudo systemctl edit unit.type # Z.b. sshd.service
-sudo systemctl show sshd.service # servisle ilgili tüm detaylari görürsün
-- socket: Socket unit (örnek: sshd.socket), bir servisin sadece ihtiyaç olduğunda çalışmasını sağlayan “tetikleme noktasıdır”. Bir servis direkt çalışmak yerine, sistem bir port veya dosya üzerinden istek alınca çalışır. 
-sshd.socket # 22 numaralı portu dinler
-sshd.service # Bir bağlantı olunca otomatik başlar
+## Systemctl 
 
-**Örnek**
-```vim
+sudo systemctl edit unit.type # e.g. sshd.service
+sudo systemctl show sshd.service # shows all service details
+
+- socket: A socket unit (e.g. sshd.socket) listens on a port and triggers the service when a connection is received.  
+sshd.socket listens on port 22 sshd.service starts when a connection occurs  
+---
+
+**Example**
+```ini
 [Unit]
 Description=Basic Python HTTP Server
 
@@ -114,145 +116,59 @@ User=nobody
 [Install]
 WantedBy=multi-user.target
 ```
-Bu dosya kaydedilip systemctl enable myhttp.service denildiğinde servis açılışta otomatik başlar.
-Bu custom.target çağrıldığında myhttp.service ve nginx.service beraber yüklenir. Yani .service tekil yapı taşıdır, .target bunları organize eden şemsiye gibidir.
 
-### Core Concepts
-**Unit**: A configuration object managed by systemd (service, socket, mount, timer, target). Stored under `/usr/lib/systemd/system/` or `/etc/systemd/system/`.
-
-**Target**: A unit type grouping other units to define a system state (e.g., `multi-user.target`, `graphical.target`, `rescue.target`). Replaces legacy runlevels.
+After saving, run:
+```bash
+systemctl daemon-reload
+systemctl enable myhttp.service
+```
 
 ---
 
-### Commands
+### Core Concepts and Commands
 
-**systemctl start \<unit>**
-Starts a unit immediately.  
-**Best practice**: Start only validated, enabled services.  
-**Use case**: Starting `httpd.service` after configuration.
+**Unit**: A configuration object managed by systemd (service, socket, mount, timer, target). Stored under:
+- `/usr/lib/systemd/system/`
+- `/etc/systemd/system/`
 
-**systemctl status \<unit>**
-Shows active state, logs, metadata.  
-**Best practice**: Always check status before troubleshooting.  
-**Use case**: Verifying `sshd.service`.
+**Target**: A unit type grouping other units to define a system state.  
+Examples:
+- multi-user.target
+- graphical.target
+- rescue.target
 
-**systemctl restart \<unit>**
-Stops and starts the unit.  
-**Best practice**: Use after config changes.  
-**Use case**: Reloading web server settings.
+```bash
+systemctl start <unit> # Starts a unit immediately.  
 
-**systemctl stop \<unit>**
-Stops a running service.  
-**Best practice**: Confirm no critical dependencies rely on it.  
-**Use case**: Stopping `firewalld.service` safely.
+systemctl stop <unit> # Stops a running service. Use case: Stopping firewalld.service
 
-**systemctl enable \<unit>**
-Activates automatic start at boot.  
-**Best practice**: Enable only essential long-running services.  
-**Use case**: Enabling `chronyd.service`.
+systemctl restart <unit> # Stops and starts the unit.  
 
-**systemctl disable \<unit>**
-Prevents boot-time start.  
-**Best practice**: Disable unused or risky services.  
-**Use case**: Disabling an unused database service.
+systemctl status <unit> # Shows active state, logs, metadata.  
 
-**systemctl list-units**
-Shows loaded and active units.  
-**Best practice**: Filter by type for clarity.  
-**Use case**: Auditing running services.
+systemctl enable <unit> # Activates automatic start at boot.  
 
-**systemctl set-default \<target>**
-Sets system boot target.  
-**Best practice**: Use `multi-user.target` for servers.  
-**Use case**: Switching from graphical to text-only mode.
+systemctl disable <unit> # Prevents boot-time start. Disabling unused services
 
-**systemctl get-default**
-Displays current default target.  
-**Best practice**: Verify before rebooting.  
-**Use case**: Checking that CLI mode is active.
+systemctl daemon-reload # Reloads unit files after edits.
 
-**systemctl cat \<unit>**
-Shows full unit definition.  
-**Best practice**: Review before editing.  
-**Use case**: Inspecting `sshd.service`.
+systemctl set-default <target> # Sets system boot target. Use case: Switching to `multi-user.target`.
 
-**systemctl show \<unit>**
-Displays all runtime properties.  
-**Best practice**: Use for deep diagnostics.  
-**Use case**: Verifying dependencies.
+systemctl get-default # Displays current default target.  
+```
+---
 
-**systemctl edit \<unit>**
-Creates drop-in overrides under `/etc/systemd/system/<unit>.d/`.  
-**Best practice**: Never modify vendor files.  
-**Use case**: Adding environment variables to a service.
-
-**systemctl daemon-reload**
-Reloads unit files after edits.  
-**Best practice**: Run after any unit modification.  
-**Use case**: Applying new service definitions.
-
-**systemctl isolate \<target>**
-Switches to another system state.  
-**Best practice**: Use cautiously; may stop many services.  
-**Use case**: Entering `rescue.target`.
-
-**systemctl list-dependencies \<unit>**
-Shows dependency tree.  
-**Best practice**: Review before disabling or isolating.  
-**Use case**: Understanding `graphical.target`.
-
-**systemctl isolate emergency.target**
-Enters minimal environment.  
-**Best practice**: Use only for critical recovery.  
-**Use case**: Fixing filesystem corruption.
-
-**systemctl list-units -t target**
-Lists all targets.  
-**Best practice**: Identify available system states.  
-**Use case**: Checking custom targets.
-
-**systemctl edit sound.target**
-Creates a drop-in for `sound.target`.  
-**Best practice**: Adjust grouped services at the target level.  
-**Use case**: Overriding audio subsystem behavior.
-
-**systemctl start name.target**
-Starts all units in the target.  
-**Best practice**: Use for structured subsystem startup.  
-**Use case**: Starting an application stack.
-
-**systemctl isolate name.target**
-Switches to the custom target.  
-**Best practice**: Ensure all required core units exist.  
-**Use case**: Application-specific environments.
-
-**systemctl list-dependencies name.target**
-Shows dependencies of a custom target.  
-**Best practice**: Validate tree before production use.  
-**Use case**: Checking completeness of grouped services.
-
-**systemctl set-default name.target**
-Sets a custom target as the boot default.  
-**Best practice**: Apply only if thoroughly tested.  
-**Use case**: Booting directly into an application environment.
-
-**systemctl set-default emergency.target**
-systemctl start default.target
-Sets emergency mode as default, then returns to normal.  
-**Best practice**: Avoid except in controlled recovery tests.  
-**Use case**: Disaster-recovery validation.
-
-**systemctl set-default graphical.target**
-systemctl start default.target
-Sets graphical mode as default and switches to it.  
-**Best practice**: Use on workstations, not servers.  
-**Use case**: Restoring GUI functionality.
 ## SYSTEMD CGROUPS
-Ne işe yarar: 
-1. Servislerin kaynak kullanımını sınırlar (CPU, RAM, I/O).
-```Ini
+
+What it does:
+1. Limits resource usage of services (CPU, RAM, I/O).
+
+```bash
 mkdir -p /etc/systemd/system/httpd.service.d
-cat > /etc/systemd/system/httpd.service.d/limits.conf 
+cat > /etc/systemd/system/httpd.service.d/limits.conf
+```
+
+```ini
 [Service]
 CPUQuota=40%
 MemoryMax=800M
@@ -260,48 +176,70 @@ IOReadBandwidthMax=/ 10M
 ```
 
 ```bash
-systemctl daemon-reload && systemctl restart httpd # Bu yapılandırma httpd servisine CPU, bellek ve I/O sınırı uygular. 
+systemctl daemon-reload
+systemctl restart httpd
 ```
+---
 
-2. Servis seviyesinde izleme ve hata yönetimi yapılmasını sağlar.
+2. Service monitoring and diagnostics.
+
 ```bash
 systemctl status mariadb
-systemd-cgtop # systemd-cgtop servisin CPU ve bellek kullanımını gerçek zamanlı gösterir.
-```
-3. Sistem kararlılığını artırır
-```Ini
-[Service]
-MemoryMax=1G # Belirlenen sınır aşılırsa kernel OOM, yalnızca o servisi hedef alır.
-```
-4. Kaynak temelli performans teşhisi sağlar.
-```bash 
-systemd-cgls # Bu komut cgroup hiyerarşisini göstererek hangi servislerin hangi süreçlere sahip olduğunu, hangi grubun yük oluşturduğunu hızlıca ortaya çıkarır.
-# Mesela
+systemd-cgtop
+systemd-cgls
 systemd-cgls | grep ssh
 ```
+---
 
-### .target .service dosyalari
-`.service ` dosyaları bireysel servisleri tanımlar. `.target` dosyaları ise bu servisleri bir araya getirip topluca yönetir. `/lib/systemd/system/` veya `/etc/systemd/system/` icinde bulunurlar. 
-`/usr/lib/systemd/` dizinindeki dosyalar sistemin varsayılan, paketle gelen systemd servis ve target tanımlarını içerir. Bu dosyalar güncellemelerle otomatik olarak değiştirilir.
-`/etc/systemd/system/` dizini ise yönetici tarafından yapılan özelleştirmeler içindir. Buradaki dosyalar önceliklidir ve /usr/lib/systemd/ içindeki aynı isimli dosyaları geçersiz kılar.
-Örnek: Varsayılan servis dosyası: /usr/lib/systemd/system/sshd.service
-Özelleştirilmiş servis dosyası: /etc/systemd/system/sshd.service
-Varsayılan dosyaları değiştirmek yerine `systemctl edit etwas.service` komutuyla override dosyası oluştur.
+3. Improves system stability.
 
-`.service` dosyası bir servisin kendisini tanımlar. İçinde hangi binary’nin çalıştırılacağı, hangi kullanıcıyla çalışacağı, ne zaman yeniden başlatılacağı gibi bilgiler olur. Örneğin: `myhttp.service` dosyasini olusturalim. 
+```ini
+[Service]
+MemoryMax=1G
+```
+---
+
+### .service and .target Files
+
+`.service`  define individual services.  
+`.target`  group services for collective management.  
+
+Locations:
+- `/usr/lib/systemd/system/`
+- `/etc/systemd/system/`
+
+Example:
+- Default: `/usr/lib/systemd/system/sshd.service`
+- Custom: `/etc/systemd/system/sshd.service`
+
+Use:
+```bash
+systemctl edit etwas.service
+```
+---
+
+**Example .service File**
+
 ```ini
 [Unit]
-Description= Python HTTP Server
+Description=Python HTTP Server
+
 [Service]
 ExecStart=/usr/bin/python3 -m http.server 8080
 Restart=always
 User=nobody
+
 [Install]
 WantedBy=multi-user.target
 ```
-Bu dosya kaydedilip `systemctl enable myhttp.service` denildiğinde servis açılışta otomatik başlar.
 
-.target dosyası ise doğrudan bir servis tanımlamaz; sadece bir grup mantıksal hedef sunar. Örneğin:
+```bash
+systemctl enable myhttp.service
+```
+---
+
+**Example .target File**
+
 ```ini
 [Unit]
 Description=Custom Services Target
@@ -309,13 +247,17 @@ Requires=myhttp.service
 Requires=nginx.service
 After=network.target
 ```
-custom.target, ağ servisleri (ör. IP yapılandırması, ağ arabirimlerinin aktif olması) hazır olmadan başlatılmaz. Bu, Requires= ile birlikte kullanıldığında, önce network.target başlar, sonra bu hedefteki servisler çalışır.
-Bazi default .target dosyalari:
-multi-user.target: ağ servisleri, çoklu kullanıcı, SSH, cron gibi servisleri çalıştırır. 
-systemctl status multi-user.target
-graphical.target GUI içeren sistemler için kullanılır. 
+---
 
-# Package Management with YUM and DNF
+### Default Targets
+
+- `multi-user.target`
+- `graphical.target`
+
+---
+ 
+
+# Package Management with DNF
 ## Commands
 ```bash
 dnf install package-name #Installing packages:
@@ -334,66 +276,108 @@ A paketi B paketine bagli. B ist weg. A atil kaldi. A is a Orphan package
 dnf repoquery --unneeded
 dnf remove $(dnf repoquery --unneeded -q)
 ```
-Snap, Canonical (Ubuntu'nun geliştiricisi) tarafından geliştirilen bir paket sistemi. APPs kendi bağımlılıklarıyla paketlenir. `sudo snap install App1`
 
-### Case Study
+### FLATPAK
+Ubuntu'daki Snap gibi, RHEL tarafında da bağımlılıkları içinde barındıran ve sistemden izole çalışan standart paketleme formatı Flatpak'tir. Red Hat sistemlerinde varsayılan olarak desteklenir ve geliştirilir.
 
-sudo  apt install google-chrome-stable_current_amd64.deb
-E: Unable to locate package google-chrome-stable_current_amd64.deb
-apt, bu komuttaki "google-chrome-stable_current_amd64.deb" ifadesini, bir paket deposundaki paket ismi sanıyor. 
-`sudo apt install Firefox` komutunda Dogru calisir. Ama sen aslında elindeki yerel bir dosyayı kurmaya çalışıyorsun. Bu yüzden sistem, Benim depolarımda `google-chrome-stable_current_amd64.deb` diye bir paket yok diyor. Ve hata veriyor. apt, .deb dosyalarını paket deposu (package repository) adı gibi algılar. Bu yüzden "Unable to locate package" hatası verir.
-.deb dosyası ile çalışmak için uygun değil.
-`sudo dpkg -i  google-chrome-stable_current_amd64.deb`  -> Doğru kullanım
+```bash
+sudo dnf install flatpak # install Flatpak
+flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpa # add repo
+flatpak search firefox # search
+sudo flatpak search typora
+# Name      Description           App ID              Version  Remotes
+# Typora    Markdown read/write   io.typora.Typora    1.12.4   flathub
+flatpak install flathub io.typora.Typora # install
+```
 
-`sudo apt install firefox` dediğinde, apt markete gider, raftan firefox paketini bulur ve kurar. 
-3. apt = Market görevlisiakip eder.
-4. deb dosyası = Poşet içindeki ürün `sudo dpkg -i ürün.deb`
-5. Dosyayi indirdigin yerde terminalde ` apt install ./sample.deb` yazsan direk calisacakti Aklini s*keyim
+
+**Case Study**
+```bash
+sudo dnf install google-chrome-stable.rpm
+E: Unable to find a match: google-chrome-stable_current_x86_64.rpm
+```
+dnf, bu komuttaki "google-chrome-stable_current_x86_64.rpm" ifadesini, bir paket deposundaki paket ismi sanıyor. Aslında elindeki yerel bir dosyayı kurmaya çalışıyorsun. Bu yüzden sistem, benim depolarımda `google-chrome-stable_current_x86_64.rpm` diye bir paket yok diyor ve hata veriyor.
+
+`sudo dnf install google-chrome-stable` komutunda doğru çalışır.  dnf, .rpm dosyalarını paket deposu (package repository) gibi algılar. Bu yüzden "Unable to find a match" hatası verir.
+.rpm dosyası ile çalışmak için uygun değil.
+`sudo rpm -i google-chrome-stable_current_x86_64.rpm`  -> Doğru kullanım
+
+`sudo dnf install google-chrome-stable` dediğinde, dnf markete gider, raftan ilgili paketi bulur ve kurar. 
+3. dnf = Market görevlisi takip eder.
+4. rpm dosyası = Poşet içindeki ürün `sudo rpm -i ürün.rpm`
+5. Dosyayı indirdiğin yerde terminalde `sudo dnf install ./google-chrome-stable_current_x86_64.rpm` yazsan direkt çalışır.
+
+---
+
+
 
 # User and Group Management
+
 ## Commands
-```py
-useradd # home directory veya psswrd olusturulmaz. Ek argümanlarla home directory olusturulur
-adduser # home dir ve passwd olusturulur
-adduser # güvenlik acisindan daha iyi
+```bash
+whoami  # Shows current logged-in user 
+who  # Users currently connected to the system
+
+useradd  # minimal user creation (manual setup)
+adduser  # creates home directory and sets password
+
 groupadd
-userdel <user> # home directory silinmez
-userdel -r <user> # home directory silinir
-usermod -G <DROUP> <USER> # diger gruplardan cikarir. kendi ismindeki grup korumur
-usermod -aG <GROUP> <USER> # diger gruplarda kalmaya devam eder
-visudo /etc/sudoers # dosyasini acar 
-who or users # makineyi o an kullanan kullanicilari verir
-id Test_User # olusturdugun userin hangi gruplarda oldugunu görürsün
+
+userdel <user>  # home directory is not deleted
+userdel -r <user>  # home directory is deleted
+
+usermod -G <GROUP> <USER>  # replaces groups
+usermod -aG <GROUP> <USER>  # appends groups
+
+visudo  # opens sudoers file safely
+
+id <USER>  # shows user group membership
 ```
-`etc/passwd` user accountlarla ilgili bilgiler
-`etc/shadow` encrypted password ler burada.
 
+---
 
-passwd icinde degisiklik yapacaksan `vipw` kullan (Ayni `visudo` da oldugu gibi) Yaptigin degisiklikleri kontrol eder ve hata varsa uyari verir- group lar icin `vigr`
-/etc/login.defs icinde degisiklikler yaparak yeni olusturulacak user larin özellikleri ayarlanabilir. 
+## System Files
 
-/etc/skel dizini, yeni kullanıcı oluşturulduğunda onun ana dizinine (home directory) otomatik kopyalanacak varsayılan dosyaları içerir.
+- `/etc/passwd` → user account information  
+- `/etc/shadow` → encrypted passwords  
+
+Use:
+- `vipw` → safely edit passwd  
+- `vigr` → safely edit group  
+
+- `/etc/login.defs`, `/etc/security/pwquality.conf`, `/etc/security/faillock.conf` → password and authentication settings  
+
+The `/etc/skel` directory contains default files that will be automatically copied to the home directory of a new user when it is created.
+
+---
+
 ## Password Policies
-`chage -l # current settings`
-sudo chage <USER_NAME> adim adim ayarlamalari yaparsin
-PASSWORD AGING: `chage -m mindays -M maxdays -d lastday`
-`sudo nano /etc/login.defs` dosyasinda bu sayilari düzelt. Bu yeni sistemlerde artik yok. Peki ne var: ` /etc/security/pwquality.conf` yine FAILED LOGINLER ICIN `/etc/security/faillock.conf` 
+
+```bash
+chage -l
+chage <USER_NAME>
+```
+
+PASSWORD AGING: `chage -m <mindays> -M <maxdays> -d <lastday>`
+
+---
+
 ## Session Management
-loginctl en yeni arac. `w` veya `who` komutlarida olur. 
-loginctl list-sessions # tüm sessions ve session number
-loginctl show-session <session_number> # detayli bilgi
+
+loginctl is the newest tool. w or who commands also work.
+
+```bash
+loginctl list-sessions
+loginctl show-session <session_number>
 loginctl terminate-session <session_number>
+```
+---
 
-### Using `ps`
-
-`ps aux | grep  ssh` bununla tüm ssh processlerini ve PID lerini görürsün
-
-ctrl + z islmei arkaya atar. jobs ile bu islemleri görürsün. %1 sana arkada calisan 1 numarali processi getirir. fg veya bg foreground background
-
-ps auxZ | grep -E 'httpd|COMMAND' # 'httpd|COMMAND' ifadesi, hem httpd içeren satırları hem de başlık satırını (COMMAND) filtreler. Böylece çıktıda işlemler ve sütun başlıkları birlikte görünür.
+# SYSTEM MONITORING
 
 
-### SYSTEM MONITORING
+
+
 `top -u user1` user1 ne kullaniyor sadece bunu gösterir
 top 
 
@@ -430,6 +414,12 @@ dmesg | grep -i fail        # Başarısızlıklarla ilgili satırlar
 dmesg | grep eth            # Ethernet veya ağ arayüzü sorunları
 ```
 ## Managing Processes
+`ps aux | grep  ssh` bununla tüm ssh processlerini ve PID lerini görürsün
+
+ctrl + z islmei arkaya atar. jobs ile bu islemleri görürsün. %1 sana arkada calisan 1 numarali processi getirir. fg veya bg foreground background
+
+ps auxZ | grep -E 'httpd|COMMAND' # 'httpd|COMMAND' ifadesi, hem httpd içeren satırları hem de başlık satırını (COMMAND) filtreler. Böylece çıktıda işlemler ve sütun başlıkları birlikte görünür.
+
 ps fax # parent child processes
 top komutu ps den daha iyi
 kill basiert auf PID
@@ -440,11 +430,11 @@ w shows all current sesions
 pgrep -l -u bob # bob isimli user la ilgili processes
 ```
 
-```py
+```bash
 pkill -SIGKILL -u <user> # user ile ilgili tüm prosesleri kill yapar
 ```
 
-```py
+```bash
 pstree -p newuser # proses agaci
 ```
 
@@ -505,16 +495,14 @@ systemctl status goodmorning.timer # Verify the Timer
 eski usül;
 log in as bob and then run `crontab -e` and write `0 5 * * * /usr/bin/logger "good morning"`. Veya `sudo nano /etc/crontab` icinde degistir
 
+
+---
+
 # Networking
 What is the loopback device? localhost
 NIC bonding: Combining multiple NICs together
 
-Debian UBUNTU
-ip a
-ip r # sadece routing kismini gösterir daha sadedir
-ifup ens3 ifdown ens3
-/etc/resokv.conf # old school
-systemd : a group of tools  working together
+
 ## UBUNTU
 systemctl status  systemd-networkd
 netplan icindeki dosyada renderer kisminda networkd yerine NetworkManager yazarsin. systemctl stop and disable systemd-networkd yap NetworkManager kur baslat.
@@ -551,23 +539,21 @@ ip l         # data link layer  info
 What is MTU?  MTU stands for Maximum Transmission Unit, indicating the largest packet size (in bytes) that a network interface can send without needing to break it into smaller pieces (fragmentation). A common default MTU is 1500 bytes
 
 ```bash
-ip -br  -4 a bu bi harika. ipv4 leri brief ediyor
+ip -br  -4 a # bu bi harika. ipv4 leri brief ediyor
 ip -o -4 a | column -t
 ip r routes
 ip -c r | column -t  # c  renklendirir
 ```
 traceroute
+
 ```bash
 dig example.com
 dig  -x IP_Address  # reverse lookup
-dig @4.2.2.2 google.com # google.com alan adının IP adresini, 4.2.2.2 DNS sunucusunu kullanarak sorgular.
+dig @4.2.2.2 google.com # queries the IP address of the google.com domain name using the 4.2.2.2 DNS server..
 ```
 
-```bash
-nmap -sn network_adres.0/24
-nmap ip_adress # dzrek hedef detaylarini verir
-```
-debclient.example.local  ä homelabs icin . local iyi. bu adrese FullyQualifiedDomainName
+
+client.example.local # bu adrese FullyQualifiedDomainName FQDN
 
 ## Working with  HOSTS file
 
@@ -604,37 +590,28 @@ hosts: files dns → IP/hostname çözümlemesinde önce /etc/hosts, sonra DNS k
 
 ## ss
 
-| Durum               | Ne Anlama Gelir?             |
-| ------------------- | ---------------------------- |
-| LISTEN              | Port dinlemede. |
-| ESTABLISHED         | Aktif bir bağlantı var |
-| CLOSE\_WAIT         | Karşı taraf kapattı ama sizin taraf hala kapatmadı |
-| TIME\_WAIT          | Bağlantı kapatıldı ama bir süre daha beklemede |
-| SYN\_SENT SYN\_RECV | TCP bağlantısı kurulmaya çalışılıyor.  |
+| Status              | Meaning                                      |
+| ------------------- | -------------------------------------------- |
+| LISTEN              | Port is listening.                           |
+| ESTABLISHED         | There is an active connection                |
+| CLOSE_WAIT          | The other side closed, but your side has not |
+| TIME_WAIT           | Connection closed but waiting for a while    |
+| SYN_SENT SYN_RECV   | TCP connection is being established.         |
 
+ss -tulnw
 
-
-ss  -tuln  / ss tulnw
-
-
-
-ss -punt
-ps  -ef  | grep -i  ssh
-ssh  -V versionu verir
-scp sourcefile_path  user@IP:/example_path
-
-pgrep  -c ssh   ssh ile kac baglanti var? dikkat burda tek baglanti gidis-gelis 2  sayilir
-pgrep -a ssh
+pgrep  -c ssh   # ssh ile kac baglanti var? dikkat burda tek baglanti gidis-gelis 2  sayilir
+pgrep -a ssh    # ssh ile  ilgili proses sayisi
 
 ## SFTP 
 SFTP vs RSYNC Use rsync for performance and automation; use SFTP for interactive management and compatibility.
 ANLIK ETKILESIMLI CALISACAKSAN  SFTP KULLAN. SSH tabanli . ekstra bisey kurmana gerek yok
 ```bash
 sftp> ansible@172.17.17.20
-sftp> get testfile # dosya indirir
-sftp> put /dosya/yolu # file upload
-sftp> mkdir etwas_dosyasi # dosxa olusturur
-sftp> lls  # lokalde malin incegi  klasörde olanlari siralar
+sftp> get testfile        # downloads the file
+sftp> put /path/to/file   # file upload
+sftp> mkdir etwas_file    # creates a file
+sftp> lls                 # lists the contents of the folder where the machine is locally
 ```
 
 ## APACHE 
@@ -1057,6 +1034,11 @@ yine `<command> &` ile komut arka planda calisir.
 # HARiCi
 ## BASlarken (SIK kullanilanlar)
 
+
+```bash
+cut -d : -f 3 /etc/passwd # selects the  3hd column
+```
+
 ```bash
 git config --global user.email  "enveronderuslu@gmail.com"  &&  git config --global user.name "Enver Onder Uslu"
  
@@ -1082,15 +1064,6 @@ Remote to Local:
 scp -r username@remote_host:/path/to/remote_folder /path/to/local_destination
 ```
 
-```bash
-alias sysupdate='sudo apt update && sudo apt upgrade -y'
-alias c='clear'
-alias l='ls -laFtr  --color=auto'
-alias ping='ping -c 5'
-alias ports='ss -tulanp' 
-alias shut='sudo shutdown now'
-PS1='$ ' # ekranda sadec $ isareti olsun istediginde
-```
 ```bash
 sudo usermod -l  fedora1 fedora && sudo usermod -d /home/fedora1 -m fedora1 # user ismi ve homedirectory degistir
 ```
