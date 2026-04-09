@@ -557,6 +557,10 @@ client.example.local # bu adrese FullyQualifiedDomainName FQDN
 
 ## Working with  HOSTS file
 
+hosts  dosyasina asagidaki bicimdede yazabilirsin.
+172.17.17.20 ans-ubuntu.example.local ans-ubuntu
+siralama;  " IP FQDN Hostname " seklinde olur.
+
 vim /etc/hosts
 172.17.17.20 ans-ubuntu # bunu yazinca artik ans-ubuntu icin dns  geregi yok
 mesela
@@ -565,9 +569,7 @@ mesela
 ssh ansible@ans-ubuntu
 ```
 
-hosts  dosyasina asagidaki bicimdede yazabilirsin.
-172.17.17.20 ans-ubuntu.example.local ans-ubuntu
-siralama;  " IP FQDN Hostname " seklinde olur.
+
 
 
 
@@ -634,7 +636,7 @@ ip route add 192.168.2.B.0/24 via 192.168.1.B
 
 
 ## Firewall Configuration with `firewalld`
-fedore ve RHEL de firewall dan port acma 
+port assign in RHEL 
 sudo firewall-cmd --permanent --add-port=8080/tcp
 sudo firewall-cmd --reload
 
