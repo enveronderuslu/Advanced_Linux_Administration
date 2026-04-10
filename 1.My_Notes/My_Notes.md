@@ -1,5 +1,5 @@
-**Linux System Basics (Red Hat–based Systems)** 
-# System and Hardware Info
+```text
+**Linux System Basics (Red Hat–based Systems)** # System and Hardware Info
 
 ```bash
 hostnamectl  # Displays full system metadata and kernel info
@@ -8,7 +8,7 @@ lsblk        # Lists all block devices and partitions
 free -h      # Shows memory usage in human-readable format
 df -h        # Displays mounted partitions and disk usage
 date         # Displays current date, time, and timezone
-sudo hostnamectl set-hostname <NewName>`# Changing System Hostname
+sudo hostnamectl set-hostname <NewName> # Changing System Hostname
 ```
 
 # Aliases & Bash Customization
@@ -314,7 +314,7 @@ Ubuntu'daki Snap gibi, RHEL tarafında da bağımlılıkları içinde barındır
 
 ```bash
 sudo dnf install flatpak # install Flatpak
-flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpa # add repo
+flatpak remote-add --if-not-exists flathub [https://flathub.org/repo/flathub.flatpa](https://flathub.org/repo/flathub.flatpa) # add repo
 flatpak search firefox # search
 sudo flatpak search typora
 # Name      Description           App ID              Version  Remotes
@@ -970,16 +970,5 @@ To grant specific users `sudo` privileges without a password:
 D-Bus (Desktop Bus), Farklı uygulamaların birbirleriyle veri veya komut paylaşmasını sağlar. Merkezi bir iletişim kanalı sağlar. Örneğin, bir uygulama diğerine “bu dosya açıldı” mesajı gönderebilir.
 Bir daemon (genellikle dbus-daemon) sürekli çalışır ve mesajları gönderip alır. Tipik Kullanım: Masaüstü ortamları (GNOME, KDE) ve sistem servisleri arasında iletişim.
 ## Runtime configuration 
-Runtime configuration; uygulamanın davranışını kod değiştirmeden ve yeniden derlemeden yönetmeye yarar. Z.b. bir web sunucusunun port numarasını veya log seviyesini bir config.yaml dosyasından uygulama her başlatıldığında okuması. Uygulama çalışırken dosya değişirse ve sunucu bu değişikliği yeniden yükleyebiliyorsa, bu bir runtime configuration kullanım örneğidir. 
-## Application (service), Process, Daemon
-Application=Service: Script list of instructions. 
-Process: when you start a service(app) it starts a Process and process id
-Daemon: etwas continuously runs in background. It is also a process
-## Sourcing vs. Running a Script
-Terminalde  `VAR=1` seklinde bir degisken tanimla.
-sonra  asagidaki Scripti yaz
-
-#!/bin/bash
-echo $VAR   # boş, değişken görünmez
-`./script.sh` dersen mevcut shell den bagimsiz calisir ve cikti vermez. 
-`source script.sh` yaparsan 1, değişkeni mevcut shell’de görünüyor
+Runtime configuration; uygulamanın davranışını kod değiştirmeden ve yeniden derlemeden yönetmeye yarar. Z.b. bir web sunucusunun port numarasını veya log seviyesini bir config.yaml dosyasından uygulama her başlatıldığında okuması. Uygulama çalışırken dosya değişirse ve sunucu bu değişikliği yeniden yükleyebiliyorsa, bu bir r
+```
