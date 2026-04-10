@@ -23,6 +23,10 @@ alias ports='ss -tulanp'
 alias shut='sudo shutdown now'
 PS1='$ ' 
 ```
+head etwas.txt shows first 10 line of the file
+tail etwas.txt shows last 10 line of the file
+tail -n 20 etwas.txt
+sudo tail -f  /var/log/syslog eklendikce yenileri  görürsün
 
 ### Use Case: profile.d usage
 To set "vim" as the system-wide default editor:
@@ -35,6 +39,34 @@ export EDITOR=$(which vim)
 export VISUAL=$(which vim)
 ```
 Make it executable: `sudo chmod +x /etc/profile.d/editor.sh`
+
+## Shell Automation Utilities
+* **xargs:** Converts standard input into arguments for other commands.
+    * Example: `cat folder.txt | xargs mkdir` (Reads folder names from a file and creates directories for each).
+
+### Understanding `xargs`
+
+`xargs` is a utility that reads items from standard input (separated by blanks or newlines) and executes a command using those items as arguments. It is essential when a command does not accept input directly via a pipe (`|`).
+
+**Practical Examples**
+
+* **Deleting multiple files found by `find`:**
+    Instead of errors when too many files are found, `xargs` processes them safely:
+    ```bash
+    find . -name "*.tmp" | xargs rm
+    ```
+
+* **Creating directories from a list:**
+    If you have a file `list.txt` containing folder names:
+    ```bash
+    cat list.txt | xargs mkdir
+    ```
+
+* **Counting lines in multiple files:**
+    ```bash
+    ls *.txt | xargs wc -l
+    ```
+---
 
 # System Architecture and Boot Process
 
@@ -498,592 +530,442 @@ log in as bob and then run `crontab -e` and write `0 5 * * * /usr/bin/logger "go
 
 ---
 
-# Networking
-What is the loopback device? localhost
-NIC bonding: Combining multiple NICs together
 
+# Networking
+
+What is the loopback device? localhost  
+NIC bonding: Combining multiple NICs together  
+
+---
 
 ## UBUNTU
-systemctl status  systemd-networkd
-netplan icindeki dosyada renderer kisminda networkd yerine NetworkManager yazarsin. systemctl stop and disable systemd-networkd yap NetworkManager kur baslat.
-networkctl
-networkctl status # bunun ciktisinda eski  loglari görürsün
-dns  isi ubuntu da /etc/systemd/resolveD.conf  dosyasindada yapiliyor. Eee aq hangisi?
-belirleyici olan netplan  icindeki  dosya
 
-Dosya	Öncelik	Rol	Etki
-/etc/netplan/50-cloud-init.yaml	1	DNS tanımı	Aktif
-/etc/systemd/resolved.conf	2	Davranış ayarları	Destekleyici
-/etc/resolv.conf	3	Otomatik çıktı	Etkisiz
+systemctl status systemd-networkd  
 
-resolvectl
-resolvectl status
+Netplan: set `renderer` to `NetworkManager` instead of `networkd`.  
+Disable `systemd-networkd` and use NetworkManager via netplan renderer.
+
+networkctl  
+networkctl status # Shows interface state and recent status information  
+
+DNS configuration:
+
+| File                               | Priority | Role               | Effect       |
+|------------------------------------|----------|--------------------|--------------|
+| /etc/netplan/50-cloud-init.yaml    | 1        | DNS definition     | Active       |
+| /etc/systemd/resolved.conf         | 2        | Behavior settings  | Supporting   |
+| /etc/resolv.conf                   | 3        | Auto-generated     | Indirect     |
+
+Netplan configuration determines the effective DNS settings.
+
+resolvectl  
+resolvectl status  
+
+---
 
 ## RHEL 
-NetworkManager
-sudo lshw -class network # deeper information
-man nmcli-examples 
-cockpit kur  sonra
-firewall-cmd --add-service=cockpit --permanent
-firewall-cmd --reload
-web arayüzü  hazir
-sudo systemctl status NetworkManager . gives the last 10 logs
-sudo journalctl -u NetworkManager | less# entire logs
 
-özellikle ssh baglantilarinda  less mutlak kullanilir. degilse malim tamami görülmez
+NetworkManager  
+
+Config file:  
+`/etc/NetworkManager/system-connections/enp0s3.nmconnection`  
+
+man nmcli-examples  
+
+Cockpit web interface runs on port 9090  
+
+sudo systemctl status NetworkManager # Shows service status and recent logs  
+sudo journalctl -u NetworkManager | less # Full logs  
+
+---
 
 ## COMMANDS
 
-ip l         # data link layer  info
+ip l # data link layer info  
 
-What is MTU?  MTU stands for Maximum Transmission Unit, indicating the largest packet size (in bytes) that a network interface can send without needing to break it into smaller pieces (fragmentation). A common default MTU is 1500 bytes
+MTU: maximum packet size (default ~1500 bytes)
 
 ```bash
-ip -br  -4 a # bu bi harika. ipv4 leri brief ediyor
+ip -br -4 a
 ip -o -4 a | column -t
-ip r routes
-ip -c r | column -t  # c  renklendirir
+ip -c r | column -t
 ```
-traceroute
 
 ```bash
 dig example.com
-dig  -x IP_Address  # reverse lookup
-dig @4.2.2.2 google.com # queries the IP address of the google.com domain name using the 4.2.2.2 DNS server..
+dig -x IP_Address
+dig @4.2.2.2 google.com # Query DNS using specific server
 ```
+---
 
+## Working with HOSTS file
 
-client.example.local # bu adrese FullyQualifiedDomainName FQDN
-
-## Working with  HOSTS file
-
-hosts  dosyasina asagidaki bicimdede yazabilirsin.
-172.17.17.20 ans-ubuntu.example.local ans-ubuntu
-siralama;  " IP FQDN Hostname " seklinde olur.
-
-vim /etc/hosts
-172.17.17.20 ans-ubuntu # bunu yazinca artik ans-ubuntu icin dns  geregi yok
-mesela
+Format: IP FQDN hostname  
 
 ```bash
-ssh ansible@ans-ubuntu
+vim /etc/hosts
+172.17.17.20 ubuntu.example.local ubuntu
 ```
 
+Local name resolution without DNS.
 
+Example:
+```bash
+ssh ansible@ubuntu
+```
+client.example.local → Fully Qualified Domain Name (FQDN)
+---
 
+## NSSWITCH
 
+`/etc/nsswitch.conf` defines lookup order for user, group, and hostname resolution.
 
-`/etc/nsswitch.conf`, isim çözümleme ve kimlik doğrulama işlemlerinde hangi kaynağın hangi sırayla kullanılacağını belirleyen yapılandırma dosyasıdır.
-örnegin passwd: files ldap  Kimlik bilgileri önce yerel dosyalardan, sonra LDAP’tan alınır.
+Example:
+```conf
+passwd: files sss
+group:  files sss
+hosts:  files dns
+```
 
+Meaning:
+- passwd: local files → SSDS  
+- hosts: /etc/hosts → DNS  
 
-/etc/nsswitch.conf sistemi, kullanıcı, grup, hostname ve benzeri sorguların hangi kaynaktan ve hangi sırayla yapılacağını belirler. Örneğin:
-passwd satırı → Kullanıcı bilgileri aranacak kaynakların sırası.
-group satırı → Grup bilgileri aranacak kaynakların sırası.
-hosts satırı → Hostname/IP çözümleme sırası.
-
-/etc/nsswitch.conf dosyasındaki örnek içerik:
-passwd:     files sss
-group:      files sss
-hosts:      files dns
-Anlamı:
-passwd: files sss → Önce /etc/passwd, sonra SSSD (örn. LDAP) kullanılacak.
-hosts: files dns → IP/hostname çözümlemesinde önce /etc/hosts, sonra DNS kullanılacak.
+---
 
 ## ss
 
-| Status              | Meaning                                      |
-| ------------------- | -------------------------------------------- |
-| LISTEN              | Port is listening.                           |
-| ESTABLISHED         | There is an active connection                |
-| CLOSE_WAIT          | The other side closed, but your side has not |
-| TIME_WAIT           | Connection closed but waiting for a while    |
-| SYN_SENT SYN_RECV   | TCP connection is being established.         |
+| Status            | Meaning                                      |
+|-------------------|----------------------------------------------|
+| LISTEN            | Port is listening                            |
+| ESTABLISHED       | Active connection                            |
+| CLOSE_WAIT        | Remote closed, local still open              |
+| TIME_WAIT         | Closed, waiting before reuse                 |
+| SYN_SENT SYN_RECV | Connection establishment in progress         |
 
+```bash
 ss -tulnw
+```
 
-pgrep  -c ssh   # ssh ile kac baglanti var? dikkat burda tek baglanti gidis-gelis 2  sayilir
-pgrep -a ssh    # ssh ile  ilgili proses sayisi
+---
+
+## Process Check
+
+```bash
+pgrep -c ssh  # Count matching processes
+pgrep -a ssh  # List matching processes
+```
+
+---
 
 ## SFTP 
-SFTP vs RSYNC Use rsync for performance and automation; use SFTP for interactive management and compatibility.
-ANLIK ETKILESIMLI CALISACAKSAN  SFTP KULLAN. SSH tabanli . ekstra bisey kurmana gerek yok
+
+Use SFTP for interactive file transfer over SSH.
+
 ```bash
-sftp> ansible@172.17.17.20
-sftp> get testfile        # downloads the file
-sftp> put /path/to/file   # file upload
-sftp> mkdir etwas_file    # creates a file
-sftp> lls                 # lists the contents of the folder where the machine is locally
+      sftp <user>@<remote_IP>
+sftp> get testfile
+sftp> put /path/to/file
+sftp> mkdir etwas_file
+sftp> lls
 ```
+
+---
 
 ## APACHE 
+
 /var/www/html/index.html
 
+---
 
 ## CASE STUDY 
-ip_A 192.168.1.A
-ip_C 192.168.2.C 
-ip_B 192.168.1.B 192.168.2.B 
-A 192.168.1.B  aginda C 192.168.2.B aginda ve B her iki agdan ipye sahip. A ile C nasil konusacak. 
- - A dan C ye ulasmak icin A nin terminalde
+
+Static routing between networks via intermediate host.
+There re two subnets 192.168.1.0/24 and 10.10.10.0/24
+Host A: 192.168.1.A  
+Host B (Router/Gateway): 192.168.1.B / 10.10.10.B  
+Host C: 10.10.10.C  
+
+To enable communication between A and C, configure static routes: 
+
+From A to C:
 ```bash
-ip route add 192.168.2.B.0/24 via 192.168.1.B
+ip route add 10.10.10.0/24 via 192.168.1.B
 ```
- - C den A ya ulasmak icin C nin terminale
- ```bash
- ip route add 192.168.1.B/24 via 192.168.2.B
- ```
 
+From C to A:
+```bash
+ip route add 192.168.1.0/24 via 10.10.10.B
+```
 
-## Firewall Configuration with `firewalld`
-port assign in RHEL 
-sudo firewall-cmd --permanent --add-port=8080/tcp
-sudo firewall-cmd --reload
+---
+
 
 # Storage and Disk Management
-## 
-fdisk -l gives the list of disks 
-fdisk /dev/nvme0n2  bu bizim VMWare de sonradan ekledigimiz disk 
-df -h disk usage
-du recursively ne varsa döker ortaya
-ncdu bu komutla bulöundugun ditindeki dosya büyüklükleri
-### MOUNT ETME ISLEME 
- mkdir -p /home/enver/Desktop/disk2 
- mkfs.ext4 /dev/nvme0n2   # önce formatladim
- mkdir -p /home/enver/Desktop/disk2 # diski mount edecegim dosyayi olusturdum
- -p ; aradaki parent klasörler yoksa onlarida olusturur
- mount /dev/nvme0n2 /home/enver/Desktop/Disk2   # simdide mount ettim
- Gparted  disk islemlerini komutsuz arayüz ile hallet
 
- Persistent Mounts using `/etc/fstab`
-## ADVANCED RESOURCING
-/usr/etc/security/limits.conf # config file
-ulimit -a # OLD SCHOOL all limitations in the system
-SysRq (Magic SysRq Key), SysRq, çekirdek seviyesinde debugging, süreç sonlandırma, senkronizasyon ve güvenli reboot gibi işlemleri gerçekleştiren bir kurtarma arabirimidir.
-Örnek. Alt + SysRq + REISUB; Kilitlenmiş sistemi güvenli şekilde yeniden başlatmak için kullanılan sıralı komut seti. Sol el ile Alt tuşuna, Sağ el ile PrintScreen/SysRq tuşuna basılı tut. SysRq tuşunu bırakmadan REISUB harflerine sirayla bas. 
+## Disk Identification and Usage
+* `fdisk -l`: Lists all available disks and partitions.
+* `lsblk`: Displays block devices in a tree-like structure (recommended for better visibility).
+* `df -h`: Shows disk space usage in human-readable format.
+* `du -sh *`: Displays the size of files and directories in the current location.
+* `ncdu`: Interactive disk usage analyzer for navigating directory sizes.
+
+## Mounting Procedures
+1.  **Format:** `sudo mkfs.ext4 /dev/nvme0n2` (Formats the disk with the ext4 filesystem).
+2.  **Create Mount Point:** `sudo mkdir -p /mnt/disk2` (`-p` creates parent directories if they do not exist).
+3.  **Mount:** `sudo mount /dev/nvme0n2 /mnt/disk2`
+4.  **Persistent Mount:** Add the entry to `/etc/fstab` to ensure the disk mounts automatically on boot.
+
+
+
+## Advanced Resource Management
+* **/etc/security/limits.conf:** Configuration file for setting user resource limits (e.g., max open files, memory usage).
+* `ulimit -a`: Displays current resource limits for the shell session.
+
+## System Recovery (Magic SysRq)
+The Magic SysRq key is a kernel-level debugging interface used for system recovery and emergency tasks.
+
+* **Emergency Reboot:** `Alt + SysRq + R, E, I, S, U, B` (Safe sequence to reboot a frozen system).
+    * **R:** Sets keyboard to raw mode.
+    * **E:** Sends SIGTERM to all processes.
+    * **I:** Sends SIGKILL to all processes.
+    * **S:** Syncs all mounted filesystems.
+    * **U:** Remounts filesystems as read-only.
+    * **B:** Reboots the system.
+
+
 
 # Security
-## FIREWALLING
-firewall-cmd --list-services # list, get, set, list, remove bunlari  --help icinde ara
-firewall-cmd --runtime-to-permanent # firewall calisirken yaptigin degisiklikleri kalici yapar
+## Firewall Management (firewalld)
+* `firewall-cmd --list-services`: Lists currently active services.
+* `firewall-cmd --runtime-to-permanent`: Saves runtime configurations to permanent rules.
+* **Rich Language:** Extends zone elements with source/destination addresses, logging, and specific actions. 
+    * `man 5 firewalld.richlanguage` (refer to the examples section).
 
-### Rich Language
-The rich language extends the current zone elements (service, port, icmp-block, icmp-type, masquerade, forward-port and source-port) with additional source and destination addresses, logging, actions and limits for logs and actions.
-man 5 firewalld.richlanguage # en sonda örnekler var
-## LINUX OS HARDENING
 
- /etc/login.defs
- /etc/pam.d/system-auth 
 
-- Remove  un-wanted Packages
- rpm -qa kurulu tüm paketleri verir (Debian da "dpkg -l")
-  bir paketi kaldirirken dependiec  kismini dikkat et
+## Linux OS Hardening
+* **Authentication Policies:**
+    * `/etc/login.defs`: Defines system-wide user profile configurations (password aging, UID/GID ranges).
+    * `/etc/pam.d/system-auth`: Configures PAM (Pluggable Authentication Modules) for authentication requirements.
+* **Package Management:**
+    * **Red Hat/CentOS/Fedora:** `rpm -qa` lists all installed packages.
+    * **Debian/Ubuntu:** `dpkg -l` lists all installed packages.
+    * *Note: Always verify dependency impacts before removing packages.*
+* **SSH Security (`/etc/ssh/sshd_config`):**
+    * Change default SSH port.
+    * Set `PermitRootLogin no`.
+    * Apply changes: `systemctl restart sshd`.
+* **Access Control:**
+    * **Firewall:** Enable `firewalld` (use `firewall-config` for GUI or `firewall-cmd` for CLI).
+    * **SELinux:** Enable Security-Enhanced Linux; configuration is located in `/etc/sysconfig/selinux`.
 
- /etc/ssh/sshd_config
- change port enable 
- PermitRootLogin no yap. kimse root olarak baglanamasin
- systemctl restart sshd yapmayi unutma
-- Enable Firewall (firewalld)
- firewall-config bir GUI acar
-  firewall-cmd  --help
-- Enable Selinux
- Security Enhanced linux 
- /etc/sysconfig/selinux burada detaylar var
-- Change listening Services Port numbers
+---
 
-head etwas.txt shows first 10 line of the file
-tail etwas.txt shows last 10 line of the file
-tail -n 20 etwas.txt
-sudo tail -f  /var/log/syslog eklendikce yenileri  görürsün
-
-```bash
- mkdir $(cat folder.txt) 
- cat folder.txt | xargs mkdir # xargs, komut satırında bir veriyi alır, komutlara argüman olarak dönüştürür
-```
-## `GREP` ve `FIND`
-
-```bash
-find  / -name *.doc 2> /dev/null
-sudo updatedb && locate deneme.txt # daha hizli bulur
-grep -c -i Ali names.txt # Dosyada ali isminin kac kere gectigini -c , büyük Kücük harf hassasiyetrinden kurtulmayi -i sagllar. 
-
-grep -r # search in subdirectories
-grep -ri ebenin* # recursively tüm dosya isimleri ve iceriklerinde ebenin kelimesiyle baslayan kelemeleri bulur
-
-whereis # tüm hardawre da aramaz path de arar 
-which  # in farki direk command in nerede calistigini verir
-find / -name *.pdf 2> /dev/null
-find / -size +100M 2> /dev/null
-find / -perm /g=w,o=w 2> /dev/null # w Hakki olan gruplar ve other people bulunur
-find  -perm /4000
-locate # hizli  updatedb
-```
-
-sudo chown cemsit deneme.txt dosyanin owner ini cemsit yapar
-sudo chown -R cemsit Folder_Name # hem klasorun Hemde altinda ne varsa hepinin sahabini degistirdi
-sudo chown -R  cemsit:cemsit klasor/ hem kullanici hem grup degisti
 
 # Filesystem Management
+
+## Searching and Locating
+* `find / -name "*.doc" 2> /dev/null`: Searches for files ending in `.doc` from the root directory.
+* `locate`: Uses `updatedb` for faster file searching.
+* `whereis`: Locates the binary, source, and manual page files for a command.
+* `which`: Displays the full path to a shell command.
+* `grep -ri [pattern] [path]`: Recursively searches for a pattern within files and subdirectories.
+
+
+
+## Permissions and Ownership
+* `chown [user]:[group] [file]`: Changes file owner and group. Use `-R` for recursive changes.
+* `chattr`: Modifies file attributes:
+    * `+i`: Immutable (cannot be modified, deleted, or renamed).
+    * `+a`: Append-only (data can only be added).
+* `umask`: Determines default file creation permissions (e.g., `022` results in `755` for directories).
+
 ## Special Permissions
+* **SUID (`u+s`):** Runs the file with the permissions of the file owner.
+* **SGID (`g+s`):** Inherits the group of the directory for new files created within it.
+* **Sticky Bit (`+t`):** Restricts file deletion within a directory to the owner or root.
 
-`setuid (setguid)`: Dosya; sahibinin (grup) yetkileriyle çalışır `chmod u+s veya (g+s) <dosya>` 
-`setgid` : Klasör; Klasöre eklenen dosyalar aynı grup ile `chmod g+s <klasör>`
-`sticky` : Klasör; Klasördeki dosyalar, sadece sahibi veya root tarafından silinebilir `chmod +t klasör`  
+## Access Control Lists (ACLs)
+Standard permissions are often insufficient; `setfacl` provides granular control.
+* `setfacl -m u:[user]:[perms] [file]`: Grants specific user permissions.
+* `setfacl -d -R -m u:[user]:[perms] [dir]`: Applies default (inherited) permissions recursively.
+* `getfacl [file]`: Displays current ACL settings.
 
-setuid/setgid sadece “komut gibi çalıştırılabilen” dosyalarda anlamlıdır. Metin dosyası yada veri dosyasında etkisi olmaz. kabaca bil yeter. Bugünlerde setfacl kullanilir.
-## `setfacl` ve  `getfacl` 
-setfacl -m u:cemsit:rw deneme.txt enver kullanicisinin üzerinde 
-Hakki olan deneme.txt dosyasina cemsit isimli user atandi (gruba hak taniyacaksan u yerine g yaz)
-gertfacl deneme.txt ile detaylari görürsün.
-
-directory icinde setfacl uygulanir fakat inherited olmasi icin :
-
-sudo setfacl -m u:user1:rw reports/ bununla reports dosyasininicindekilere inherit edemezsin. 
-sudo setfacl  -d -R -m  u:user1:rw reports/ yaparsan asagi Dogru gider
-setfacl -m u:test:--x /root # biseyi calistirma || root listeleme hakki vermez. Sadece gecis yapmayi saglar. baska türlü dosyaya atlayamaz
-setfacl -m u:test:r /root/deneme.txt 
-
-chattr +i dosya.txt # Dosya değiştirilemez
-chattr +a log.txt # Dosyaya sadece ekleme yapılabilir.
-
-umax file olusturulunca otomatik verilecek yetkileri belirler
-
-cat /etc/fstab  file system table
+## Links (Hard vs. Soft)
+* **Hard Link:** `ln [source] [link]`. Shares the same inode. Data remains accessible even if the original file is deleted.
+* **Symbolic Link:** `ln -s [source] [link]`. A pointer to the file path. Deleting the source breaks the link.
 
 
-ls .. what is in the parent dirctory
-ls -d D* bulundugun yerde D ile baslayan directories
-ls -d test_directory test kalsörüyle ilgili özellikler
-tree <Directory_Name>
-ln mainfile.txt  sonradanolusanfile.txt  link yapma  herhangibirinde yaptigin degisiklik digerinde de olusur
 
-file creation default icin umask degeri kullanilir. Mesela 022 aslinda 755 tir. umask degeri 777 den cikarilir umask /etc/bashrc icinde bu degeri degistirebilirsun
+## System Utilities
+* `tree [dir]`: Displays directory contents in a tree structure.
+* `du -h --max-depth=1 /`: Summarizes disk usage for directories one level deep.
+* `/etc/fstab`: Static information about the file systems (used for automatic mounting).
 
-sudo du -h --max-depth=1 /  2>/dev/null  root tan itibren bir dosya aagiya Kadar ne varsa onlaeri ve diskusage leri bulur
+## SELinux Tools
+* `getenforce` / `setenforce`: Checks or changes SELinux status.
+* `semanage`: Manages SELinux policy configurations.
+* `restorecon`: Restores the default security context for files.
+* `getsebool`: Queries SELinux boolean values.
 
-### Hard- Softlink
-
-ln test linktest # test dosyasina hardlink  yaptik. Birini silsen digeri  calismaya devam eder
-ls -li # inode numarasini verir
-ln -s test symlintest # sembolik link olusturur
-ikinci satirtdaki "2" sayisi ayni inode numarasina sahip dosya sayisini gösterir
-
-link olusturma ln -s testdir/file1.txt link1
-rm -rf öpcelenmeden herseyi siler 
-tail -n 1 /etc/group veya /etc/passwd 
-
-### `getenforce`, `setenforce`
-### `semanage`, `restorecon`, `getsebool`
 
 # System Monitoring and Performance
-## I/O Monitoring
-### Monitoring Tools 
 
-ps fax # parent child processes
-top komutu ps den daha iyi
-kill basiert auf PID
-killall basiert auf Processname 
+## Process and System Monitoring
+* `ps fax`: Displays process tree (parent/child relationships).
+* `top` / `htop`: Real-time monitoring of CPU, memory, and running tasks.
+    * In `top`, press `Shift + M` to sort by memory usage.
+* `vmstat`: Reports virtual memory statistics, CPU activity, and system load.
+* `iotop`: Displays real-time disk I/O usage per process. (Install via `dnf install iotop`).
+* `nmon`: Comprehensive system monitoring tool for CPU, memory, network, and disks.
 
 
-- `htop`  # A better, interactive version of `top` with a cleaner UI
-- `top` → press `Enter`, then `Shift + M`  
-  Sorts processes by memory usage
-- `vmstat`  # Reports current memory and system activity
-- `iotop`  # Displays real-time disk read/write by processes
-- `nmon`  # Powerful monitoring tool for all system statistics
-iotop kullanilabilir. dnf  install iotop ile kurmalisin. 
-### dd KOMUTU
-dd if=ornek.iso of=/tmp/kopya.iso bs=1M # Bir dosyayı kopyalama. bs (block size), dd’nin her okuyup yazdığı veri parçasının büyüklüğüdür. 1M, 1 megabaytlık bloklarla okuma/yazma yapılacağı anlamına gelir.
-dd if=/dev/sda of=/tmp/disk.img bs=4M # Bir disk imajı oluşturma
-dd if=ornek.img of=/dev/sdb bs=4M status=progress # Bir imajı diske yazma. status=progress kopyalanan veri miktarını ve hızını terminalde canlı olarak gösterir.
-## KERNEL & KERNEL MODULES
-`findmnt` shows the mounted  devices
-`sudo umount /dev/sr0` ile istedigin cihazi unmoint edersin
-options → bağlama seçenekleri, virgülle ayrılır: 
-- defaults → varsayılan seçenekler
-- noauto → otomatik bağlama yok
-- ro → salt okunur
-- rw → okunabilir ve yazılabilir
 
-kernel tuning: çekirdek seviyesinde performans, güvenlik veya kaynak kullanımını optimize etmek için yapılan ayarlamalardır.
+## Advanced I/O and Disk Utilities
+### The `dd` Command
+Used for low-level copying and conversion of raw data.
+* **Copy file:** `dd if=source.iso of=destination.iso bs=1M`
+* **Create disk image:** `dd if=/dev/sda of=/tmp/disk.img bs=4M`
+* **Write image with progress:** `dd if=source.img of=/dev/sdb bs=4M status=progress`
+
+## Kernel and System Parameters
+### The `/proc` and `/sys` Filesystems (Virtual Interfaces)
+* **/proc:** A virtual filesystem providing kernel and process information.
+    * `/proc/cpuinfo`: CPU specifications.
+    * `/proc/meminfo`: RAM and Swap statistics.
+    * `/proc/uptime`: System operational time.
+* **/sys (sysfs):** Exposes kernel objects, hardware devices, and drivers in a hierarchical structure.
+* **/proc/sys:** Interface for kernel runtime tuning (manually adjustable parameters).
 
 ### Kernel Tuning
-/proc sistem durumu ve kernel parametrelerini izlemek ve değiştirmek için kullanılan sanal bir arayüzdür erçek disk üzerinde fiziksel olarak var olmaz. Amaç: çekirdek ve sistem bilgilerini kullanıcıya sunmak.
-- Dosyalar fiziksel değil, RAM üzerinden çekirdek tarafından oluşturulur.
-- Bazı dosyalar sadece okunur, bazıları ise kernel parametrelerini değiştirmek için yazılabilir.
-- Dinamik içerik. Sistem çalıştıkça içerik güncellenir.
+* **sysctl:** Command-line tool to modify kernel parameters at runtime (stored in `/etc/sysctl.conf` for persistence).
 
-Örnek Dosyalar ve Klasörler
-- /proc/cpuinfo İşlemci bilgileri (model, çekirdek sayısı, hız)
-- /proc/meminfo Bellek durumu (toplam, boş, swap)
-- /proc/uptime  Sistem çalışmaya başladığından beri geçen süre
+## Mount Management
+* `findmnt`: Lists all mounted filesystems.
+* `umount [device]`: Unmounts a filesystem.
+* **Common Mount Options:**
+    * `defaults`: Uses standard settings (rw, suid, dev, exec, auto, nouser, async).
+    * `noauto`: Does not mount automatically at boot.
+    * `ro` / `rw`: Read-only or Read-write access.
 
-`/sys` provide info about devices and their attributes. Donanim ve sürücüler hakkinda bilgi verir. 
+## Boot Operations
+### Emergency Mode (Recovery)
+1. Reboot the system and interrupt the bootloader (usually press `e` at the GRUB menu).
+2. Locate the line starting with `linux` or `linux16`.
+3. Append `systemd.unit=emergency.target` to the end of the line.
+4. Press `Ctrl+x` or `F10` to boot into the emergency shell.
 
-`/proc/sys` Kernelin tuning ve runtime yapılandırma parametrelerini sunar.
-sysctl komutunun doğrudan arayüzüdür.
-
-`/sys` (sysfs): Kernel içindeki donanım, sürücü ve çekirdek nesnelerini hiyerarşik şekilde gösterir. Gerçek zamanlı donanım durum bilgisi sağlar.
-
-## BOOT OPERATIONS
-### Emergency Mode
-- Reboot your system.
-- Interrupt the boot loader countdown (by pressing a key like "e" ).
-- Locate the kernel command line (often starts with linux or linux16).
-- Append systemd.unit=emergency.target to the end of that line.
-- Boot using Ctrl+x or F10, depending on the bootloader instructions). 
-## Reading Logs with `journalctl`
-## Syslog vs. Rsyslog
-Syslog is the basic protocol and original daemon, while Rsyslog is an advanced version with many more features. Rsyslog is modern and default for many Linux distributions. 
+## Log Management
+* **journalctl:** The standard tool for querying and displaying logs from `systemd-journald`.
+* **Syslog vs. Rsyslog:** * **Syslog:** The legacy logging protocol/daemon.
+    * **Rsyslog:** The modern, feature-rich, high-performance successor (standard in most distributions).
+---
 
 # Troubleshooting and Recovery
-##  What Is Troubleshooting in Linux?
 
-Troubleshooting means:
-- Detecting what’s wrong
-- Diagnosing the cause
-- Applying a fix
-- Testing if the fix worked
-
-Recovery is what you do **after something breaks** — like when your system doesn’t boot, or a service crashes.
-
-### LOG MONITORING 
-Log directory /var/log/secure   all login logout activities
-tail -f secure dinamik olarrak log penceresi acik kalir 
-
-httpd apache application log 
-## LINUX LOGGING
-journalctl -u cron.service # cron servisi (unit i ile ilgili) loglari gösterir.
-### Common Troubleshooting Tools and Techniques
-
-| Tool/Command         | Purpose                                      |
-|----------------------|----------------------------------------------|
-| `journalctl`         | View system logs                             |
-| `dmesg`              | View kernel messages                         |
-| `systemctl status`   | Check status of systemd services             |
-| `top`, `htop`        | Monitor CPU and memory usage                 |
-| `ps aux`, `pstree`   | View running processes                       |
-| `strace`             | Trace system calls of a process              |
-| `netstat`, `ss`      | Monitor network connections                  |
-| `ping`, `traceroute` | Check connectivity                           |
-| `lsblk`, `df`, `mount` | Diagnose storage and mount issues          |
-
-load avarage: uptime veya cat /proc/loadavg ile bulunur. son 1, 5 ve 15 dakikalik load avarage (cpu) kullanimini verir. lscpu da degerleri verir 
-
-
-### Example: A Service Isn’t Starting
-
-Your Apache web server isn’t starting. Step-by-step:
-
-```bash
-systemctl status httpd  # Check service status
-journalctl -xeu httpd # View logs
-# Look for errors** like:
-"Permission denied"
-"Port already in use"
-"SELinux denial"
-apachectl configtest  # Check configuration syntax
-systemctl restart httpd # Fix the issue and restart
-```
-
-### Troubleshooting Boot Issues
-
-Sometimes your system fails to boot. Here’s what to try:
-
-### Boot into Rescue Mode or Emergency Mode
-
-1. Reboot the system.
-2. At the GRUB screen, edit the kernel line:
-   - Add `systemd.unit=rescue.target` or `emergency.target`.
-
-This gives you a **minimal shell** for recovery.
-
-### Common Boot Problems
-
-| Symptom                              | Possible Cause                     |
-|--------------------------------------|------------------------------------|
-| Kernel panic                         | Bad initramfs or hardware issues   |
-| Hanging after grub                   | Missing root device                |
-| "Cannot mount root"                  | Filesystem issues or UUID mismatch |
-| Black screen                         | Graphics driver problem            |
-
-### Fixing with Dracut
-
-If initramfs is broken:
-
-```bash
-dracut --force
-```
-
-Or regenerate for a specific kernel:
-
-```bash
-dracut -f /boot/initramfs-$(uname -r).img $(uname -r)
-```
-
-### System Running Slow?
-```bash
-top # CPU Usage
-free -m # Memory Usage
-df -h # Disk Space
-iostat # I/O Wait
-ps aux | grep 'Z'  #Zombie Processes
-```
-### Application Crashes
-
-When an app crashes:
-
-- Use `journalctl` to see logs
-- Use `strace` to trace it: `strace ./appname`
-- Look at core dumps: ` coredumpctl list &&  coredumpctl info <PID>`
-
-DNS problems: Server is not reaxhable
-```bash 
- cat /etc/hosts
- cat /etc/resolv.conf
- cat /etc/nsswitch.conf
- ping gateway
-```
-
-WEBsite or Application is not erreichbar
-ping with ip adress or hostname
-telnet 192.168.178.x 80 port calisip calismadigini gösterir
-/etc/ssh/ssh_config  ssh ile giderken yapilan ayarlar 
-/etc/ssh/sshd_config gelen ssh baglantilaei icin ayarlar
-/var/log/secure  burayi tail -f ile izlersen  canli tüm loginleri görürsün
-cat /etc/fstab  diskle ilgili bilgiler var 
-
-TOP    command 
-PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
-PID: The Process ID — a unique number that identifies each running process.
- USER: The user who owns the process.
- PR: The process's priority for scheduling. 
- Lower numbers mean higher priority. ATAMAYI SYSTEM YAPAR 
- NI: The "nice" value, which affects the priority. 
- Ranges from -20 (highest) to 19 (lowest). KULLANICI ATAMASI
- VIRT: The total virtual memory used by the process, including code, data, and shared libraries.
- RES: The resident memory — the actual physical RAM used by the process.
- SHR: The amount of memory shared with other processes (usually from shared libraries).
- S: The current status of the process:
- R = Running
- S = Sleeping
- D = Uninterruptible sleep
- Z = Zombie
- T = Stopped
- %CPU: The percentage of CPU the process is using.
- %MEM: The percentage of physical RAM the process is using.
- TIME+: The total amount of CPU time the process has used since it started, in minutes and seconds.
- COMMAND: The name of the command that started the process.
- MiB Swap, sisteminizdeki takas alanıdir (swap). 
- RAM yetersiz kaldığında sistemin geçici olarak disk üzerinde kullandığı bellektir.
-WHAT IS SWAP MEMORY?
- Swap memory is a portion of the storage 
- that used as extra virtual memory when the physical RAM is full.
- mevcut memory nin iki kati büyüklükte olmasi tavsiye edilir 
- netstat -rnv gives the IP routing table 
-
-pwconv, şifreleri güvenli bir şekilde saklamak için kullanılır. Şifreler /etc/passwd içindeyse, bu komut onları /etc/shadow'a taşır ve /etc/passwd içindeki şifre alanını x olarak değiştirir.
-
-LAST komutu sisteme login olanlari bulur 
-
-Rollback Update Nedir? Rollback update, bir sistem veya yazılım güncellemesi yapıldıktan sonra, eski (önceki) sürüme geri dönme işlemidir.
-
-sos report komutu  rhel ve rocky linux sistemlerde;
-Sistem hakkında ayrıntılı teşhis bilgileri toplar:
-Donanım bilgileri
-Ağ ayarları
-Servis durumları
-Log dosyaları
-Yüklü paketler
-Çekirdek bilgileri vs. 
+## Understanding Troubleshooting
+Troubleshooting is a structured process to identify, diagnose, and resolve system issues.
+* **Detection:** Identifying symptoms.
+* **Diagnosis:** Analyzing logs and states to find the root cause.
+* **Fix:** Applying a solution.
+* **Verification:** Testing the system to ensure stability.
 
 
 
-VIM Kullanimi
-yy satir yw kelime kopyalar p yapistirir
-dd / de satir / üzerinde oldugu kelimeyi  siler 
-/word yazarsan dosya icindeki ilk "word" kelimesini bulur. Sonra n harfine basarak
-sirasiyla digerlerini bulursun. 
-asagidan yukari arama: shift + g ile dosyanin sonnuna git. 
-Satir numaralarin inasil gösterirsin: escape modda:set number
-3 shift g  ile 3. satira gidersin
-kelime degistirme: kelimenin üstüne gel cw yaz sonra yeni kelimeyi yaz
-## System Architecture and BOOT Process
-## Command Cheat Sheet
-date  uptime(1, 5, 15 dakikalarda cpu kullanimi)   
-hostname   uname   ehich  
-cal 11 1976
-bc calculator
-`cp  -pr`  klasörü icindekilerle  kopyalaar
-`cat  -n`  satirlari numaralandirarak cikti verir
-`cat isimler.txt| sort`    satirlari bas harflerine göre siralar
-&& önce sol taraf  sonra sol calisirsa sag taraf calisir
-echo -e icerdeki özel karakterleri algila
-Bash script te cift tirnak kullan
-tmux (Terminal Multplex Command) terminal ekranini birkac bölmeye ayirir
-bin & sbin :  executables for all & executanles for root  
-Bir script calisacaksa nerelerde aranir 
-PATH=/root/... Mesela deneme.sh dosyasini bu dizinlerden birine tasi Sonra istedigin yerde direk calistir 
-export PATH=$PATH:/home/rocky2/Skripten (Yeni path olusturacaz. Mevcut path i $PATH ile ekledik )
+## Log Monitoring
+Logs are the primary source of diagnostic data.
+* `/var/log/secure`: Authentication and login/logout logs.
+* `journalctl -u <service_name>`: Displays logs for a specific `systemd` unit.
+* `tail -f /var/log/<file>`: Follows log files in real-time.
 
-Thread (İş Parçacığı): Çekirdeklerin aynı anda birden fazla işi işleyebilmesini sağlayan mantıksal işlem yolları. Yani işlemcinin verimliliği artar.
+## Common Diagnostic Tools
+| Tool | Purpose |
+| :--- | :--- |
+| `journalctl` | Query `systemd` logs |
+| `dmesg` | Kernel ring buffer (hardware/driver issues) |
+| `strace` | Traces system calls made by a process |
+| `ss` / `netstat` | Network socket statistics |
+| `iostat` | CPU and I/O statistics |
+| `coredumpctl` | Manage and inspect process core dumps |
 
-&&  baglacida ; gibi kullanilabilir fakat komut1 && komut2 farkli anlama gelir. birinci calisr ise ikinci calisir. ; de birbirinden bagimsiz calisir.
-benzer sekilde komut_1 || komut_2 var. Bu defa sol taraf hata dönerde sag taraf  calisir-  sol taraf calisirsa sag calismaz. XOR gibi 
+## System Resource Metrics (`top` Fields)
+When monitoring `top`, understand these key metrics:
+* **PR (Priority):** Scheduling priority (system-assigned).
+* **NI (Nice):** User-defined priority (-20 to 19).
+* **VIRT:** Total virtual memory size.
+* **RES:** Physical RAM used (Resident Set Size).
+* **SHR:** Shared memory size.
 
-yine `<command> &` ile komut arka planda calisir. 
+## Boot and Recovery
+### Emergency/Rescue Mode
+If the system fails to boot:
+1.  Reboot and interrupt the GRUB menu (press `e`).
+2.  Append `systemd.unit=emergency.target` to the line starting with `linux`.
+3.  Boot (`Ctrl+x`).
+4.  If `initramfs` is corrupt, use `dracut -f` to regenerate it.
 
-# HARiCi
-## BASlarken (SIK kullanilanlar)
+## Advanced File Management and Automation
+* **ACLs (`setfacl` / `getfacl`):** Provides granular permissions beyond standard UGO (User/Group/Other) settings.
+* **`chattr`:** Sets immutable (`+i`) or append-only (`+a`) file attributes.
+* **`umask`:** Determines default permissions for newly created files/directories (e.g., `umask 022` results in `755` for directories).
+* **Command Logic:**
+    * `&&`: Runs the second command only if the first succeeds.
+    * `||`: Runs the second command only if the first fails.
+    * `;`: Runs commands sequentially, regardless of success/failure.
 
 
-```bash
-cut -d : -f 3 /etc/passwd # selects the  3hd column
-```
 
-```bash
-git config --global user.email  "enveronderuslu@gmail.com"  &&  git config --global user.name "Enver Onder Uslu"
+## System Architecture Highlights
+* **`/proc`:** Virtual filesystem for kernel and process state (RAM-based).
+* **`/sys`:** Hierarchical interface for hardware devices and drivers.
+* **Swap:** Virtual memory on disk used when physical RAM is exhausted (recommended size is 2x RAM).
+* **Sosreport:** Generates a comprehensive system diagnostic archive for troubleshooting.
+
+## Essential VIM Shortcuts
+* `yy` / `dd`: Yank (copy) / delete current line.
+* `p`: Paste.
+* `set number`: Display line numbers.
+* `/pattern`: Search forward for a pattern; `n` for next match.
+* `cw`: Change word (deletes word and enters insert mode).
+---
  
-ssh-keygen -t  rsa -b 4096  
-ssh-copy-id -i ~/.ssh/id_rsa.pub remote@192.remote_IP 
- 
-sudo dpkg-reconfigure console-setup  #ubuntu serverda font VGA 16:32 yap cicek 
+# Miscellaneous Utilities and Configuration
 
-```
-### setup vim  color
- open or create   ~/.vimrc
+### Quick Reference Commands
+* `cut -d : -f 3 /etc/passwd`: Selects the 3rd column from `/etc/passwd` using `:` as a delimiter.
+* `git config --global ...`: Sets Git user email and name globally.
+* `ssh-keygen -t rsa -b 4096`: Generates a secure 4096-bit RSA SSH key pair.
+* `ssh-copy-id -i ~/.ssh/id_rsa.pub [user]@[host]`: Copies the public SSH key to the remote host for passwordless login.
+
+### VIM Configuration
+To enable syntax highlighting and color schemes, create or edit `~/.vimrc`:
 ```vim
-# vim ~/.vimrc 
 syntax on
 colorscheme industry
 ```
-### copy with ssh
 
-```bash
-Local to Remote:
-scp -r /path/to/local_folder username@remote_host:/path/to/destination
-Remote to Local:
-scp -r username@remote_host:/path/to/remote_folder /path/to/local_destination
-```
+### Remote File Transfer (SCP)
+* **Local to Remote:** `scp -r /local/path user@host:/remote/path`
+* **Remote to Local:** `scp -r user@host:/remote/path /local/path`
 
-```bash
-sudo usermod -l  fedora1 fedora && sudo usermod -d /home/fedora1 -m fedora1 # user ismi ve homedirectory degistir
-```
+### User Account Management
+* **Rename User and Home Directory:**
+  ```bash
+  sudo usermod -l newname oldname
+  sudo usermod -d /home/newname -m newname
+  ```
 
-```bash
-# gerekirse virtualbox ta sanallara ssh baglantisi icin  port forwarding yaptiktan sonra 
-alias debian1=' ssh  -p 2221 debian1@127.0.0.1'
-# yine gerekirse anahtar tasima icin
-ssh-copy-id -i ~/.ssh/id_rsa.pub -p 2231 fedora1@127.0.0.1
-```
-### sudo derdinden kurtulmak istiyorum: 
-Hedef makinada sunu ekle:
-```bash
-sudo visudo
-boss ALL=(ALL) NOPASSWD: ALL
-# Eğer sadece reboot komutu için yetki vermek istersen:
-test ALL=(ALL) NOPASSWD: /sbin/reboot
-```
+### SSH Aliases and Port Forwarding
+If using VirtualBox or complex networking, use aliases to simplify connections:
+* `alias machine_name='ssh -p [port] [user]@[ip]'`
+* Use `ssh-copy-id -p [port] [user]@[ip]` to transfer keys across custom ports.
+
+### Passwordless Sudo (`visudo`)
+To grant specific users `sudo` privileges without a password:
+* **Full Access:** `boss ALL=(ALL) NOPASSWD: ALL`
+* **Command Specific:** `test ALL=(ALL) NOPASSWD: /sbin/reboot`
+
 ## D-Bus busctl list
 D-Bus (Desktop Bus), Farklı uygulamaların birbirleriyle veri veya komut paylaşmasını sağlar. Merkezi bir iletişim kanalı sağlar. Örneğin, bir uygulama diğerine “bu dosya açıldı” mesajı gönderebilir.
 Bir daemon (genellikle dbus-daemon) sürekli çalışır ve mesajları gönderip alır. Tipik Kullanım: Masaüstü ortamları (GNOME, KDE) ve sistem servisleri arasında iletişim.
