@@ -1,5 +1,7 @@
-```text
-**Linux System Basics (Red Hat–based Systems)** # System and Hardware Info
+
+**Linux System Basics (Red Hat–based Systems)** 
+
+# System and Hardware Info
 
 ```bash
 hostnamectl  # Displays full system metadata and kernel info
@@ -26,7 +28,7 @@ PS1='$ '
 head etwas.txt shows first 10 line of the file
 tail etwas.txt shows last 10 line of the file
 tail -n 20 etwas.txt
-sudo tail -f  /var/log/syslog eklendikce yenileri  görürsün
+sudo tail -f  /var/log/messages eklendikce yenileri  görürsün
 
 ### Use Case: profile.d usage
 To set "vim" as the system-wide default editor:
@@ -453,7 +455,6 @@ ctrl + z islmei arkaya atar. jobs ile bu islemleri görürsün. %1 sana arkada c
 ps auxZ | grep -E 'httpd|COMMAND' # 'httpd|COMMAND' ifadesi, hem httpd içeren satırları hem de başlık satırını (COMMAND) filtreler. Böylece çıktıda işlemler ve sütun başlıkları birlikte görünür.
 
 ps fax # parent child processes
-top komutu ps den daha iyi
 kill basiert auf PID
 killall basiert auf Processname 
 
@@ -628,7 +629,7 @@ hosts:  files dns
 ```
 
 Meaning:
-- passwd: local files → SSDS  
+- passwd: local files → SSSD  
 - hosts: /etc/hosts → DNS  
 
 ---
@@ -716,8 +717,6 @@ ip route add 192.168.1.0/24 via 10.10.10.B
 3.  **Mount:** `sudo mount /dev/nvme0n2 /mnt/disk2`
 4.  **Persistent Mount:** Add the entry to `/etc/fstab` to ensure the disk mounts automatically on boot.
 
-
-
 ## Advanced Resource Management
 * **/etc/security/limits.conf:** Configuration file for setting user resource limits (e.g., max open files, memory usage).
 * `ulimit -a`: Displays current resource limits for the shell session.
@@ -758,7 +757,7 @@ The Magic SysRq key is a kernel-level debugging interface used for system recove
     * Apply changes: `systemctl restart sshd`.
 * **Access Control:**
     * **Firewall:** Enable `firewalld` (use `firewall-config` for GUI or `firewall-cmd` for CLI).
-    * **SELinux:** Enable Security-Enhanced Linux; configuration is located in `/etc/sysconfig/selinux`.
+    * **SELinux:** Enable Security-Enhanced Linux; configuration is located in `/etc/selinux/config`.
 
 ---
 
@@ -935,7 +934,7 @@ If the system fails to boot:
 ### Quick Reference Commands
 * `cut -d : -f 3 /etc/passwd`: Selects the 3rd column from `/etc/passwd` using `:` as a delimiter.
 * `git config --global ...`: Sets Git user email and name globally.
-* `ssh-keygen -t rsa -b 4096`: Generates a secure 4096-bit RSA SSH key pair.
+* `ssh-keygen -t ED25519 -b 4096`: Generates a  SSH key pair. ED25519 artik rsa yerine bu kullamiliyor. 
 * `ssh-copy-id -i ~/.ssh/id_rsa.pub [user]@[host]`: Copies the public SSH key to the remote host for passwordless login.
 
 ### VIM Configuration
