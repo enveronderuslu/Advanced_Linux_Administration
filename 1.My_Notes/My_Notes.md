@@ -1,5 +1,5 @@
 
-**Linux System Basics (Red Hat–based Systems)** 
+**Linux System Basics (Red Hat–based System)** 
 
 # System and Hardware Info
 
@@ -17,7 +17,7 @@ sudo hostnamectl set-hostname <NewName> # Changing System Hostname
 Users have their own `.bashrc` file. To apply changes: `source ~/.bashrc`
 The command `alias` shows all active aliases.
 ```ini
-alias sysupdate='sudo dnf5 -y upgrade'
+alias sysupdate='sudo dnf -y upgrade'
 alias c='clear'
 alias l='ls -laFtr --color=auto --group-directories-first'
 alias ping='ping -c 5'
@@ -408,9 +408,6 @@ loginctl terminate-session <session_number>
 ---
 
 # SYSTEM MONITORING
-
-
-
 
 `top -u user1` user1 ne kullaniyor sadece bunu gösterir
 top 
