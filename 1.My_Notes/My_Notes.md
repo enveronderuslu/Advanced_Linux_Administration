@@ -17,7 +17,7 @@ sudo hostnamectl set-hostname <NewName> # Changing System Hostname
 Users have their own `.bashrc` file. To apply changes: `source ~/.bashrc`
 The command `alias` shows all active aliases.
 ```ini
-alias sysupdate='sudo dnf -y upgrade'
+alias sysupdate='sudo dnf -y update'
 alias c='clear'
 alias l='ls -laFtr --color=auto --group-directories-first'
 alias ping='ping -c 5'
