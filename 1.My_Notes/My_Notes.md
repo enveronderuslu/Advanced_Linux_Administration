@@ -1,4 +1,3 @@
-
 **Linux System Basics (Red Hat–based System)** 
 
 # System and Hardware Info
